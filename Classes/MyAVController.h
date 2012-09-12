@@ -3,6 +3,7 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import <CoreVideo/CoreVideo.h>
 #import <CoreMedia/CoreMedia.h>
+//opencv
 
 /*!
  @class	AVController 
@@ -15,7 +16,9 @@
 	UIImageView *_imageView;
 	CALayer *_customLayer;
 	AVCaptureVideoPreviewLayer *_prevLayer;
+    
 }
+
 
 /*!
  @brief	The capture session takes the input from the camera and capture it
@@ -39,5 +42,7 @@
  @brief	This method initializes the capture session
  */
 - (void)initCapture;
-
+//-(UIImage *) UIImageFromBits:(uint8_t *)planar_addr height:(size_t)height width:(size_t)width;
+-(UIImage *) UIImageFromBits:(uint8_t *)planar_addr height:(size_t)height width:(size_t)width bytesPerRow: (size_t)bytesPerRow;
 @end
+

@@ -3,6 +3,7 @@
 
 @implementation WelcomeViewController
 
+
 - (IBAction)startFlashcodeDetection {
 	[self presentModalViewController:[[MyAVController alloc] init] animated:YES];
 }
