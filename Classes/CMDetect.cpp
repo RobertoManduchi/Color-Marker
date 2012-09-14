@@ -99,28 +99,6 @@ int CMDetect::LoadPars(){
     return 0;
 }
 
-//int CMDetect::WhiteOrNot(unsigned char* pix, int *A, int *B, int *C, int *D)
-int CMDetect::WhiteOrNot(unsigned char* pix, unsigned char *A, unsigned char *B, unsigned char *C, unsigned char *D)
-
-/* is pixel closest to white (A) or to another color (B,C or D)?
- * if evaluation of and (&&) conditions is "strict" rather than "lazy", then could this be sped up?
- * would pointers for WhiteOrNot(), which currently has *many* arguments, speed this up?
- */
-{
-	int da;
-	
-	if (pix[0]==1)
-		return 2; // '2' means that this was already labeled as 'color'
-	da=abs(pix[2]-A[0])+abs(pix[1]-A[1])+abs(pix[0]-A[2]);
-	if (da > abs(pix[2]-B[0])+abs(pix[1]-B[1])+abs(pix[0]-B[2]))
-		return 0;
-	if (da > abs(pix[2]-C[0])+abs(pix[1]-C[1])+abs(pix[0]-C[2]))
-		return 0;
-	if (da > abs(pix[2]-D[0])+abs(pix[1]-D[1])+abs(pix[0]-D[2]))
-		return 0;
-	return 1; // '1' means that this pixel is white
-}
-
 
 // Reads user parameters
 int CMDetect::ParseUserParsXML()
@@ -393,10 +371,6 @@ int CMDetect::FindTarget()
     for (int iP=0; iP<nPerms; iP++) {
         int currPerm = permIndices[iP];
         for (y=P_SHIFT; y<IMAGE_H-P_SHIFT; y++) {
-//            ptrArr[0] = ptr + (y+ps_a2[currPerm])*WIDTH_STEP + 3*(P_SHIFT+ps_a1[currPerm]) ;
-//            ptrArr[1] = ptr + (y+ps_b2[currPerm])*WIDTH_STEP + 3*(P_SHIFT+ps_b1[currPerm]) ;
-//            ptrArr[2] = ptr + (y+ps_c2[currPerm])*WIDTH_STEP + 3*(P_SHIFT+ps_c1[currPerm]) ;
-//            ptrArr[3] = ptr + (y+ps_d2[currPerm])*WIDTH_STEP + 3*(P_SHIFT+ps_d1[currPerm]) ;
             ptrArr[0] = ptr + (y+ps_a2[currPerm])*WIDTH_STEP + 4*(P_SHIFT+ps_a1[currPerm]) ;
             ptrArr[1] = ptr + (y+ps_b2[currPerm])*WIDTH_STEP + 4*(P_SHIFT+ps_b1[currPerm]) ;
             ptrArr[2] = ptr + (y+ps_c2[currPerm])*WIDTH_STEP + 4*(P_SHIFT+ps_c1[currPerm]) ;
@@ -407,8 +381,7 @@ int CMDetect::FindTarget()
                     int cID = classID[id];
                     CMColInd colInd = colClass[cID];
                     
-//                    if (LTF[cID][*(ptrArr[colInd.ind1]+colInd.ind3)][*(ptrArr[colInd.ind2]+colInd.ind3)]){
-                        if (LTF[cID * 256 * 256 + *(ptrArr[colInd.ind1]+colInd.ind3) * 256 + *(ptrArr[colInd.ind2]+colInd.ind3)]){
+                    if (LTF[cID * 256 * 256 + *(ptrArr[colInd.ind1]+colInd.ind3) * 256 + *(ptrArr[colInd.ind2]+colInd.ind3)]){
                         found = 0;
                         break;
                     }
@@ -810,6 +783,7 @@ int CMDetect::FindHornTopBottom(CardPoint topOrBottom, CardPoint leftOrRight)
     int yStart, yEnd;
     int xStart, xEnd;
     
+    
     if (topOrBottom==Top) {
         yStart = max(0,outValues.center.iY - 5 * rad1/4);
         yEnd = min(IMAGE_H-1,outValues.center.iY - 3 * rad1/4);
@@ -822,76 +796,87 @@ int CMDetect::FindHornTopBottom(CardPoint topOrBottom, CardPoint leftOrRight)
     xStart = max(0,outValues.center.iX-rad2);
     xEnd =  min(IMAGE_W-1,outValues.center.iX+rad4);
     
-    if (((yEnd-yStart) < N_DIAG) || ((xEnd-xStart) < N_DIAG)) {
+    int nDiag = (yEnd - yStart)/N_DIAG_RATIO;
+
+    if (nDiag < 3)
+        return 0;
+   
+   if ((xEnd-xStart) < nDiag) {
         return 0;
     }
     
+    xStart += nDiag;
+    xEnd -= nDiag;
+    if (xEnd < xStart)
+        return 0;
+    
+    yEnd -= nDiag;
     
     // Prepare image
                  
     // upper triangular
-    for (int ix = xStart; ix <= xEnd-N_DIAG; ix++){
+    for (int ix = xStart; ix <= xEnd; ix++){
         // first fill
         pixPtr(ix,yStart,ptr)[1] = (unsigned char) (pixPtr(ix,yStart,ptr)[0] == 1);
         
         // we already know that the following is safe
-        for (int j=0; j<=N_DIAG; j++) {
+        for (int j=0; j<=nDiag; j++) {
             pixPtr(ix,yStart,ptr)[1] += (unsigned char) (pixPtr(ix+j,yStart+j,ptr)[0] == 1);
         }
         
         //now go!
-        int jEnd = min(xEnd-N_DIAG-ix, yEnd-N_DIAG-yStart);
+        int jEnd = min(xEnd-ix, yEnd-yStart);
         for (int j = 1; j <= jEnd; j++) {
-            pixPtr(ix+j,yStart+j,ptr)[1] = pixPtr(ix+j-1,yStart+j-1,ptr)[1] + (unsigned char) (pixPtr(ix+j+N_DIAG,yStart+j+N_DIAG,ptr)[0] == 1);
+            pixPtr(ix+j,yStart+j,ptr)[1] = pixPtr(ix+j-1,yStart+j-1,ptr)[1] + (unsigned char) (pixPtr(ix+j+nDiag,yStart+j+nDiag,ptr)[0] == 1);
             pixPtr(ix+j,yStart+j,ptr)[1] -= (unsigned char) (pixPtr(ix+j-1,yStart+j-1,ptr)[0] == 1);
         }
         
     }
     // lower triangular
-    for (int iy = yStart+1; iy <= yEnd-N_DIAG; iy++) {
+    for (int iy = yStart+1; iy <= yEnd; iy++) {
         // first fill
         pixPtr(xStart,iy,ptr)[1] = (unsigned char) (pixPtr(xStart,iy,ptr)[0] == 1);
-        for (int j=0; j<=N_DIAG; j++) {
+        for (int j=0; j<=nDiag; j++) {
             pixPtr(xStart,iy,ptr)[1] += (unsigned char) (pixPtr(xStart+j,iy+j,ptr)[0] == 1);
         }
         //now go!
-        int jEnd = min(xEnd-N_DIAG-xStart, yEnd-N_DIAG-iy);
+        int jEnd = min(xEnd-xStart, yEnd-iy);
         for (int j = 1; j <= jEnd; j++) {
-            pixPtr(xStart+j,iy+j,ptr)[1] = pixPtr(xStart+j-1,iy+j-1,ptr)[1] + (unsigned char) (pixPtr(xStart+j+N_DIAG,iy+j+N_DIAG,ptr)[0] == 1);
+            pixPtr(xStart+j,iy+j,ptr)[1] = pixPtr(xStart+j-1,iy+j-1,ptr)[1] + (unsigned char) (pixPtr(xStart+j+nDiag,iy+j+nDiag,ptr)[0] == 1);
             pixPtr(xStart+j,iy+j,ptr)[1] -= (unsigned char) (pixPtr(xStart+j-1,iy+j-1,ptr)[0] == 1);
         }
         
     }
     
     // upper triangular
-    for (int ix = xStart+N_DIAG; ix <= xEnd; ix++){
+    for (int ix = xStart; ix <= xEnd; ix++){
         // first fill
         pixPtr(ix,yStart,ptr)[2] = (unsigned char) (pixPtr(ix,yStart,ptr)[0] == 1);
         
         // we already know that the following is safe
-        for (int j=0; j<=N_DIAG; j++) {
+        for (int j=0; j<=nDiag; j++) {
             pixPtr(ix,yStart,ptr)[2] += (unsigned char) (pixPtr(ix-j,yStart+j,ptr)[0] == 1);
         }
         
         //now go!
-        int jEnd = min(ix-N_DIAG-xStart, yEnd-N_DIAG-yStart);
+        int jEnd = min(ix-xStart, yEnd-yStart);
         for (int j = 1; j <= jEnd; j++) {
-            pixPtr(ix-j,yStart+j,ptr)[2] = pixPtr(ix-j+1,yStart+j-1,ptr)[2] + (unsigned char) (pixPtr(ix-j-N_DIAG,yStart+j+N_DIAG,ptr)[0] == 1);
+            pixPtr(ix-j,yStart+j,ptr)[2] = pixPtr(ix-j+1,yStart+j-1,ptr)[2] + (unsigned char) (pixPtr(ix-j-nDiag,yStart+j+nDiag,ptr)[0] == 1);
             pixPtr(ix-j,yStart+j,ptr)[2] -= (unsigned char) (pixPtr(ix-j+1,yStart+j-1,ptr)[0] == 1);
         }
         
     }
     // lower triangular
-    for (int iy = yStart+1; iy <= yEnd-N_DIAG; iy++) {
+    for (int iy = yStart+1; iy <= yEnd; iy++) {
         // first fill
         pixPtr(xEnd,iy,ptr)[2] = (unsigned char) (pixPtr(xEnd,iy,ptr)[0] == 1);
-        for (int j=0; j<=N_DIAG; j++) {
+        for (int j=0; j<=nDiag; j++) {
             pixPtr(xEnd,iy,ptr)[2] += (unsigned char) (pixPtr(xEnd-j,iy+j,ptr)[0] == 1);
         }
         //now go!
-        int jEnd = min(xEnd-N_DIAG-xStart, yEnd-N_DIAG-iy);
+        int jEnd = min(xEnd-xStart, yEnd-iy);
         for (int j = 1; j <= jEnd; j++) {
-            pixPtr(xEnd-j,iy+j,ptr)[2] = pixPtr(xEnd-j+1,iy+j-1,ptr)[2] + (unsigned char) (pixPtr(xEnd-j-N_DIAG,iy+j+N_DIAG,ptr)[0] == 1);
+            pixPtr(xEnd-j,iy+j,ptr)[2] = pixPtr(xEnd-j+1,iy+j-1,ptr)[2] + (unsigned char) (pixPtr(xEnd-j-nDiag,iy+j+nDiag,ptr)[0] == 1);
             pixPtr(xEnd-j,iy+j,ptr)[2] -= (unsigned char) (pixPtr(xEnd-j+1,iy+j-1,ptr)[0] == 1);
         }
         
@@ -915,10 +900,10 @@ int CMDetect::FindHornTopBottom(CardPoint topOrBottom, CardPoint leftOrRight)
         }
     }
         
-    for (int iy = yStart+N_DIAG; iy <= yEnd-N_DIAG; iy++) {
-        for (int ix = xStart+N_DIAG; ix < xEnd-N_DIAG; ix++) {
-            countDiag =  s1 * (int) pixPtr(ix-N_DIAG, iy-N_DIAG, ptr)[1] +
-                s2 * (int) pixPtr(ix+N_DIAG, iy-N_DIAG, ptr)[2] +
+    for (int iy = yStart; iy <= yEnd; iy++) {
+        for (int ix = xStart; ix < xEnd; ix++) {
+            countDiag =  s1 * (int) pixPtr(ix-nDiag, iy-nDiag, ptr)[1] +
+                s2 * (int) pixPtr(ix+nDiag, iy-nDiag, ptr)[2] +
                 s3 * (int) pixPtr(ix, iy, ptr)[2] +
                 s4 * (int) pixPtr(ix, iy, ptr)[1];
             
@@ -958,76 +943,88 @@ int CMDetect::FindHornLeftRight(CardPoint leftOrRight, CardPoint topOrBottom)
     yStart = max(0,outValues.center.iY-rad1);
     yEnd =  min(IMAGE_H-1,outValues.center.iY+rad3);
     
-    if (((yEnd-yStart) < N_DIAG) || ((xEnd-xStart) < N_DIAG)) {
+    int nDiag = (xEnd - xStart)/N_DIAG_RATIO;
+    
+    if (nDiag < 3)
+        return 0;
+    
+
+    if ((yEnd-yStart) < nDiag) {
         return 0;
     }
    
+    yStart += nDiag;
+    yEnd -= nDiag;
+    if (yEnd < yStart)
+        return 0;
+    
+    xEnd -= nDiag;
     // Prepare image
    
     
     // upper triangular
-    for (int ix = xStart; ix <= xEnd-N_DIAG; ix++){
+    for (int ix = xStart; ix <= xEnd; ix++){
         // first fill
         pixPtr(ix,yStart,ptr)[1] = (unsigned char) (pixPtr(ix,yStart,ptr)[0] == 1);
         
         // we already know that the following is safe
-        for (int j=0; j<=N_DIAG; j++) {
+        for (int j=0; j<=nDiag; j++) {
             pixPtr(ix,yStart,ptr)[1] += (unsigned char) (pixPtr(ix+j,yStart+j,ptr)[0] == 1);
         }
         
         //now go!
-        int jEnd = min(xEnd-N_DIAG-ix, yEnd-N_DIAG-yStart);
+        int jEnd = min(xEnd-ix, yEnd-yStart);
         for (int j = 1; j <= jEnd; j++) {
-            pixPtr(ix+j,yStart+j,ptr)[1] = pixPtr(ix+j-1,yStart+j-1,ptr)[1] + (unsigned char) (pixPtr(ix+j+N_DIAG,yStart+j+N_DIAG,ptr)[0] == 1);
+            pixPtr(ix+j,yStart+j,ptr)[1] = pixPtr(ix+j-1,yStart+j-1,ptr)[1] + (unsigned char) (pixPtr(ix+j+nDiag,yStart+j+nDiag,ptr)[0] == 1);
             pixPtr(ix+j,yStart+j,ptr)[1] -= (unsigned char) (pixPtr(ix+j-1,yStart+j-1,ptr)[0] == 1);
         }
         
     }
     // lower triangular
-    for (int iy = yStart+1; iy <= yEnd-N_DIAG; iy++) {
+    for (int iy = yStart+1; iy <= yEnd; iy++) {
         // first fill
         pixPtr(xStart,iy,ptr)[1] = (unsigned char) (pixPtr(xStart,iy,ptr)[0] == 1);
-        for (int j=0; j<=N_DIAG; j++) {
+        for (int j=0; j<=nDiag; j++) {
             pixPtr(xStart,iy,ptr)[1] += (unsigned char) (pixPtr(xStart+j,iy+j,ptr)[0] == 1);
         }
         //now go!
-        int jEnd = min(xEnd-N_DIAG-xStart, yEnd-N_DIAG-iy);
+        int jEnd = min(xEnd-xStart, yEnd-iy);
         for (int j = 1; j <= jEnd; j++) {
-            pixPtr(xStart+j,iy+j,ptr)[1] = pixPtr(xStart+j-1,iy+j-1,ptr)[1] + (unsigned char) (pixPtr(xStart+j+N_DIAG,iy+j+N_DIAG,ptr)[0] == 1);
+            pixPtr(xStart+j,iy+j,ptr)[1] = pixPtr(xStart+j-1,iy+j-1,ptr)[1] + (unsigned char) (pixPtr(xStart+j+nDiag,iy+j+nDiag,ptr)[0] == 1);
             pixPtr(xStart+j,iy+j,ptr)[1] -= (unsigned char) (pixPtr(xStart+j-1,iy+j-1,ptr)[0] == 1);
         }
         
     }
     
     // upper triangular
-    for (int ix = xStart+N_DIAG; ix <= xEnd; ix++){
+    for (int ix = xStart; ix <= xEnd; ix++){
         // first fill
         pixPtr(ix,yStart,ptr)[2] = (unsigned char) (pixPtr(ix,yStart,ptr)[0] == 1);
         
         // we already know that the following is safe
-        for (int j=0; j<=N_DIAG; j++) {
+        for (int j=0; j<=nDiag; j++) {
             pixPtr(ix,yStart,ptr)[2] += (unsigned char) (pixPtr(ix-j,yStart+j,ptr)[0] == 1);
         }
         
         //now go!
-        int jEnd = min(ix-N_DIAG-xStart, yEnd-N_DIAG-yStart);
+        int jEnd = min(ix-xStart, yEnd-yStart);
         for (int j = 1; j <= jEnd; j++) {
-            pixPtr(ix-j,yStart+j,ptr)[2] = pixPtr(ix-j+1,yStart+j-1,ptr)[2] + (unsigned char) (pixPtr(ix-j-N_DIAG,yStart+j+N_DIAG,ptr)[0] == 1);
+            pixPtr(ix-j,yStart+j,ptr)[2] = pixPtr(ix-j+1,yStart+j-1,ptr)[2] + (unsigned char) (pixPtr(ix-j-nDiag,yStart+j+nDiag,ptr)[0] == 1);
             pixPtr(ix-j,yStart+j,ptr)[2] -= (unsigned char) (pixPtr(ix-j+1,yStart+j-1,ptr)[0] == 1);
         }
         
     }
     // lower triangular
-    for (int iy = yStart+1; iy <= yEnd-N_DIAG; iy++) {
+    for (int iy = yStart+1; iy <= yEnd; iy++) {
         // first fill
         pixPtr(xEnd,iy,ptr)[2] = (unsigned char) (pixPtr(xEnd,iy,ptr)[0] == 1);
-        for (int j=0; j<=N_DIAG; j++) {
+        for (int j=0; j<=nDiag; j++) {
             pixPtr(xEnd,iy,ptr)[2] += (unsigned char) (pixPtr(xEnd-j,iy+j,ptr)[0] == 1);
         }
         //now go!
-        int jEnd = min(xEnd-N_DIAG-xStart, yEnd-N_DIAG-iy);
+        int jEnd = min(xEnd-xStart, yEnd-iy);
         for (int j = 1; j <= jEnd; j++) {
-            pixPtr(xEnd-j,iy+j,ptr)[2] = pixPtr(xEnd-j+1,iy+j-1,ptr)[2] + (unsigned char) (pixPtr(xEnd-j-N_DIAG,iy+j+N_DIAG,ptr)[0] == 1);
+            pixPtr(xEnd-j,iy+j,ptr)[2] = pixPtr(xEnd-j+1,iy+j-1,ptr)[2] + (unsigned char) (pixPtr(xEnd-j-nDiag,iy+j+nDiag,ptr)[0] == 1);
             pixPtr(xEnd-j,iy+j,ptr)[2] -= (unsigned char) (pixPtr(xEnd-j+1,iy+j-1,ptr)[0] == 1);
         }
         
@@ -1052,10 +1049,10 @@ int CMDetect::FindHornLeftRight(CardPoint leftOrRight, CardPoint topOrBottom)
         }
     }
     
-    for (int iy = yStart+N_DIAG; iy <= yEnd-N_DIAG; iy++) {
-        for (int ix = xStart+N_DIAG; ix < xEnd-N_DIAG; ix++) {
-            countDiag =  s1 * (int) pixPtr(ix-N_DIAG, iy-N_DIAG, ptr)[1] +
-            s2 * (int) pixPtr(ix+N_DIAG, iy-N_DIAG, ptr)[2] +
+    for (int iy = yStart; iy <= yEnd; iy++) {
+        for (int ix = xStart; ix < xEnd; ix++) {
+            countDiag =  s1 * (int) pixPtr(ix-nDiag, iy-nDiag, ptr)[1] +
+            s2 * (int) pixPtr(ix+nDiag, iy-nDiag, ptr)[2] +
             s3 * (int) pixPtr(ix, iy, ptr)[2] +
             s4 * (int) pixPtr(ix, iy, ptr)[1];
 
@@ -1135,6 +1132,7 @@ int CMDetect::FloodSegment(int cx, int cy, short *A, short *B,short *C,short *D)
             { //if (i0,j0) has been included in segmentation:
                 //look among neighbors in outer shell for non-whites (3 neighbors)
                 int i=i0-1; //above
+                
                 for (int j=j0-2; j<=j0+2; j++)
                 {
                     pix = pixPtr(j, i, ptr);
@@ -1166,6 +1164,7 @@ int CMDetect::FloodSegment(int cx, int cy, short *A, short *B,short *C,short *D)
             { //if (i0,j0) has been included in segmentation:
                 //look among neighbors in outer shell for non-whites (3 neighbors)
                 int j=j0-1; //left
+                
                 for (int i=i0-2; i<=i0+2; i++)
                 {
                     pix=pixPtr(j, i, ptr);
@@ -1198,6 +1197,7 @@ int CMDetect::FloodSegment(int cx, int cy, short *A, short *B,short *C,short *D)
             { //if (i0,j0) has been included in segmentation:
                 //look among neighbors in outer shell in outer shell for non-whites (3 neighbors)
                 int i=i0+1; //below
+
                 for (int j=j0-2; j<=j0+2; j++)
                 {
                     pix = pixPtr(j, i, ptr);
@@ -1229,6 +1229,7 @@ int CMDetect::FloodSegment(int cx, int cy, short *A, short *B,short *C,short *D)
             { //if (i0,j0) has been included in segmentation:
                 //look among neighbors for non-whites (3 neighbors)
                 int j=j0+1; //right
+
                 for (int i=i0-2; i<=i0+2; i++)
                 {
                     pix=pixPtr(j, i, ptr);

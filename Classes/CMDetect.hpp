@@ -60,9 +60,9 @@ inline CMColInd _ColInd(int _ind1, int _ind2, int _ind3){
 
 class CMDetect {
    
-    int P_SHIFT = 8;    // default if not loaded in CMUserParams.xml
+    int P_SHIFT;   
     
-    int N_DIAG = 10;    // should change with the apparent size of the target
+    int N_DIAG_RATIO = 4;    // should change with the apparent size of the target
     
     int TOL_SHIFT_RATIO,PT_CLUSTER_THRESHOLD,PT_DISTANCE_THRESHOLD2, MAX_PIXELS1;
     int ps_c1[24],ps_a1[24],ps_d1[24],ps_b1[24],ps_c2[24],ps_a2[24],ps_d2[24],ps_b2[24];
@@ -77,7 +77,6 @@ class CMDetect {
     CMColInd    colClass[18];
     
     unsigned char *LTF;
-//    unsigned char LTF[MAX_CASCADE][256][256];
     
     int permIndices[24], nPerms;
     
@@ -86,9 +85,6 @@ class CMDetect {
     inline unsigned char* pixPtr(int, int, unsigned char*);
     
     int PermShift();
-    
- //   int WhiteOrNot(unsigned char*,int*,int*,int*,int*);
-    int WhiteOrNot(unsigned char*,unsigned char *,unsigned char *,unsigned char *,unsigned char *);
     
     int LoadTable();    
     
