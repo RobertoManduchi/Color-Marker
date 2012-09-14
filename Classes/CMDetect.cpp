@@ -31,6 +31,8 @@
 
 using namespace std;
 
+#define COLOR_CHANNELS  3   // 4 for iPhone, 3 for RGB
+#define DIAG_RATIO  6
 
 CMDetect::CMDetect(string _userParsFileName, string _classParsFileName){
     
@@ -44,7 +46,25 @@ CMDetect::CMDetect(string _userParsFileName, string _classParsFileName){
     PermShift();
     LoadTable();
     ptr = 0;
+    P_SHIFT = 8;
+    N_DIAG_RATIO = DIAG_RATIO;
+    N_CHANNELS = COLOR_CHANNELS;
+}
+
+CMDetect::CMDetect(string _userParsFileName){
     
+    userParsFileName = _userParsFileName;
+    assert(ParseUserParsXML());
+    assert(ParseClassifiersParsXML());
+    ///
+    LTF = new unsigned char [MAX_CASCADE*256*256];
+    LoadPars();
+    PermShift();
+    LoadTable();
+    ptr = 0;
+    P_SHIFT = 8;
+    N_DIAG_RATIO = DIAG_RATIO;
+    N_CHANNELS = COLOR_CHANNELS; 
 }
 
 
@@ -60,6 +80,11 @@ int CMDetect::AccessImage(unsigned char* thePtr, int theWidth,int theHeight, int
     IMAGE_H = theHeight;
     WIDTH_STEP = theWidthStep;
     return 0;
+}
+
+inline unsigned char* CMDetect::pixPtr(int x, int y, unsigned char* origin)
+{
+	return origin + y*WIDTH_STEP + N_CHANNELS*x;
 }
 
 
@@ -173,20 +198,24 @@ int CMDetect::ParseUserParsXML()
     
     currNode = currNode->parent->parent->children;
    
-//    while ((currNode != NULL) && (xmlStrcmp(currNode->name, (const xmlChar *) "ClassifierParameterFileName"))) {
-//        currNode = currNode->next; 
-//    }
-//    if (currNode == NULL) {
-//        result = 0;
-//        goto CLEANUP;
-//    }
-//    
-//    content = xmlNodeListGetString(doc, currNode->xmlChildrenNode, 1);
-//
-//    classParsFileName = (char *) content;
-//    classParsFileName.erase(0, classParsFileName.find_first_not_of(" \t\r\n\v\f"));
-//    classParsFileName.erase(classParsFileName.find_last_not_of(" \t\r\n\v\f")+1);
-//    xmlFree(content);
+    if (classParsFileName.empty()) {
+        // it was not initialized when the detector was created
+            while ((currNode != NULL) && (xmlStrcmp(currNode->name, (const xmlChar *) "ClassifierParameterFileName"))) {
+                currNode = currNode->next;
+            }
+            if (currNode == NULL) {
+                result = 0;
+               goto CLEANUP;
+            }
+        
+            content = xmlNodeListGetString(doc, currNode->xmlChildrenNode, 1);
+        
+            classParsFileName = (char *) content;
+            classParsFileName.erase(0, classParsFileName.find_first_not_of(" \t\r\n\v\f"));
+            classParsFileName.erase(classParsFileName.find_last_not_of(" \t\r\n\v\f")+1);
+            xmlFree(content);
+
+    }
 
     // reset
     currNode = currNode->parent->xmlChildrenNode;
@@ -371,10 +400,10 @@ int CMDetect::FindTarget()
     for (int iP=0; iP<nPerms; iP++) {
         int currPerm = permIndices[iP];
         for (y=P_SHIFT; y<IMAGE_H-P_SHIFT; y++) {
-            ptrArr[0] = ptr + (y+ps_a2[currPerm])*WIDTH_STEP + 4*(P_SHIFT+ps_a1[currPerm]) ;
-            ptrArr[1] = ptr + (y+ps_b2[currPerm])*WIDTH_STEP + 4*(P_SHIFT+ps_b1[currPerm]) ;
-            ptrArr[2] = ptr + (y+ps_c2[currPerm])*WIDTH_STEP + 4*(P_SHIFT+ps_c1[currPerm]) ;
-            ptrArr[3] = ptr + (y+ps_d2[currPerm])*WIDTH_STEP + 4*(P_SHIFT+ps_d1[currPerm]) ;
+            ptrArr[0] = ptr + (y+ps_a2[currPerm])*WIDTH_STEP + N_CHANNELS * (P_SHIFT+ps_a1[currPerm]) ;
+            ptrArr[1] = ptr + (y+ps_b2[currPerm])*WIDTH_STEP + N_CHANNELS * (P_SHIFT+ps_b1[currPerm]) ;
+            ptrArr[2] = ptr + (y+ps_c2[currPerm])*WIDTH_STEP + N_CHANNELS * (P_SHIFT+ps_c1[currPerm]) ;
+            ptrArr[3] = ptr + (y+ps_d2[currPerm])*WIDTH_STEP + N_CHANNELS * (P_SHIFT+ps_d1[currPerm]) ;
             for (x=P_SHIFT; x<IMAGE_W-P_SHIFT; x++) {
                 int found = 1;
                 for (int id=0; id<cascadeLength; id++) {
@@ -396,10 +425,10 @@ int CMDetect::FindTarget()
                     //               a = pixPtr(x, y, ptr);
                     //               a[0] = 0; a[1] = 0; a[2] = 255;
                 }
-                ptrArr[0]+=4;
-                ptrArr[1]+=4;
-                ptrArr[2]+=4;
-                ptrArr[3]+=4;
+                ptrArr[0]+=N_CHANNELS ;
+                ptrArr[1]+=N_CHANNELS;
+                ptrArr[2]+=N_CHANNELS;
+                ptrArr[3]+=N_CHANNELS;
             }
         }
 
@@ -528,37 +557,37 @@ int CMDetect::FindTarget()
     
     ComputeKeypoints(cx, cy);
     
-    for (int iy = max(0,outValues.top.iY-3); iy<= min(IMAGE_H-1,outValues.top.iY+3); iy++) {
-        for (int ix = max(0,outValues.top.iX-3); ix<= min(IMAGE_W-1,outValues.top.iX+3); ix++) {
-            unsigned char * pix = pixPtr(ix, iy, ptr);
-            pix[0]=pix[1]=0; pix[2]=255;
-        }
-    }
-    for (int iy = max(0,outValues.left.iY-3); iy<= min(IMAGE_H-1,outValues.left.iY+3); iy++) {
-        for (int ix = max(0,outValues.left.iX-3); ix<= min(IMAGE_W-1,outValues.left.iX+3); ix++) {
-            unsigned char * pix = pixPtr(ix, iy, ptr);
-            pix[0]=pix[1]=0; pix[2]=255;
-        }
-    }
-    for (int iy = max(0,outValues.right.iY-3); iy<= min(IMAGE_H-1,outValues.right.iY+3); iy++) {
-        for (int ix = max(0,outValues.right.iX-3); ix<= min(IMAGE_W-1,outValues.right.iX+3); ix++) {
-            unsigned char * pix = pixPtr(ix, iy, ptr);
-            pix[0]=pix[1]=0; pix[2]=255;
-        }
-    }
-    for (int iy = max(0,outValues.bottom.iY-3); iy<= min(IMAGE_H-1,outValues.bottom.iY+3); iy++) {
-        for (int ix = max(0,outValues.bottom.iX-3); ix<= min(IMAGE_W-1,outValues.bottom.iX+3); ix++) {
-            unsigned char * pix = pixPtr(ix, iy, ptr);
-            pix[0]=pix[1]=0; pix[2]=255;
-        }
-    }
-    for (int iy = max(0,outValues.center.iY-3); iy<= min(IMAGE_H-1,outValues.center.iY+3); iy++) {
-        for (int ix = max(0,outValues.center.iX-3); ix<= min(IMAGE_W-1,outValues.center.iX+3); ix++) {
-            unsigned char * pix = pixPtr(ix, iy, ptr);
-            pix[0]=pix[1]=0; pix[2]=255;
-        }
-    }
-    
+//    for (int iy = max(0,outValues.top.iY-3); iy<= min(IMAGE_H-1,outValues.top.iY+3); iy++) {
+//        for (int ix = max(0,outValues.top.iX-3); ix<= min(IMAGE_W-1,outValues.top.iX+3); ix++) {
+//            unsigned char * pix = pixPtr(ix, iy, ptr);
+//            pix[0]=pix[1]=0; pix[2]=255;
+//        }
+//    }
+//    for (int iy = max(0,outValues.left.iY-3); iy<= min(IMAGE_H-1,outValues.left.iY+3); iy++) {
+//        for (int ix = max(0,outValues.left.iX-3); ix<= min(IMAGE_W-1,outValues.left.iX+3); ix++) {
+//            unsigned char * pix = pixPtr(ix, iy, ptr);
+//            pix[0]=pix[1]=0; pix[2]=255;
+//        }
+//    }
+//    for (int iy = max(0,outValues.right.iY-3); iy<= min(IMAGE_H-1,outValues.right.iY+3); iy++) {
+//        for (int ix = max(0,outValues.right.iX-3); ix<= min(IMAGE_W-1,outValues.right.iX+3); ix++) {
+//            unsigned char * pix = pixPtr(ix, iy, ptr);
+//            pix[0]=pix[1]=0; pix[2]=255;
+//        }
+//    }
+//    for (int iy = max(0,outValues.bottom.iY-3); iy<= min(IMAGE_H-1,outValues.bottom.iY+3); iy++) {
+//        for (int ix = max(0,outValues.bottom.iX-3); ix<= min(IMAGE_W-1,outValues.bottom.iX+3); ix++) {
+//            unsigned char * pix = pixPtr(ix, iy, ptr);
+//            pix[0]=pix[1]=0; pix[2]=255;
+//        }
+//    }
+//    for (int iy = max(0,outValues.center.iY-3); iy<= min(IMAGE_H-1,outValues.center.iY+3); iy++) {
+//        for (int ix = max(0,outValues.center.iX-3); ix<= min(IMAGE_W-1,outValues.center.iX+3); ix++) {
+//            unsigned char * pix = pixPtr(ix, iy, ptr);
+//            pix[0]=pix[1]=0; pix[2]=255;
+//        }
+//    }
+//    
     // 5- Consistency checks
 
     int SemiMajorAxisY1 = 0, SemiMajorAxisX1 = 0, SemiMajorAxisY2 = 0, SemiMajorAxisX2 = 0;
@@ -798,12 +827,13 @@ int CMDetect::FindHornTopBottom(CardPoint topOrBottom, CardPoint leftOrRight)
     
     int nDiag = (yEnd - yStart)/N_DIAG_RATIO;
 
-    if (nDiag < 3)
-        return 0;
-   
-   if ((xEnd-xStart) < nDiag) {
-        return 0;
+    if (nDiag < 10)
+        nDiag = 10;
+
+    if (nDiag > 200) {
+        nDiag = 200;
     }
+   
     
     xStart += nDiag;
     xEnd -= nDiag;
@@ -811,6 +841,9 @@ int CMDetect::FindHornTopBottom(CardPoint topOrBottom, CardPoint leftOrRight)
         return 0;
     
     yEnd -= nDiag;
+    yStart += nDiag;
+    if (yEnd < yStart)
+        return 0;
     
     // Prepare image
                  
@@ -820,7 +853,7 @@ int CMDetect::FindHornTopBottom(CardPoint topOrBottom, CardPoint leftOrRight)
         pixPtr(ix,yStart,ptr)[1] = (unsigned char) (pixPtr(ix,yStart,ptr)[0] == 1);
         
         // we already know that the following is safe
-        for (int j=0; j<=nDiag; j++) {
+        for (int j=1; j<=nDiag; j++) {
             pixPtr(ix,yStart,ptr)[1] += (unsigned char) (pixPtr(ix+j,yStart+j,ptr)[0] == 1);
         }
         
@@ -836,7 +869,7 @@ int CMDetect::FindHornTopBottom(CardPoint topOrBottom, CardPoint leftOrRight)
     for (int iy = yStart+1; iy <= yEnd; iy++) {
         // first fill
         pixPtr(xStart,iy,ptr)[1] = (unsigned char) (pixPtr(xStart,iy,ptr)[0] == 1);
-        for (int j=0; j<=nDiag; j++) {
+        for (int j=1; j<=nDiag; j++) {
             pixPtr(xStart,iy,ptr)[1] += (unsigned char) (pixPtr(xStart+j,iy+j,ptr)[0] == 1);
         }
         //now go!
@@ -854,7 +887,7 @@ int CMDetect::FindHornTopBottom(CardPoint topOrBottom, CardPoint leftOrRight)
         pixPtr(ix,yStart,ptr)[2] = (unsigned char) (pixPtr(ix,yStart,ptr)[0] == 1);
         
         // we already know that the following is safe
-        for (int j=0; j<=nDiag; j++) {
+        for (int j=1; j<=nDiag; j++) {
             pixPtr(ix,yStart,ptr)[2] += (unsigned char) (pixPtr(ix-j,yStart+j,ptr)[0] == 1);
         }
         
@@ -870,7 +903,7 @@ int CMDetect::FindHornTopBottom(CardPoint topOrBottom, CardPoint leftOrRight)
     for (int iy = yStart+1; iy <= yEnd; iy++) {
         // first fill
         pixPtr(xEnd,iy,ptr)[2] = (unsigned char) (pixPtr(xEnd,iy,ptr)[0] == 1);
-        for (int j=0; j<=nDiag; j++) {
+        for (int j=1; j<=nDiag; j++) {
             pixPtr(xEnd,iy,ptr)[2] += (unsigned char) (pixPtr(xEnd-j,iy+j,ptr)[0] == 1);
         }
         //now go!
@@ -945,12 +978,11 @@ int CMDetect::FindHornLeftRight(CardPoint leftOrRight, CardPoint topOrBottom)
     
     int nDiag = (xEnd - xStart)/N_DIAG_RATIO;
     
-    if (nDiag < 3)
-        return 0;
+    if (nDiag < 10)
+        nDiag = 10;
     
-
-    if ((yEnd-yStart) < nDiag) {
-        return 0;
+    if (nDiag > 200) {
+        nDiag = 200;
     }
    
     yStart += nDiag;
@@ -959,6 +991,9 @@ int CMDetect::FindHornLeftRight(CardPoint leftOrRight, CardPoint topOrBottom)
         return 0;
     
     xEnd -= nDiag;
+    xStart += nDiag;
+    if (xEnd < xStart)
+        return 0;
     // Prepare image
    
     
@@ -968,7 +1003,7 @@ int CMDetect::FindHornLeftRight(CardPoint leftOrRight, CardPoint topOrBottom)
         pixPtr(ix,yStart,ptr)[1] = (unsigned char) (pixPtr(ix,yStart,ptr)[0] == 1);
         
         // we already know that the following is safe
-        for (int j=0; j<=nDiag; j++) {
+        for (int j=1; j<=nDiag; j++) {
             pixPtr(ix,yStart,ptr)[1] += (unsigned char) (pixPtr(ix+j,yStart+j,ptr)[0] == 1);
         }
         
@@ -984,7 +1019,7 @@ int CMDetect::FindHornLeftRight(CardPoint leftOrRight, CardPoint topOrBottom)
     for (int iy = yStart+1; iy <= yEnd; iy++) {
         // first fill
         pixPtr(xStart,iy,ptr)[1] = (unsigned char) (pixPtr(xStart,iy,ptr)[0] == 1);
-        for (int j=0; j<=nDiag; j++) {
+        for (int j=1; j<=nDiag; j++) {
             pixPtr(xStart,iy,ptr)[1] += (unsigned char) (pixPtr(xStart+j,iy+j,ptr)[0] == 1);
         }
         //now go!
@@ -1002,7 +1037,7 @@ int CMDetect::FindHornLeftRight(CardPoint leftOrRight, CardPoint topOrBottom)
         pixPtr(ix,yStart,ptr)[2] = (unsigned char) (pixPtr(ix,yStart,ptr)[0] == 1);
         
         // we already know that the following is safe
-        for (int j=0; j<=nDiag; j++) {
+        for (int j=1; j<=nDiag; j++) {
             pixPtr(ix,yStart,ptr)[2] += (unsigned char) (pixPtr(ix-j,yStart+j,ptr)[0] == 1);
         }
         
@@ -1018,7 +1053,7 @@ int CMDetect::FindHornLeftRight(CardPoint leftOrRight, CardPoint topOrBottom)
     for (int iy = yStart+1; iy <= yEnd; iy++) {
         // first fill
         pixPtr(xEnd,iy,ptr)[2] = (unsigned char) (pixPtr(xEnd,iy,ptr)[0] == 1);
-        for (int j=0; j<=nDiag; j++) {
+        for (int j=1; j<=nDiag; j++) {
             pixPtr(xEnd,iy,ptr)[2] += (unsigned char) (pixPtr(xEnd-j,iy+j,ptr)[0] == 1);
         }
         //now go!
@@ -1030,7 +1065,7 @@ int CMDetect::FindHornLeftRight(CardPoint leftOrRight, CardPoint topOrBottom)
         
     }
     
-    int    s1 = -1, s2 = -1, s3 = -1, s4 = 1;
+    int    s1 = -1, s2 = -1, s3 = -1, s4 = -1;
     
     if (leftOrRight==Left) {
         if (topOrBottom==Top) {
@@ -1326,7 +1361,7 @@ int CMDetect::ComputeKeypoints(int cx, int cy)
             break;
     }
    
-    
+    return 1;
 }
 
 // Computes probes for different permutations
@@ -1493,12 +1528,10 @@ int CMDetect::LoadTable(){
         for (int j=0; j<256; j++) {
             for (int i=0; i<256; i++) {
                 float diff = (float)j - (classPar_m[id] * (float)i + 0.5);
-                if ( diff >  classPar_b1[id] || diff < -classPar_b2[id] )
-//                    LTF[id][j][i] = 1;
+                if (diff >  classPar_b1[id] || diff < -classPar_b2[id] )
                     LTF[id* 256 * 256 + j* 256 +i] = 1;
                 else
-//                    LTF[id][j][i] =  0;
-                LTF[id* 256 * 256 + j* 256 +i] =  0;
+                    LTF[id* 256 * 256 + j* 256 +i] =  0;
             }
         }
     }

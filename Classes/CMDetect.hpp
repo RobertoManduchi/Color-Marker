@@ -21,10 +21,6 @@
 
 #include "string"
 
-/************** TO BE SET BY THE USER **************************/
-// Full pathname of the user parameter file. 
-#define USERPARSFILENAME   "CMUserParams.xml"
-/***************************************************************/
 
 struct CMPoint {
     int iX;
@@ -62,7 +58,7 @@ class CMDetect {
    
     int P_SHIFT;   
     
-    int N_DIAG_RATIO = 4;    // should change with the apparent size of the target
+    int N_DIAG_RATIO;   
     
     int TOL_SHIFT_RATIO,PT_CLUSTER_THRESHOLD,PT_DISTANCE_THRESHOLD2, MAX_PIXELS1;
     int ps_c1[24],ps_a1[24],ps_d1[24],ps_b1[24],ps_c2[24],ps_a2[24],ps_d2[24],ps_b2[24];
@@ -104,12 +100,14 @@ class CMDetect {
     
     int FloodSegment(int,int, short*, short*, short*, short*);
     
-    int rad1, rad2, rad3, rad4;
+    
+    int N_CHANNELS;
     
    
 public:
     
     CMDetect (std::string _userParsFileName, std::string _classParsFileName);
+    CMDetect (std::string _userParsFileName);
     ~CMDetect();
     
     int AccessImage(unsigned char*,int,int,int);
@@ -117,20 +115,18 @@ public:
     int ParseClassifiersParsXML();
     int ParseUserParsXML();
 
-    std::string  userParsFileName = USERPARSFILENAME;
+    std::string  userParsFileName;
     
     int     perm;
     unsigned char*  ptr;
-    int     IMAGE_W,IMAGE_H,WIDTH_STEP;
+    int     IMAGE_W;
+    int     IMAGE_H;
+    int     WIDTH_STEP;
     std::string  classParsFileName;
     
     CMOutput outValues;
-    
+    int rad1, rad2, rad3, rad4;
+   
 };
 
-inline unsigned char* CMDetect::pixPtr(int x, int y, unsigned char* origin)
-{
-//	return origin + y*WIDTH_STEP + 3*x;
-	return origin + y*WIDTH_STEP + 4*x;
-}
 
