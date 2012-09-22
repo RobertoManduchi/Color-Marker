@@ -5,7 +5,7 @@
 @implementation MyAVControllerAppDelegate
 
 @synthesize window;
-@synthesize viewController;
+//@synthesize viewController;
 
 
 #pragma mark -
@@ -16,9 +16,11 @@
     // Override point for customization after application launch.
 
     // Add the view controller's view to the window and display.
-    [window addSubview:viewController.view];
-    [window makeKeyAndVisible];
 
+//    // RM 9/16
+//    [window addSubview:viewController.view];
+//    [window makeKeyAndVisible];
+//
     return YES;
 }
 
@@ -64,11 +66,11 @@
 }
 
 
-- (void)dealloc {
-    [viewController release];
-    [window release];
-    [super dealloc];
-}
+//- (void)dealloc {
+//    [viewController release];
+//    [window release];
+//    [super dealloc];
+//}
 
 
 @end

@@ -25,6 +25,9 @@
 		7D60E2F715F3276B00C17888 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D60E2F615F3276B00C17888 /* libxml2.dylib */; };
 		7D60E2F915F328FC00C17888 /* test8-30_4.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7D60E2F815F328FC00C17888 /* test8-30_4.xml */; };
 		7D60E2FC15F3291000C17888 /* CMDetect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D60E2FA15F3291000C17888 /* CMDetect.cpp */; };
+		7DB91E4F160D41F00054F941 /* iPhone-9-21-12.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7DB91E4E160D41F00054F941 /* iPhone-9-21-12.xml */; };
+		7DEC12D31606DEBC0043202D /* MyAVController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DEC12D21606DEBC0043202D /* MyAVController.xib */; };
+		7DEC12D61606E60B0043202D /* Storyboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7DEC12D51606E60B0043202D /* Storyboard.storyboard */; };
 		E871D51B12E78A4900E59564 /* ucscvision.jpg in Resources */ = {isa = PBXBuildFile; fileRef = E871D51A12E78A4900E59564 /* ucscvision.jpg */; };
 /* End PBXBuildFile section */
 
@@ -53,6 +56,9 @@
 		7D60E2F815F328FC00C17888 /* test8-30_4.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "test8-30_4.xml"; sourceTree = "<group>"; };
 		7D60E2FA15F3291000C17888 /* CMDetect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CMDetect.cpp; sourceTree = "<group>"; };
 		7D60E2FB15F3291000C17888 /* CMDetect.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CMDetect.hpp; sourceTree = "<group>"; };
+		7DB91E4E160D41F00054F941 /* iPhone-9-21-12.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "iPhone-9-21-12.xml"; sourceTree = "<group>"; };
+		7DEC12D21606DEBC0043202D /* MyAVController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MyAVController.xib; path = Classes/MyAVController.xib; sourceTree = "<group>"; };
+		7DEC12D51606E60B0043202D /* Storyboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Storyboard.storyboard; path = Classes/Storyboard.storyboard; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* MyAVController-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "MyAVController-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 		E871D4EE12E782BC00E59564 /* libcv.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcv.a; sourceTree = "<group>"; };
 		E871D4EF12E782BD00E59564 /* libcxcore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcxcore.a; sourceTree = "<group>"; };
@@ -127,6 +133,9 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				7DB91E4E160D41F00054F941 /* iPhone-9-21-12.xml */,
+				7DEC12D51606E60B0043202D /* Storyboard.storyboard */,
+				7DEC12D21606DEBC0043202D /* MyAVController.xib */,
 				7D60E2F815F328FC00C17888 /* test8-30_4.xml */,
 				7D60E2F315F3202100C17888 /* CMUserParams.xml */,
 				E871D51A12E78A4900E59564 /* ucscvision.jpg */,
@@ -219,6 +228,9 @@
 				E871D51B12E78A4900E59564 /* ucscvision.jpg in Resources */,
 				7D60E2F515F3202100C17888 /* CMUserParams.xml in Resources */,
 				7D60E2F915F328FC00C17888 /* test8-30_4.xml in Resources */,
+				7DEC12D31606DEBC0043202D /* MyAVController.xib in Resources */,
+				7DEC12D61606E60B0043202D /* Storyboard.storyboard in Resources */,
+				7DB91E4F160D41F00054F941 /* iPhone-9-21-12.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

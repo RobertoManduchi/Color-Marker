@@ -64,6 +64,7 @@ class CMDetect {
     int ps_c1[24],ps_a1[24],ps_d1[24],ps_b1[24],ps_c2[24],ps_a2[24],ps_d2[24],ps_b2[24];
     
     float   classPar_m[18], classPar_b1[18], classPar_b2[18];
+    int     classPar_t_min_1[18], classPar_t_min_2[18], classPar_t_max_1[18], classPar_t_max_2[18];
     int     classID[18];
     
     int     cascadeLength;

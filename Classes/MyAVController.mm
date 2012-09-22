@@ -6,10 +6,11 @@
 NSString * path = [[NSBundle mainBundle] pathForResource:  @"CMUserParams" ofType: @"xml"];
 std::string userParsFileName = [path cStringUsingEncoding:1];
 
-NSString * path2  = [[NSBundle mainBundle] pathForResource:  @"test8-30_4" ofType: @"xml"];
+NSString * path2  = [[NSBundle mainBundle] pathForResource:  @"iPhone-9-21-12" ofType: @"xml"];
 std::string classParsFileName = [path2 cStringUsingEncoding:1];
 
 CMDetect theDetector(userParsFileName,classParsFileName);
+// When am I going to destroy it ?!?!?!?
 //////////
 
 
@@ -31,6 +32,8 @@ int nFrames;
 		self.imageView = nil;
 		self.prevLayer = nil;
 		self.customLayer = nil;
+        
+        self.shouldTakeSnapshot = NO;
 	}
 	return self;
 }
@@ -73,7 +76,10 @@ int nFrames;
     
 	/*And we create a capture session*/
 	self.captureSession = [[AVCaptureSession alloc] init];
-	self.captureSession.sessionPreset = AVCaptureSessionPreset640x480;//AVCaptureSessionPreset352x288;//;AVCaptureSessionPresetMedium;//AVCaptureSessionPreset640x480;//AVCaptureSessionPreset352x288;
+	self.captureSession.sessionPreset = AVCaptureSessionPreset640x480;
+//    self.captureSession.sessionPreset = AVCaptureSessionPreset352x288;
+    
+//    AVCaptureSessionPreset352x288;//;AVCaptureSessionPresetMedium;//AVCaptureSessionPreset640x480;//AVCaptureSessionPreset352x288;
 	
     
 	/*We add input and output*/
@@ -107,25 +113,24 @@ int nFrames;
  { 
  float start_time = clock();
  
- printf("captureOutput was called \n");
+//     printf("captureOutput was called \n");
  
- /*We create an autorelease pool because as we are not in the main_queue our code is
- not executed in the main thread. So we have to create an autorelease pool for the thread we are in*/
-// Get CVImage from sample buffer
-//CVImageBufferRef cvImage = CMSampleBufferGetImageBuffer(sampleBuffer);
-NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+     /*We create an autorelease pool because as we are not in the main_queue our code is
+     not executed in the main thread. So we have to create an autorelease pool for the thread we are in*/
 
-CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer); 
-/*Lock the image buffer*/
-CVPixelBufferLockBaseAddress(imageBuffer,0); 
+     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+
+     CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer); 
+    /*Lock the image buffer*/
+     CVPixelBufferLockBaseAddress(imageBuffer,0); 
 
      uint8_t *baseAddress = (uint8_t *)CVPixelBufferGetBaseAddress(imageBuffer);
  
- // Get the number of bytes per row for the pixel buffer
- size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer); 
- // Get the pixel buffer width and height
- size_t width = CVPixelBufferGetWidth(imageBuffer); 
- size_t height = CVPixelBufferGetHeight(imageBuffer); 
+     // Get the number of bytes per row for the pixel buffer
+     size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer); 
+     // Get the pixel buffer width and height
+     size_t width = CVPixelBufferGetWidth(imageBuffer); 
+     size_t height = CVPixelBufferGetHeight(imageBuffer); 
  
      // RM - test
      
@@ -148,6 +153,22 @@ CVPixelBufferLockBaseAddress(imageBuffer,0);
      theDetector.AccessImage((unsigned char*)base, width, height ,bytesPerRow);
      theDetector.FindTarget();
      
+#ifdef INVERTEVERYFEWFFRAMES
+     if ((nFrames++ % 10) == 0){
+         nFrames = 1;
+         uint8_t *tp1, *tp2;
+         tp1 = base;
+         for (int iy=0;iy<height; iy++,tp1 += bytesPerRow){
+             tp2 = tp1;
+             for (int ix=0 ;ix<bytesPerRow;ix+=4,tp2+=4){
+                 *tp2 = 255 - *tp2;
+                 *(tp2+1) = 255 - *(tp2+1);
+                 *(tp2+2) = 255 - *(tp2+2);
+             }
+         }
+     }
+#endif
+     
      ////
 #else
 /// RM 6/15 
@@ -158,7 +179,7 @@ CVPixelBufferLockBaseAddress(imageBuffer,0);
          tp2 = tp1;
          for (int ix=0 ;ix<bytesPerRow;ix+=4,tp2+=4){
  //            *tp2 = *(tp2+2);
-             *(tp2+2)=255;
+ //            *(tp2+2)=255;
          }
       }
      // RM - test
@@ -169,38 +190,76 @@ CVPixelBufferLockBaseAddress(imageBuffer,0);
       
      /////
      
- // Create a device-dependent RGB color space
+     // Create a device-dependent RGB color space
      CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB(); 
  
- // Create a bitmap graphics context with the sample buffer data
- CGContextRef context = CGBitmapContextCreate(baseAddress, width, height, 8, 
-                                              bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst); 
- // Create a Quartz image from the pixel data in the bitmap graphics context
- CGImageRef quartzImage = CGBitmapContextCreateImage(context); 
- // Unlock the pixel buffer
- CVPixelBufferUnlockBaseAddress(imageBuffer,0);
+     // Create a bitmap graphics context with the sample buffer data
+     CGContextRef context = CGBitmapContextCreate(baseAddress, width, height, 8, 
+                                                  bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst); 
+     // Create a Quartz image from the pixel data in the bitmap graphics context
+     CGImageRef quartzImage = CGBitmapContextCreateImage(context); 
+
+     // Unlock the pixel buffer
+     CVPixelBufferUnlockBaseAddress(imageBuffer,0);
 
      // Free up the context and color space
      CGContextRelease(context);
      CGColorSpaceRelease(colorSpace);
 
- // Create an image object from the Quartz image
-//     UIImage *image = [UIImage imageWithCGImage:quartzImage];
+     // Create an image object from the Quartz image
+     // UIImage *image = [UIImage imageWithCGImage:quartzImage];
      UIImage *image = [UIImage imageWithCGImage:quartzImage scale:(CGFloat)1 orientation:UIImageOrientationRight];
+     
+     
+     if ((self.shouldTakeSnapshot) && ((clock() - time1) / (double)CLOCKS_PER_SEC) > 1.) {
+         NSMutableString *imageName = [NSMutableString string];
+         
+         
+//         imageName = [NSString stringWithFormat:@"%d",self.indPicture++]; //%d or %i both is ok.
+         imageName = [NSMutableString stringWithFormat:@"%d",self.indPicture++]; //%d or %i both is ok.
+         
+//         [imageName insertString:@"image" atIndex: (NSUInteger) 0];
+         [imageName appendString:@".png"];
+         // test RM 9/15 - save image
+         NSData *pngData = UIImagePNGRepresentation(image);
+         //     NSData *jpgData = UIImageJPEGRepresentation(image, 1.0);
+         
+         //save to the default 100Apple(Camera Roll) folder.
+         
+         //     [pngData writeToFile:@"/private/var/mobile/Media/DCIM/100APPLE/customImageFilename.jpg" atomically:NO];
+         
+         
+         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+         NSString *documentsPath = [paths objectAtIndex:0]; //Get the docs directory
+//         NSString *filePath = [documentsPath stringByAppendingPathComponent:@"image.png"]; //Add the file name
+         NSString *filePath = [documentsPath stringByAppendingPathComponent:imageName]; //Add the file name
+         
+         //     NSString *filePath = @"/private/var/mobile/Media/DCIM/100APPLE/customImageFilename.PNG";
+          [pngData writeToFile:filePath atomically:YES]; //
+         self.shouldTakeSnapshot = NO;
+         
+     }
+     
+     //     NSString *filePath = @"/private/var/mobile/Media/DCIM/100APPLE/IMG_0050.JPG";
+//     [jpgData writeToFile:filePath atomically:NO]; //Write the file
+//     [jpgData writeToFile:@"/private/var/mobile/Media/DCIM/100APPLE/IMG_0050.JPG" atomically:NO]; //Write the file
  
- // Release the Quartz image
- CGImageRelease(quartzImage);     
+//     UIImageWriteToSavedPhotosAlbum(image,nil,nil,nil);
+     
+     // Release the Quartz image
+     CGImageRelease(quartzImage);     
     
 //notice we use this selector to call our setter method 'setImg' Since only the main thread can update this 
 
-if (nFrames++ % 1 == 0)
-    [self.imageView performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:YES];    
+//     if ((nFrames++ % 1) == 0){
+//         nFrames = 1;
+         [self.imageView performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:YES];
+//     }
+     
 
-float time_in_seconds = (clock() - start_time) / (double)CLOCKS_PER_SEC;
-printf("%f time spent processing frame\n",time_in_seconds); 
+//    float time_in_seconds = (clock() - start_time) / (double)CLOCKS_PER_SEC;
+//    printf("%f time spent processing frame\n",time_in_seconds);
 
-/*We unlock the  image buffer*/
-//CVPixelBufferUnlockBaseAddress(imageBuffer,0);
 
 [pool drain];
 } 
@@ -250,7 +309,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
     
     float time_in_seconds = (clock() - start_time) / (double)CLOCKS_PER_SEC;
-    printf("%f time spent processing frame\n",time_in_seconds); 
+    printf("%f time spent processing frame\n",time_in_seconds);
     
     /*We unlock the  image buffer*/
     CVPixelBufferUnlockBaseAddress(imageBuffer,0);
@@ -305,4 +364,11 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 }
 
 
+//- (IBAction)takeSnapshot:(id)sender {
+//}
+- (IBAction)takeSnapshot:(id)sender {
+    
+    self.shouldTakeSnapshot = YES;
+    time1 = clock();
+}
 @end

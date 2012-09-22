@@ -31,7 +31,7 @@
 
 using namespace std;
 
-#define COLOR_CHANNELS  3   // 4 for iPhone, 3 for RGB
+#define COLOR_CHANNELS  4   // 4 for iPhone, 3 for RGB
 #define DIAG_RATIO  6
 
 CMDetect::CMDetect(string _userParsFileName, string _classParsFileName){
@@ -79,7 +79,7 @@ int CMDetect::AccessImage(unsigned char* thePtr, int theWidth,int theHeight, int
     IMAGE_W = theWidth;
     IMAGE_H = theHeight;
     WIDTH_STEP = theWidthStep;
-    return 0;
+    return 1;
 }
 
 inline unsigned char* CMDetect::pixPtr(int x, int y, unsigned char* origin)
@@ -91,7 +91,7 @@ inline unsigned char* CMDetect::pixPtr(int x, int y, unsigned char* origin)
 // This loads all of the internal parameters. 
 int CMDetect::LoadPars(){
     TOL_SHIFT_RATIO = 3;         
-    PT_CLUSTER_THRESHOLD = 5;
+    PT_CLUSTER_THRESHOLD = 15;  // RM test 9/18
     PT_DISTANCE_THRESHOLD2 = 4;
     MAX_PIXELS1 = (int)(MAX_PIXELS-5);      // why???
     
@@ -121,7 +121,7 @@ int CMDetect::LoadPars(){
     colClass[16] =  _ColInd(3, 2, 1);
     colClass[17] =  _ColInd(3, 2, 0);
     
-    return 0;
+    return 1;
 }
 
 
@@ -350,8 +350,61 @@ int CMDetect::ParseClassifiersParsXML()
         }
         content = xmlNodeListGetString(doc, currNode->xmlChildrenNode, 1);
         classPar_b2[classID[i]]= atof((char *)content);
- 
+        
         //cout << "b2 " << content << '\n';
+        
+        xmlFree(content);
+        while ((currNode != NULL) && (xmlStrcmp(currNode->name, (const xmlChar *) "t_min_1"))) {
+            currNode = currNode->next;
+        }
+        if (currNode == NULL) {
+            result = 0;
+            goto CLEANUP;
+        }
+        content = xmlNodeListGetString(doc, currNode->xmlChildrenNode, 1);
+        classPar_t_min_1[classID[i]]= atoi((char *)content);
+        
+        cout << "t_min_1 " << content << '\n';
+        
+        xmlFree(content);
+        while ((currNode != NULL) && (xmlStrcmp(currNode->name, (const xmlChar *) "t_min_2"))) {
+            currNode = currNode->next;
+        }
+        if (currNode == NULL) {
+            result = 0;
+            goto CLEANUP;
+        }
+        content = xmlNodeListGetString(doc, currNode->xmlChildrenNode, 1);
+        classPar_t_min_2[classID[i]]= atoi((char *)content);
+        
+        cout << "t_min_2 " << content << '\n';
+
+        xmlFree(content);
+        while ((currNode != NULL) && (xmlStrcmp(currNode->name, (const xmlChar *) "t_max_1"))) {
+            currNode = currNode->next;
+        }
+        if (currNode == NULL) {
+            result = 0;
+            goto CLEANUP;
+        }
+        content = xmlNodeListGetString(doc, currNode->xmlChildrenNode, 1);
+        classPar_t_max_1[classID[i]]= atoi((char *)content);
+        
+        cout << "t_max_1 " << content << '\n';
+        
+        
+        xmlFree(content);
+        while ((currNode != NULL) && (xmlStrcmp(currNode->name, (const xmlChar *) "t_max_2"))) {
+            currNode = currNode->next;
+        }
+        if (currNode == NULL) {
+            result = 0;
+            goto CLEANUP;
+        }
+        content = xmlNodeListGetString(doc, currNode->xmlChildrenNode, 1);
+        classPar_t_max_2[classID[i]]= atoi((char *)content);
+        
+        cout << "t_max_2 " << content << '\n';
         
         xmlFree(content);
        
@@ -422,8 +475,8 @@ int CMDetect::FindTarget()
                         cntr[currPerm]++;
                     }
                     // debug RM 8/24
-                    //               a = pixPtr(x, y, ptr);
-                    //               a[0] = 0; a[1] = 0; a[2] = 255;
+//                   unsigned char * a = pixPtr(x, y, ptr);
+//                   a[0] = 0; a[1] = 0; a[2] = 255;
                 }
                 ptrArr[0]+=N_CHANNELS ;
                 ptrArr[1]+=N_CHANNELS;
@@ -462,7 +515,7 @@ int CMDetect::FindTarget()
     // cntr[perm] has the number of detected pixels for the winning permutation
     
     if (maxScore < PT_CLUSTER_THRESHOLD)
-         return 0;  // no points found
+         return maxScore;  // no points found
     
     unsigned char *pix;
 
@@ -557,37 +610,37 @@ int CMDetect::FindTarget()
     
     ComputeKeypoints(cx, cy);
     
-//    for (int iy = max(0,outValues.top.iY-3); iy<= min(IMAGE_H-1,outValues.top.iY+3); iy++) {
-//        for (int ix = max(0,outValues.top.iX-3); ix<= min(IMAGE_W-1,outValues.top.iX+3); ix++) {
-//            unsigned char * pix = pixPtr(ix, iy, ptr);
-//            pix[0]=pix[1]=0; pix[2]=255;
-//        }
-//    }
-//    for (int iy = max(0,outValues.left.iY-3); iy<= min(IMAGE_H-1,outValues.left.iY+3); iy++) {
-//        for (int ix = max(0,outValues.left.iX-3); ix<= min(IMAGE_W-1,outValues.left.iX+3); ix++) {
-//            unsigned char * pix = pixPtr(ix, iy, ptr);
-//            pix[0]=pix[1]=0; pix[2]=255;
-//        }
-//    }
-//    for (int iy = max(0,outValues.right.iY-3); iy<= min(IMAGE_H-1,outValues.right.iY+3); iy++) {
-//        for (int ix = max(0,outValues.right.iX-3); ix<= min(IMAGE_W-1,outValues.right.iX+3); ix++) {
-//            unsigned char * pix = pixPtr(ix, iy, ptr);
-//            pix[0]=pix[1]=0; pix[2]=255;
-//        }
-//    }
-//    for (int iy = max(0,outValues.bottom.iY-3); iy<= min(IMAGE_H-1,outValues.bottom.iY+3); iy++) {
-//        for (int ix = max(0,outValues.bottom.iX-3); ix<= min(IMAGE_W-1,outValues.bottom.iX+3); ix++) {
-//            unsigned char * pix = pixPtr(ix, iy, ptr);
-//            pix[0]=pix[1]=0; pix[2]=255;
-//        }
-//    }
-//    for (int iy = max(0,outValues.center.iY-3); iy<= min(IMAGE_H-1,outValues.center.iY+3); iy++) {
-//        for (int ix = max(0,outValues.center.iX-3); ix<= min(IMAGE_W-1,outValues.center.iX+3); ix++) {
-//            unsigned char * pix = pixPtr(ix, iy, ptr);
-//            pix[0]=pix[1]=0; pix[2]=255;
-//        }
-//    }
-//    
+    for (int iy = max(0,outValues.top.iY-3); iy<= min(IMAGE_H-1,outValues.top.iY+3); iy++) {
+        for (int ix = max(0,outValues.top.iX-3); ix<= min(IMAGE_W-1,outValues.top.iX+3); ix++) {
+            unsigned char * pix = pixPtr(ix, iy, ptr);
+            pix[0]=pix[1]=0; pix[2]=255;
+        }
+    }
+    for (int iy = max(0,outValues.left.iY-3); iy<= min(IMAGE_H-1,outValues.left.iY+3); iy++) {
+        for (int ix = max(0,outValues.left.iX-3); ix<= min(IMAGE_W-1,outValues.left.iX+3); ix++) {
+            unsigned char * pix = pixPtr(ix, iy, ptr);
+            pix[0]=pix[1]=0; pix[2]=255;
+        }
+    }
+    for (int iy = max(0,outValues.right.iY-3); iy<= min(IMAGE_H-1,outValues.right.iY+3); iy++) {
+        for (int ix = max(0,outValues.right.iX-3); ix<= min(IMAGE_W-1,outValues.right.iX+3); ix++) {
+            unsigned char * pix = pixPtr(ix, iy, ptr);
+            pix[0]=pix[1]=0; pix[2]=255;
+        }
+    }
+    for (int iy = max(0,outValues.bottom.iY-3); iy<= min(IMAGE_H-1,outValues.bottom.iY+3); iy++) {
+        for (int ix = max(0,outValues.bottom.iX-3); ix<= min(IMAGE_W-1,outValues.bottom.iX+3); ix++) {
+            unsigned char * pix = pixPtr(ix, iy, ptr);
+            pix[0]=pix[1]=0; pix[2]=255;
+        }
+    }
+    for (int iy = max(0,outValues.center.iY-3); iy<= min(IMAGE_H-1,outValues.center.iY+3); iy++) {
+        for (int ix = max(0,outValues.center.iX-3); ix<= min(IMAGE_W-1,outValues.center.iX+3); ix++) {
+            unsigned char * pix = pixPtr(ix, iy, ptr);
+            pix[0]=pix[1]=0; pix[2]=255;
+        }
+    }
+    
     // 5- Consistency checks
 
     int SemiMajorAxisY1 = 0, SemiMajorAxisX1 = 0, SemiMajorAxisY2 = 0, SemiMajorAxisX2 = 0;
@@ -614,7 +667,7 @@ int CMDetect::FindTarget()
     if (CONSISTENCYCHECK1) {
         if (! ((2*SemiMajorAxisX1 < 3*SemiMajorAxisX2) && (2*SemiMajorAxisX2 < 3*SemiMajorAxisX1) &&
         (2*SemiMajorAxisY1 < 3*SemiMajorAxisY2) && (2*SemiMajorAxisY2 < 3*SemiMajorAxisY1)) )
-                return 0;
+                return 11;
     }
     
     // Consistency check 2: area
@@ -622,7 +675,7 @@ int CMDetect::FindTarget()
         float 	theoreticalArea;
         theoreticalArea = (3./4.)*3.14*(float)SemiAxis.iX*(float)SemiAxis.iY;
         if (! (((float)Area > (3./4.)*theoreticalArea) && (theoreticalArea > (3./4.)*(float)Area)) )
-            return 0;
+            return 12;
     }
                 
     // Consistency check 3: perimeter
@@ -648,7 +701,7 @@ int CMDetect::FindTarget()
         }
         
         if (! (((float)Perimeter > (6./7.)*theoreticalPerimeter) && (theoreticalPerimeter > (6./7.)*(float)Perimeter)))
-            return 0;
+            return 13;
     }
         
     return 1;
@@ -814,12 +867,20 @@ int CMDetect::FindHornTopBottom(CardPoint topOrBottom, CardPoint leftOrRight)
     
     
     if (topOrBottom==Top) {
-        yStart = max(0,outValues.center.iY - 5 * rad1/4);
-        yEnd = min(IMAGE_H-1,outValues.center.iY - 3 * rad1/4);
+        int hBord = min(rad1,max(40,rad1/4));
+        yStart = max(0,outValues.center.iY - rad1 - hBord);
+        yEnd = min(IMAGE_W-1,outValues.center.iY - rad1 + hBord);
+
+//        yStart = max(0,outValues.center.iY - 6 * rad1/4);
+//        yEnd = min(IMAGE_H-1,outValues.center.iY - 2 * rad1/4);
     }
     else {
-        yStart = max(0,outValues.center.iY+ 3 * rad3/4);
-        yEnd = min(IMAGE_H-1,outValues.center.iY+ 5 * rad3/4);
+        int hBord = min(rad3,max(40,rad3/4));
+        yStart = max(0,outValues.center.iY + rad3 - hBord);
+        yEnd = min(IMAGE_W-1,outValues.center.iY + rad3 + hBord);
+        
+//        yStart = max(0,outValues.center.iY+ 2 * rad3/4);
+//        yEnd = min(IMAGE_H-1,outValues.center.iY+ 6 * rad3/4);
     }
     
     xStart = max(0,outValues.center.iX-rad2);
@@ -964,13 +1025,20 @@ int CMDetect::FindHornLeftRight(CardPoint leftOrRight, CardPoint topOrBottom)
     int maxDiag = 0, countDiag;
     int xStart, xEnd, yStart, yEnd;
     
+    
     if (leftOrRight==Left) {
-        xStart = max(0,outValues.center.iX - 5 * rad2/4);
-        xEnd = min(IMAGE_W-1,outValues.center.iX - 3 * rad2/4);
+        int hBord = min(rad2,max(40,rad2/4));
+//        xStart = max(0,outValues.center.iX - 6 * rad2/4);
+//        xEnd = min(IMAGE_W-1,outValues.center.iX - 2 * rad2/4);
+        xStart = max(0,outValues.center.iX - rad2 - hBord);
+        xEnd = min(IMAGE_W-1,outValues.center.iX - rad2 + hBord);
     }
     else {
-        xStart = max(0,outValues.center.iX+ 3 * rad4/4);
-        xEnd = min(IMAGE_W-1,outValues.center.iX+ 5 * rad4/4);
+        int hBord = min(rad4,max(40,rad4/4));
+//        xStart = max(0,outValues.center.iX+ 2 * rad4/4);
+//        xEnd = min(IMAGE_W-1,outValues.center.iX+ 6 * rad4/4);
+        xStart = max(0,outValues.center.iX+ rad4 - hBord);
+        xEnd = min(IMAGE_W-1,outValues.center.iX+ rad4 + hBord);
     }
     
     yStart = max(0,outValues.center.iY-rad1);
@@ -1524,14 +1592,72 @@ int CMDetect::PermShift()
 
 // Loads look-up classifier table
 int CMDetect::LoadTable(){
+    
+    // note: '0' means 'detect'    
+    
     for (int id = 0; id < 18; id++){
         for (int j=0; j<256; j++) {
             for (int i=0; i<256; i++) {
                 float diff = (float)j - (classPar_m[id] * (float)i + 0.5);
-                if (diff >  classPar_b1[id] || diff < -classPar_b2[id] )
+//                float diff = (float)j - (classPar_m[id] * (float)i);
+                if (diff >  classPar_b1[id] || diff < classPar_b2[id] )
                     LTF[id* 256 * 256 + j* 256 +i] = 1;
                 else
                     LTF[id* 256 * 256 + j* 256 +i] =  0;
+            }
+        }
+        
+        // saturation zone.
+        
+        int SAT_VALUE = 240;    // this should be imported from the xml file
+        
+        int maxX1 = min(255, (int) ((255. - classPar_b1[id])/classPar_m[id]));
+        int maxY1 = min(255, (int) (classPar_m[id] * 255. +classPar_b1[id]));
+        int maxX2 = min(255, (int) ((255. - classPar_b2[id])/classPar_m[id]));
+        int maxY2 = min(255, (int) (classPar_m[id] * 255. +classPar_b2[id]));
+        
+        int maxXStart = min(maxX1, maxX2);
+        int maxXEnd = min(255,2 * max(maxX1, maxX2));
+
+        int maxYStart = min(maxY1, maxY2);
+        int maxYEnd = min(255,2 * max(maxY1, maxY2));
+        
+        // anything below the smallest value found (divided by margin ratio) in each channel is set to '1' ('not detect')
+        
+        for (int i=0; i < classPar_t_min_1[id]; i++)
+            for (int j = 0; j <= 255; j++)
+                LTF[id* 256 * 256 + j* 256 +i] = 1;
+
+        for (int j = 0; j < classPar_t_min_2[id]; j++)
+            for (int i=0; i <= 255; i++)
+                LTF[id* 256 * 256 + j* 256 +i] = 1;
+        
+        // anything above the largest value found (multiplied by margin ratio) in each channel is set to '1' ('not detect'). Unless the max is in thesaturation region. Then we assume that it can grow indefinitely, so we set to '0' ('detect') all values that could be obtained with that channel saturating.
+        
+        if (classPar_t_max_1[id] < SAT_VALUE) {
+            for (int i=classPar_t_max_1[id]+1; i<=255; i++)
+                for (int j = 0; j <= 255; j++)
+                    LTF[id* 256 * 256 + j* 256 +i] = 1;
+        }
+        else {
+            for (int j=maxYStart; j<=maxYEnd; j++) {
+                for (int i=SAT_VALUE; i<=255; i++) {
+                    LTF[id* 256 * 256 + j* 256 +i] = 0;
+                }
+            }
+        }
+        
+        if (classPar_t_max_2[id] < SAT_VALUE) {
+            for (int j = classPar_t_max_2[id]+1; j<=255; j++)
+                for (int i=0; i <= 255; i++)
+                    LTF[id* 256 * 256 + j* 256 +i] = 1;
+            
+        }
+        else {
+            for (int i=maxXStart; i<=maxXEnd; i++) {
+                for (int j=SAT_VALUE; j<=255; j++) {
+                    LTF[id* 256 * 256 + j* 256 +i] = 0;
+                }
             }
         }
     }

@@ -17,8 +17,18 @@
 	CALayer *_customLayer;
 	AVCaptureVideoPreviewLayer *_prevLayer;
     
+    BOOL    _shouldTakeSnapshot;
+    
+    int     _indPicture;
+    float   time1,time2;
+    
+    
 }
 
+- (IBAction)takeSnapshot:(id)sender;
+
+@property (nonatomic) BOOL shouldTakeSnapshot;
+@property (nonatomic) int indPicture;
 
 /*!
  @brief	The capture session takes the input from the camera and capture it
