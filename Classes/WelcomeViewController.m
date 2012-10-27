@@ -6,7 +6,7 @@
 
 
 - (IBAction)startFlashcodeDetection {
-	[self  presentViewController:[[MyAVController alloc] init] animated:YES completion: NULL];
+	[self  p3:[[MyAVController alloc] init] animated:YES completion: NULL];
 //    - (IBAction)startFlashcodeDetection {
 //        [self presentModalViewController:[[MyAVController alloc] init] animated:YES];
 }

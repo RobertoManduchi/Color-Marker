@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<root>
+
+<DesignParameters>
+
+<BackgroundImagesFolder>
+./bckgr_images/
+</BackgroundImagesFolder>
+
+<TrainingDataFile>
+test8-30_4.mat
+</TrainingDataFile>
+
+<BackgroundImageSuffix>
+.png
+</BackgroundImageSuffix>
+
+<EigenspaceDimension>
+4D
+</EigenspaceDimension>
+
+<Intercept>
+1
+</Intercept>
+
+<SaturatedPointRemoval>
+0
+</SaturatedPointRemoval>
+
+<MarginRatio>
+1.100000e+00
+</MarginRatio>
+
+</DesignParameters>
+
+<ClassifierParameters>
+
+<Classifier id="5">
+<m>7.403278e-01</m>
+<b1>-1.041184e+02</b1>
+<b2>1.407040e+02</b2>
+</Classifier>
+
+<Classifier id="15">
+<m>6.332649e+01</m>
+<b1>-1.564640e+04</b1>
+<b2>1.615051e+04</b2>
+</Classifier>
+
+<Classifier id="1">
+<m>1.095168e-02</m>
+<b1>2.544796e+02</b1>
+<b2>-2.465266e+02</b2>
+</Classifier>
+
+<Classifier id="9">
+<m>8.514156e-03</m>
+<b1>2.538211e+02</b1>
+<b2>-2.459806e+02</b2>
+</Classifier>
+
+<Classifier id="14">
+<m>5.192277e-01</m>
+<b1>-5.200575e+01</b1>
+<b2>8.693070e+01</b2>
+</Classifier>
+
+<Classifier id="12">
+<m>5.094748e-01</m>
+<b1>-4.874678e+01</b1>
+<b2>7.693227e+01</b2>
+</Classifier>
+
+<Classifier id="16">
+<m>5.534766e-01</m>
+<b1>-3.824046e+01</b1>
+<b2>6.517280e+01</b2>
+</Classifier>
+
+<Classifier id="10">
+<m>5.391716e-01</m>
+<b1>-4.302368e+01</b1>
+<b2>8.950252e+01</b2>
+</Classifier>
+
+<Classifier id="2">
+<m>6.935314e-01</m>
+<b1>-1.936910e+01</b1>
+<b2>5.275987e+01</b2>
+</Classifier>
+
+<Classifier id="13">
+<m>5.677637e-01</m>
+<b1>-2.074839e+01</b1>
+<b2>8.087783e+01</b2>
+</Classifier>
+
+<Classifier id="0">
+<m>1.286291e+00</m>
+<b1>9.411949e+01</b1>
+<b2>-3.391666e+01</b2>
+</Classifier>
+
+<Classifier id="4">
+<m>1.337595e+00</m>
+<b1>-1.098543e+02</b1>
+<b2>1.406543e+02</b2>
+</Classifier>
+
+<Classifier id="6">
+<m>2.030661e+00</m>
+<b1>8.940170e+01</b1>
+<b2>-6.821254e+00</b2>
+</Classifier>
+
+<Classifier id="11">
+<m>9.204992e-01</m>
+<b1>-9.068670e+00</b1>
+<b2>3.324554e+01</b2>
+</Classifier>
+
+<Classifier id="8">
+<m>1.054375e+00</m>
+<b1>-2.697246e+01</b1>
+<b2>6.684816e+01</b2>
+</Classifier>
+
+<Classifier id="3">
+<m>1.453119e+00</m>
+<b1>-9.338682e+01</b1>
+<b2>1.323852e+02</b2>
+</Classifier>
+
+<Classifier id="17">
+<m>9.145136e-01</m>
+<b1>-3.169161e-01</b1>
+<b2>6.435973e+01</b2>
+</Classifier>
+
+<Classifier id="7">
+<m>1.152936e+00</m>
+<b1>1.554311e+01</b1>
+<b2>5.546523e+01</b2>
+</Classifier>
+
+</ClassifierParameters>
+</root>
+

@@ -1,5 +1,6 @@
 #import "MyAVController.h"
 #import "CMDetect.hpp"
+#import "CMAudio.h"
 
 
 // Test 9/1
@@ -13,7 +14,10 @@ CMDetect theDetector(userParsFileName,classParsFileName);
 // When am I going to destroy it ?!?!?!?
 //////////
 
+// RM 10/25
+CMAudio* theBeep = [[CMAudio alloc] init];  // when am I going to deallocate it?x
 
+////
 @implementation MyAVController
 
 @synthesize captureSession = _captureSession;
@@ -45,6 +49,11 @@ int nFrames;
 
 
 - (void)initCapture {
+    
+    // RM 10/26
+    
+    [theBeep playIt:@"beep-7" andType:@"mp3"];
+    
     
 	/*We setup the input*/
     AVCaptureDeviceInput *captureInput = [AVCaptureDeviceInput 
@@ -105,6 +114,8 @@ int nFrames;
 }
 
 
+
+
 /*** RM 6/15 - test ***/
 #if 1
  - (void)captureOutput:(AVCaptureOutput *)captureOutput 
@@ -148,6 +159,7 @@ int nFrames;
 //     std::string classParsFileName = [path cStringUsingEncoding:1];
 //
 //     CMDetect theDetector(userParsFileName,classParsFileName);
+     
      
 #if 1
      theDetector.AccessImage((unsigned char*)base, width, height ,bytesPerRow);
@@ -360,6 +372,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 - (void)dealloc {
 	[self.captureSession release];
+    [theBeep release];
     [super dealloc];
 }
 
