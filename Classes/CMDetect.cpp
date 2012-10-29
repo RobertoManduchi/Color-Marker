@@ -171,10 +171,13 @@ int CMDetect::ParseUserParsXML()
     nPerms = atoi((char *)content);
     xmlFree(content);
 
-    // reset
-    currNode = currNode->parent->xmlChildrenNode;
+//    // reset
+//    currNode = currNode->parent->xmlChildrenNode;
     
     for (int id=0; id<nPerms; id++) {
+        // reset
+        currNode = currNode->parent->xmlChildrenNode;
+
         while ((currNode != NULL) && (xmlStrcmp(currNode->name, (const xmlChar *) "PermutationIndex"))) {
             currNode = currNode->next;
         }
@@ -475,8 +478,8 @@ int CMDetect::FindTarget()
                         cntr[currPerm]++;
                     }
                     // debug RM 8/24
-//                   unsigned char * a = pixPtr(x, y, ptr);
-//                   a[0] = 0; a[1] = 0; a[2] = 255;
+                   unsigned char * a = pixPtr(x, y, ptr);
+                   a[0] = 0; a[1] = 0; a[2] = 255;
                 }
                 ptrArr[0]+=N_CHANNELS ;
                 ptrArr[1]+=N_CHANNELS;
@@ -515,7 +518,8 @@ int CMDetect::FindTarget()
     // cntr[perm] has the number of detected pixels for the winning permutation
     
     if (maxScore < PT_CLUSTER_THRESHOLD)
-         return maxScore;  // no points found
+//        return maxScore;  // no points found
+        return 0;  // no points found
     
     unsigned char *pix;
 
@@ -667,7 +671,8 @@ int CMDetect::FindTarget()
     if (CONSISTENCYCHECK1) {
         if (! ((2*SemiMajorAxisX1 < 3*SemiMajorAxisX2) && (2*SemiMajorAxisX2 < 3*SemiMajorAxisX1) &&
         (2*SemiMajorAxisY1 < 3*SemiMajorAxisY2) && (2*SemiMajorAxisY2 < 3*SemiMajorAxisY1)) )
-                return 11;
+//            return 11;
+            return 0;
     }
     
     // Consistency check 2: area
@@ -675,7 +680,8 @@ int CMDetect::FindTarget()
         float 	theoreticalArea;
         theoreticalArea = (3./4.)*3.14*(float)SemiAxis.iX*(float)SemiAxis.iY;
         if (! (((float)Area > (3./4.)*theoreticalArea) && (theoreticalArea > (3./4.)*(float)Area)) )
-            return 12;
+//            return 12;
+            return 0;
     }
                 
     // Consistency check 3: perimeter
@@ -701,7 +707,8 @@ int CMDetect::FindTarget()
         }
         
         if (! (((float)Perimeter > (6./7.)*theoreticalPerimeter) && (theoreticalPerimeter > (6./7.)*(float)Perimeter)))
-            return 13;
+//            return 13;
+            return 0;
     }
         
     return 1;
@@ -869,7 +876,9 @@ int CMDetect::FindHornTopBottom(CardPoint topOrBottom, CardPoint leftOrRight)
     if (topOrBottom==Top) {
         int hBord = min(rad1,max(40,rad1/4));
         yStart = max(0,outValues.center.iY - rad1 - hBord);
-        yEnd = min(IMAGE_W-1,outValues.center.iY - rad1 + hBord);
+// Bug? RM 10/26
+//        yEnd = min(IMAGE_W-1,outValues.center.iY - rad1 + hBord);
+        yEnd = min(IMAGE_H-1,outValues.center.iY - rad1 + hBord);
 
 //        yStart = max(0,outValues.center.iY - 6 * rad1/4);
 //        yEnd = min(IMAGE_H-1,outValues.center.iY - 2 * rad1/4);
@@ -877,7 +886,9 @@ int CMDetect::FindHornTopBottom(CardPoint topOrBottom, CardPoint leftOrRight)
     else {
         int hBord = min(rad3,max(40,rad3/4));
         yStart = max(0,outValues.center.iY + rad3 - hBord);
-        yEnd = min(IMAGE_W-1,outValues.center.iY + rad3 + hBord);
+// Bug? RM 10/26
+//        yEnd = min(IMAGE_W-1,outValues.center.iY + rad3 + hBord);
+        yEnd = min(IMAGE_H-1,outValues.center.iY + rad3 + hBord);
         
 //        yStart = max(0,outValues.center.iY+ 2 * rad3/4);
 //        yEnd = min(IMAGE_H-1,outValues.center.iY+ 6 * rad3/4);

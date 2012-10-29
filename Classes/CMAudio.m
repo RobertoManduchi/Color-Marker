@@ -11,26 +11,39 @@
 
 @implementation CMAudio
 
-- (void) playIt:(NSString*)sndTxt andType:(NSString*)sndType {
-	
+- (id) initWithName:(NSString*)sndTxt andType:(NSString*)sndType
+{
 	NSString *path = [[NSBundle mainBundle] pathForResource:sndTxt ofType:sndType];
-	
-//	self.theAudio = [[AVAudioPlayer alloc] init]; // <<=== ???
-	self.theAudio = [AVAudioPlayer alloc]; // <<=== ???
-    
-    
-    
+
+	self.theAudio = [AVAudioPlayer alloc]; 
+
 	if([self.theAudio initWithContentsOfURL:[NSURL fileURLWithPath:path] error:NULL]) {
 		[self.theAudio autorelease];
-	}
+  	}
 	else {
 		[self.theAudio release];
 		self.theAudio = nil;
+        return nil;
 	}
 	[self.theAudio setDelegate:self];
-	
     self.theAudio.numberOfLoops = (NSInteger)-1;
-	[self.theAudio play];
+    
+    return self;
+}
+
+- (void) playIt {
+    
+    if (!self.theAudio.isPlaying) {
+        [self.theAudio play];
+    }
+    
+}
+- (void) pauseIt {
+    
+    if (self.theAudio.isPlaying) {
+        [self.theAudio pause];
+    }
+    
 }
 
 - (void)dealloc {

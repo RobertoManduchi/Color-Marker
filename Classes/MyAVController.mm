@@ -3,6 +3,7 @@
 #import "CMAudio.h"
 
 
+int nRecorded = 0;
 // Test 9/1
 NSString * path = [[NSBundle mainBundle] pathForResource:  @"CMUserParams" ofType: @"xml"];
 std::string userParsFileName = [path cStringUsingEncoding:1];
@@ -15,7 +16,31 @@ CMDetect theDetector(userParsFileName,classParsFileName);
 //////////
 
 // RM 10/25
-CMAudio* theBeep = [[CMAudio alloc] init];  // when am I going to deallocate it?x
+CMAudio* theBeep1 = [[CMAudio alloc] initWithName:@"beep-1" andType:@"aif"];  // when am I going to deallocate it?x
+CMAudio* theBeep2 = [[CMAudio alloc] initWithName:@"beep-2" andType:@"aif"];  // when am I going to deallocate it?x
+
+// RM 10/26
+//NSString * outFilePath;
+
+//NSFileHandle *outFileHandler;// = [NSFileHandle alloc];
+NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+
+NSString *documentsDir = [documentPaths objectAtIndex:0];
+NSString *outFilePath = [[NSString alloc] initWithFormat:@"%@",[documentsDir stringByAppendingPathComponent:@"Points.xml"]];
+
+BOOL openedFile = [[NSFileManager defaultManager] createFileAtPath:outFilePath contents:nil attributes:nil];
+
+NSFileHandle *outFileHandler  = [NSFileHandle fileHandleForWritingToURL:
+                   [NSURL fileURLWithPath:outFilePath] error:NULL];
+
+
+//NSString *content = @"One\nTwo\nThree\nFour\nFive";
+
+
+
+//    [outFileHandler writeData:[content dataUsingEncoding:NSUTF8StringEncoding]];
+//    [outFileHandler closeFile];
+
 
 ////
 @implementation MyAVController
@@ -51,10 +76,13 @@ int nFrames;
 - (void)initCapture {
     
     // RM 10/26
-    
-    [theBeep playIt:@"beep-7" andType:@"mp3"];
-    
-    
+    // TODO: must manage errors
+    [theBeep1 playIt];
+    [theBeep1.theAudio pause];
+    [theBeep2 playIt];
+    [theBeep2.theAudio pause];
+
+   
 	/*We setup the input*/
     AVCaptureDeviceInput *captureInput = [AVCaptureDeviceInput 
 										  deviceInputWithDevice:[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo] 
@@ -163,7 +191,89 @@ int nFrames;
      
 #if 1
      theDetector.AccessImage((unsigned char*)base, width, height ,bytesPerRow);
-     theDetector.FindTarget();
+     if (theDetector.FindTarget())
+     {
+         [outFileHandler writeData:[[NSString stringWithFormat: @"<Quintuple id=\"%d\">\n",++nRecorded] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"<Center>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"<X>"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.center.iX] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"</X>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"<Y>"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.center.iY] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"</Y>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"</Center>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat:          @"<Top>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"<X>"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.top.iX] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"</X>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"<Y>"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.top.iY] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"</Y>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"</Top>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat:          @"<Bottom>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"<X>"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.bottom.iX] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"</X>"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"<Y>"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.bottom.iY] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"</Y>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"</Bottom>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat:          @"<Left>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"<X>"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.left.iX] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"</X>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"<Y>"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.left.iY] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"</Y>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"</Left>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat:          @"<Right>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"<X>"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.right.iX] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"</X>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"<Y>"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.right.iY] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"</Y>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"</Right>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+         [outFileHandler writeData:[[NSString stringWithFormat: @"</Quintuple>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+         
+//         NSString   *outString = [NSString stringWithFormat: @"%d\n %d\n %d\n %d\n %d %d\n %d %d\n %d %d\n\n ",
+//                                  theDetector.outValues.center.iX, theDetector.outValues.center.iY,
+//                                  theDetector.outValues.top.iX, theDetector.outValues.top.iY,
+//                                  theDetector.outValues.bottom.iX, theDetector.outValues.bottom.iY,
+//                                  theDetector.outValues.left.iX, theDetector.outValues.left.iY,
+//                                  theDetector.outValues.right.iX, theDetector.outValues.right.iY];
+//         
+//         
+//         [outFileHandler writeData:[outString dataUsingEncoding:NSUTF8StringEncoding]];
+//         
+         
+         
+         if ((theDetector.outValues.center.iX < theDetector.IMAGE_W * 3/5) &&
+             (theDetector.outValues.center.iX > theDetector.IMAGE_W * 2/5)) {
+             theBeep1.theAudio.volume = 1.;
+             theBeep2.theAudio.volume = 1.;
+         }
+         else{
+             theBeep1.theAudio.volume = 0.1;
+             theBeep2.theAudio.volume = 0.1;
+         }
+         if (theDetector.rad1 < 100)
+         {
+             [theBeep1 playIt];
+             [theBeep2 pauseIt];
+         }
+         else
+         {
+             [theBeep2 playIt];
+             [theBeep1 pauseIt];
+         }
+     }     
+     else
+     {
+         [theBeep1 pauseIt];
+         [theBeep2 pauseIt];
+     }
+     
      
 #ifdef INVERTEVERYFEWFFRAMES
      if ((nFrames++ % 10) == 0){
@@ -372,7 +482,13 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 - (void)dealloc {
 	[self.captureSession release];
-    [theBeep release];
+    [theBeep1 release];
+    [theBeep2 release];
+    [outFileHandler writeData:[[NSString stringWithFormat: @"<NumberOfQuintuples>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [outFileHandler writeData:[[NSString stringWithFormat: @"%d\n",nRecorded] dataUsingEncoding:NSUTF8StringEncoding]];
+    [outFileHandler writeData:[[NSString stringWithFormat: @"</NumberOfQuintuples>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    [outFileHandler closeFile];
     [super dealloc];
 }
 

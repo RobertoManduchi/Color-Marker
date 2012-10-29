@@ -12,5 +12,8 @@
 @interface CMAudio : NSObject
 
 @property (nonatomic,retain) AVAudioPlayer* theAudio;
--(void) playIt:(NSString*)sndTxt andType:(NSString*)sndType;
+-(id) initWithName:(NSString*)sndTxt andType:(NSString*)sndType;
+//-(void) playIt:(NSString*)sndTxt andType:(NSString*)sndType;
+-(void) playIt;
+-(void) pauseIt;
 @end
