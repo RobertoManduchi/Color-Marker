@@ -90,9 +90,7 @@
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "267"
-         endingLineNumber = "267"
-         landmarkName = "CMDetect::ParseClassifiersParsXML()"
-         landmarkType = "5">
+         endingLineNumber = "267">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -103,7 +101,9 @@
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "1592"
-         endingLineNumber = "1592">
+         endingLineNumber = "1592"
+         landmarkName = "CMDetect::PermShift()"
+         landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -335,9 +335,7 @@
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "33"
-         endingLineNumber = "33"
-         landmarkName = "-init"
-         landmarkType = "5">
+         endingLineNumber = "33">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -349,7 +347,7 @@
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "57"
          endingLineNumber = "57"
-         landmarkName = "-initCapture"
+         landmarkName = "-init"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint

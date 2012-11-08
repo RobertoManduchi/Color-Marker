@@ -337,26 +337,17 @@ int nFrames;
          NSMutableString *imageName = [NSMutableString string];
          
          
-//         imageName = [NSString stringWithFormat:@"%d",self.indPicture++]; //%d or %i both is ok.
          imageName = [NSMutableString stringWithFormat:@"%d",self.indPicture++]; //%d or %i both is ok.
          
-//         [imageName insertString:@"image" atIndex: (NSUInteger) 0];
          [imageName appendString:@".png"];
          // test RM 9/15 - save image
          NSData *pngData = UIImagePNGRepresentation(image);
-         //     NSData *jpgData = UIImageJPEGRepresentation(image, 1.0);
-         
-         //save to the default 100Apple(Camera Roll) folder.
-         
-         //     [pngData writeToFile:@"/private/var/mobile/Media/DCIM/100APPLE/customImageFilename.jpg" atomically:NO];
-         
+          
          
          NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
          NSString *documentsPath = [paths objectAtIndex:0]; //Get the docs directory
-//         NSString *filePath = [documentsPath stringByAppendingPathComponent:@"image.png"]; //Add the file name
          NSString *filePath = [documentsPath stringByAppendingPathComponent:imageName]; //Add the file name
          
-         //     NSString *filePath = @"/private/var/mobile/Media/DCIM/100APPLE/customImageFilename.PNG";
           [pngData writeToFile:filePath atomically:YES]; //
          self.shouldTakeSnapshot = NO;
          
