@@ -19,11 +19,15 @@
 		438CE3E511D2719F00CF55BC /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 438CE3E411D2719F00CF55BC /* CoreMedia.framework */; };
 		438CE43111D2766D00CF55BC /* MyAVController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 438CE43011D2766D00CF55BC /* MyAVController.mm */; };
 		43D32BCE11D341F400AFA790 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D32BCD11D341F400AFA790 /* QuartzCore.framework */; };
+		7D2B5019164C7CEF00F056E7 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D2B5018164C7CEF00F056E7 /* ImageIO.framework */; };
+		7D2B501B164C7CFE00F056E7 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D2B501A164C7CFE00F056E7 /* libz.dylib */; };
 		7D57A44D163B5D1C004CFBAB /* beep-7.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7D57A44C163B5D1C004CFBAB /* beep-7.mp3 */; };
 		7D60E2F515F3202100C17888 /* CMUserParams.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7D60E2F315F3202100C17888 /* CMUserParams.xml */; };
 		7D60E2F715F3276B00C17888 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D60E2F615F3276B00C17888 /* libxml2.dylib */; };
 		7D60E2F915F328FC00C17888 /* test8-30_4.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7D60E2F815F328FC00C17888 /* test8-30_4.xml */; };
 		7D60E2FC15F3291000C17888 /* CMDetect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D60E2FA15F3291000C17888 /* CMDetect.cpp */; };
+		7D60FD5916535170000352F7 /* iPhone-11-11-12-noWB.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7D60FD5716535170000352F7 /* iPhone-11-11-12-noWB.xml */; };
+		7D60FD5A16535170000352F7 /* iPhone-11-13-12.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7D60FD5816535170000352F7 /* iPhone-11-13-12.xml */; };
 		7DB91E4F160D41F00054F941 /* iPhone-9-21-12.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7DB91E4E160D41F00054F941 /* iPhone-9-21-12.xml */; };
 		7DEC12D31606DEBC0043202D /* MyAVController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DEC12D21606DEBC0043202D /* MyAVController.xib */; };
 		7DEC12D61606E60B0043202D /* Storyboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7DEC12D51606E60B0043202D /* Storyboard.storyboard */; };
@@ -52,20 +56,22 @@
 		438CE43011D2766D00CF55BC /* MyAVController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MyAVController.mm; sourceTree = "<group>"; };
 		43D32BCD11D341F400AFA790 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		43D32E2F11D3A1DB00AFA790 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		7D2B5018164C7CEF00F056E7 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
+		7D2B501A164C7CFE00F056E7 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		7D57A44C163B5D1C004CFBAB /* beep-7.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "beep-7.mp3"; sourceTree = "<group>"; };
 		7D60E2F315F3202100C17888 /* CMUserParams.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = CMUserParams.xml; sourceTree = "<group>"; };
 		7D60E2F615F3276B00C17888 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = ../../../../usr/lib/libxml2.dylib; sourceTree = "<group>"; };
 		7D60E2F815F328FC00C17888 /* test8-30_4.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "test8-30_4.xml"; sourceTree = "<group>"; };
 		7D60E2FA15F3291000C17888 /* CMDetect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CMDetect.cpp; sourceTree = "<group>"; };
 		7D60E2FB15F3291000C17888 /* CMDetect.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CMDetect.hpp; sourceTree = "<group>"; };
+		7D60FD5716535170000352F7 /* iPhone-11-11-12-noWB.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "iPhone-11-11-12-noWB.xml"; sourceTree = "<group>"; };
+		7D60FD5816535170000352F7 /* iPhone-11-13-12.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "iPhone-11-13-12.xml"; sourceTree = "<group>"; };
 		7DB91E4E160D41F00054F941 /* iPhone-9-21-12.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "iPhone-9-21-12.xml"; sourceTree = "<group>"; };
 		7DEC12D21606DEBC0043202D /* MyAVController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MyAVController.xib; path = Classes/MyAVController.xib; sourceTree = "<group>"; };
 		7DEC12D51606E60B0043202D /* Storyboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Storyboard.storyboard; path = Classes/Storyboard.storyboard; sourceTree = "<group>"; };
 		7DF1A754163B702300208014 /* CMAudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMAudio.h; sourceTree = "<group>"; };
 		7DF1A755163B702300208014 /* CMAudio.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CMAudio.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* MyAVController-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "MyAVController-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
-		E871D4EE12E782BC00E59564 /* libcv.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcv.a; sourceTree = "<group>"; };
-		E871D4EF12E782BD00E59564 /* libcxcore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcxcore.a; sourceTree = "<group>"; };
 		E871D51A12E78A4900E59564 /* ucscvision.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = ucscvision.jpg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -74,6 +80,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7D2B501B164C7CFE00F056E7 /* libz.dylib in Frameworks */,
+				7D2B5019164C7CEF00F056E7 /* ImageIO.framework in Frameworks */,
 				7DF1A753163B6E7700208014 /* AVFoundation.framework in Frameworks */,
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
@@ -138,6 +146,8 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				7D60FD5716535170000352F7 /* iPhone-11-11-12-noWB.xml */,
+				7D60FD5816535170000352F7 /* iPhone-11-13-12.xml */,
 				7D57A44C163B5D1C004CFBAB /* beep-7.mp3 */,
 				7DB91E4E160D41F00054F941 /* iPhone-9-21-12.xml */,
 				7DEC12D51606E60B0043202D /* Storyboard.storyboard */,
@@ -155,6 +165,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7D2B5018164C7CEF00F056E7 /* ImageIO.framework */,
 				438CE3BB11D2717800CF55BC /* CoreGraphics.framework */,
 				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
 				1D30AB110D05D00D00671497 /* Foundation.framework */,
@@ -170,9 +181,8 @@
 		E871D4ED12E782BB00E59564 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				7D2B501A164C7CFE00F056E7 /* libz.dylib */,
 				7D60E2F615F3276B00C17888 /* libxml2.dylib */,
-				E871D4EE12E782BC00E59564 /* libcv.a */,
-				E871D4EF12E782BD00E59564 /* libcxcore.a */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -238,6 +248,8 @@
 				7DEC12D61606E60B0043202D /* Storyboard.storyboard in Resources */,
 				7DB91E4F160D41F00054F941 /* iPhone-9-21-12.xml in Resources */,
 				7D57A44D163B5D1C004CFBAB /* beep-7.mp3 in Resources */,
+				7D60FD5916535170000352F7 /* iPhone-11-11-12-noWB.xml in Resources */,
+				7D60FD5A16535170000352F7 /* iPhone-11-13-12.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,9 +276,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LIBRARY = "libstdc++";
 				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = "";
-				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../ios\"",
+					/Users/manduchi/Developer/ios/,
+					"\"$(SRCROOT)\"",
+				);
+				"FRAMEWORK_SEARCH_PATHS[arch=*]" = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../ios\"",
+				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -274,8 +295,9 @@
 				"HEADER_SEARCH_PATHS[arch=*]" = /usr/include/libXML2;
 				INFOPLIST_FILE = "MyAVController-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)\"",
+					"<Multiple",
+					"values>",
+					/usr/local/lib,
 				);
 				"LIBRARY_SEARCH_PATHS[arch=*]" = "";
 				PRODUCT_NAME = MyAVController;
@@ -287,14 +309,24 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LIBRARY = "libstdc++";
 				COPY_PHASE_STRIP = YES;
-				FRAMEWORK_SEARCH_PATHS = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../ios\"",
+					/Users/manduchi/Developer/ios/,
+					"\"$(SRCROOT)\"",
+				);
 				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = MyAVController_Prefix.pch;
 				HEADER_SEARCH_PATHS = /usr/include/libXML2;
 				INFOPLIST_FILE = "MyAVController-Info.plist";
-				LIBRARY_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = (
+					"<Multiple",
+					"values>",
+					/usr/local/lib,
+				);
 				PRODUCT_NAME = MyAVController;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;

@@ -33,6 +33,7 @@ using namespace std;
 
 #define COLOR_CHANNELS  4   // 4 for iPhone, 3 for RGB
 #define DIAG_RATIO  6
+#define MIN_HBORD 15
 
 CMDetect::CMDetect(string _userParsFileName, string _classParsFileName){
     
@@ -47,7 +48,9 @@ CMDetect::CMDetect(string _userParsFileName, string _classParsFileName){
     LoadTable();
     ptr = 0;
     P_SHIFT = 8;
+    SCAN_STEP = 2;
     N_DIAG_RATIO = DIAG_RATIO;
+    N_MIN_HBOARD = MIN_HBORD;
     N_CHANNELS = COLOR_CHANNELS;
 }
 
@@ -63,8 +66,10 @@ CMDetect::CMDetect(string _userParsFileName){
     LoadTable();
     ptr = 0;
     P_SHIFT = 8;
+    SCAN_STEP = 2;
     N_DIAG_RATIO = DIAG_RATIO;
-    N_CHANNELS = COLOR_CHANNELS; 
+    N_MIN_HBOARD = MIN_HBORD;
+    N_CHANNELS = COLOR_CHANNELS;
 }
 
 
@@ -91,8 +96,8 @@ inline unsigned char* CMDetect::pixPtr(int x, int y, unsigned char* origin)
 // This loads all of the internal parameters. 
 int CMDetect::LoadPars(){
     TOL_SHIFT_RATIO = 3;         
-    PT_CLUSTER_THRESHOLD = 15;  // RM test 9/18
-    PT_DISTANCE_THRESHOLD2 = 4;
+    PT_CLUSTER_THRESHOLD = 1; // RM test 11/11; was 15;  // RM test 9/18
+    PT_DISTANCE_THRESHOLD2 = 8; // RM test 11//1; was 4;
     MAX_PIXELS1 = (int)(MAX_PIXELS-5);      // why???
     
     CONSISTENCYCHECK1 = 0;
@@ -449,24 +454,46 @@ int CMDetect::FindTarget()
     
     unsigned char * ptrArr[4];
     
+//    unsigned char cArr[4][3];
     
+    int NC_SS = N_CHANNELS * SCAN_STEP;
     
     // 1- Find candidate marker points
-    
     for (int iP=0; iP<nPerms; iP++) {
         int currPerm = permIndices[iP];
-        for (y=P_SHIFT; y<IMAGE_H-P_SHIFT; y++) {
+        for (y=P_SHIFT; y<IMAGE_H-P_SHIFT; y+=SCAN_STEP) {
             ptrArr[0] = ptr + (y+ps_a2[currPerm])*WIDTH_STEP + N_CHANNELS * (P_SHIFT+ps_a1[currPerm]) ;
             ptrArr[1] = ptr + (y+ps_b2[currPerm])*WIDTH_STEP + N_CHANNELS * (P_SHIFT+ps_b1[currPerm]) ;
             ptrArr[2] = ptr + (y+ps_c2[currPerm])*WIDTH_STEP + N_CHANNELS * (P_SHIFT+ps_c1[currPerm]) ;
             ptrArr[3] = ptr + (y+ps_d2[currPerm])*WIDTH_STEP + N_CHANNELS * (P_SHIFT+ps_d1[currPerm]) ;
-            for (x=P_SHIFT; x<IMAGE_W-P_SHIFT; x++) {
+            
+            for (x=P_SHIFT; x<IMAGE_W-P_SHIFT; x+=SCAN_STEP) {
+
+//                // debug RM 8/24 - to see saturated pixels in blue
+//                unsigned char * a = pixPtr(x, y, ptr);
+//                if ((a[0]>252)||(a[1]>252)||(a[2]>252)) {
+//                    a[0] = 255; a[1] = 0; a[2] = 0;
+//                }
+                
+//                // test RM 11/11 - tried copying the color values - slows it down 
+//                cArr[0][0] = *(ptrArr[0]); cArr[0][1] = *(ptrArr[0]+1); cArr[0][2] = *(ptrArr[0]+2);
+//                cArr[1][0] = *(ptrArr[1]); cArr[1][1] = *(ptrArr[1]+1); cArr[1][2] = *(ptrArr[1]+2);
+//                cArr[2][0] = *(ptrArr[2]); cArr[2][1] = *(ptrArr[2]+1); cArr[2][2] = *(ptrArr[2]+2);
+//                cArr[3][0] = *(ptrArr[3]); cArr[3][1] = *(ptrArr[3]+1); cArr[3][2] = *(ptrArr[3]+2);
+
                 int found = 1;
                 for (int id=0; id<cascadeLength; id++) {
-                    int cID = classID[id];
+                    unsigned int cID = classID[id];
                     CMColInd colInd = colClass[cID];
                     
                     if (LTF[cID * 256 * 256 + *(ptrArr[colInd.ind1]+colInd.ind3) * 256 + *(ptrArr[colInd.ind2]+colInd.ind3)]){
+                    
+                    // RM 11/11 - using shift operators instead of multiplications - doesn't seem to make it faster
+//                    if (LTF[(int)(cID << 16) + (int)(*(ptrArr[colInd.ind1]+colInd.ind3) << 8) + *(ptrArr[colInd.ind2]+colInd.ind3)]){
+
+//                  // test RM 11/11
+//                    if (LTF[(int)(cID << 16) + cArr[colInd.ind1][colInd.ind3] * 256 + cArr[colInd.ind2][colInd.ind3]]){
+
                         found = 0;
                         break;
                     }
@@ -480,16 +507,17 @@ int CMDetect::FindTarget()
                     // debug RM 8/24
                    unsigned char * a = pixPtr(x, y, ptr);
                    a[0] = 0; a[1] = 0; a[2] = 255;
+                    
+                    
                 }
-                ptrArr[0]+=N_CHANNELS ;
-                ptrArr[1]+=N_CHANNELS;
-                ptrArr[2]+=N_CHANNELS;
-                ptrArr[3]+=N_CHANNELS;
+                ptrArr[0] += NC_SS;
+                ptrArr[1] += NC_SS;
+                ptrArr[2] += NC_SS;
+                ptrArr[3] += NC_SS;
             }
         }
 
     }
-    
     // 2- Computes clusters of points around detected candidates and selects winner permutation
 
     int maxScore = 0;		
@@ -512,7 +540,6 @@ int CMDetect::FindTarget()
             }
         }
     }
-    
     // now perm has the winning permutation
     // XYArray[perm][indMaxScore] has the point with the max number of neighbors (equal to maxScore)
     // cntr[perm] has the number of detected pixels for the winning permutation
@@ -613,6 +640,8 @@ int CMDetect::FindTarget()
     // 4 - Compute keypoints
     
     ComputeKeypoints(cx, cy);
+    
+    // Color keypoints
     
     for (int iy = max(0,outValues.top.iY-3); iy<= min(IMAGE_H-1,outValues.top.iY+3); iy++) {
         for (int ix = max(0,outValues.top.iX-3); ix<= min(IMAGE_W-1,outValues.top.iX+3); ix++) {
@@ -863,218 +892,125 @@ int  CMDetect::FindOppositeLeftRight(CardPoint leftOrRight)
         return 1;
     }
 
-
-
-/////
-int CMDetect::FindHornTopBottom(CardPoint topOrBottom, CardPoint leftOrRight)
-{
-    int maxDiag = 0, countDiag;
-    int yStart, yEnd;
-    int xStart, xEnd;
-    
-    
-    if (topOrBottom==Top) {
-        int hBord = min(rad1,max(40,rad1/4));
-        yStart = max(0,outValues.center.iY - rad1 - hBord);
-// Bug? RM 10/26
-//        yEnd = min(IMAGE_W-1,outValues.center.iY - rad1 + hBord);
-        yEnd = min(IMAGE_H-1,outValues.center.iY - rad1 + hBord);
-
-//        yStart = max(0,outValues.center.iY - 6 * rad1/4);
-//        yEnd = min(IMAGE_H-1,outValues.center.iY - 2 * rad1/4);
-    }
-    else {
-        int hBord = min(rad3,max(40,rad3/4));
-        yStart = max(0,outValues.center.iY + rad3 - hBord);
-// Bug? RM 10/26
-//        yEnd = min(IMAGE_W-1,outValues.center.iY + rad3 + hBord);
-        yEnd = min(IMAGE_H-1,outValues.center.iY + rad3 + hBord);
-        
-//        yStart = max(0,outValues.center.iY+ 2 * rad3/4);
-//        yEnd = min(IMAGE_H-1,outValues.center.iY+ 6 * rad3/4);
-    }
-    
-    xStart = max(0,outValues.center.iX-rad2);
-    xEnd =  min(IMAGE_W-1,outValues.center.iX+rad4);
-    
-    int nDiag = (yEnd - yStart)/N_DIAG_RATIO;
-
-    if (nDiag < 10)
-        nDiag = 10;
-
-    if (nDiag > 200) {
-        nDiag = 200;
-    }
-   
-    
-    xStart += nDiag;
-    xEnd -= nDiag;
-    if (xEnd < xStart)
-        return 0;
-    
-    yEnd -= nDiag;
-    yStart += nDiag;
-    if (yEnd < yStart)
-        return 0;
-    
-    // Prepare image
-                 
-    // upper triangular
-    for (int ix = xStart; ix <= xEnd; ix++){
-        // first fill
-        pixPtr(ix,yStart,ptr)[1] = (unsigned char) (pixPtr(ix,yStart,ptr)[0] == 1);
-        
-        // we already know that the following is safe
-        for (int j=1; j<=nDiag; j++) {
-            pixPtr(ix,yStart,ptr)[1] += (unsigned char) (pixPtr(ix+j,yStart+j,ptr)[0] == 1);
-        }
-        
-        //now go!
-        int jEnd = min(xEnd-ix, yEnd-yStart);
-        for (int j = 1; j <= jEnd; j++) {
-            pixPtr(ix+j,yStart+j,ptr)[1] = pixPtr(ix+j-1,yStart+j-1,ptr)[1] + (unsigned char) (pixPtr(ix+j+nDiag,yStart+j+nDiag,ptr)[0] == 1);
-            pixPtr(ix+j,yStart+j,ptr)[1] -= (unsigned char) (pixPtr(ix+j-1,yStart+j-1,ptr)[0] == 1);
-        }
-        
-    }
-    // lower triangular
-    for (int iy = yStart+1; iy <= yEnd; iy++) {
-        // first fill
-        pixPtr(xStart,iy,ptr)[1] = (unsigned char) (pixPtr(xStart,iy,ptr)[0] == 1);
-        for (int j=1; j<=nDiag; j++) {
-            pixPtr(xStart,iy,ptr)[1] += (unsigned char) (pixPtr(xStart+j,iy+j,ptr)[0] == 1);
-        }
-        //now go!
-        int jEnd = min(xEnd-xStart, yEnd-iy);
-        for (int j = 1; j <= jEnd; j++) {
-            pixPtr(xStart+j,iy+j,ptr)[1] = pixPtr(xStart+j-1,iy+j-1,ptr)[1] + (unsigned char) (pixPtr(xStart+j+nDiag,iy+j+nDiag,ptr)[0] == 1);
-            pixPtr(xStart+j,iy+j,ptr)[1] -= (unsigned char) (pixPtr(xStart+j-1,iy+j-1,ptr)[0] == 1);
-        }
-        
-    }
-    
-    // upper triangular
-    for (int ix = xStart; ix <= xEnd; ix++){
-        // first fill
-        pixPtr(ix,yStart,ptr)[2] = (unsigned char) (pixPtr(ix,yStart,ptr)[0] == 1);
-        
-        // we already know that the following is safe
-        for (int j=1; j<=nDiag; j++) {
-            pixPtr(ix,yStart,ptr)[2] += (unsigned char) (pixPtr(ix-j,yStart+j,ptr)[0] == 1);
-        }
-        
-        //now go!
-        int jEnd = min(ix-xStart, yEnd-yStart);
-        for (int j = 1; j <= jEnd; j++) {
-            pixPtr(ix-j,yStart+j,ptr)[2] = pixPtr(ix-j+1,yStart+j-1,ptr)[2] + (unsigned char) (pixPtr(ix-j-nDiag,yStart+j+nDiag,ptr)[0] == 1);
-            pixPtr(ix-j,yStart+j,ptr)[2] -= (unsigned char) (pixPtr(ix-j+1,yStart+j-1,ptr)[0] == 1);
-        }
-        
-    }
-    // lower triangular
-    for (int iy = yStart+1; iy <= yEnd; iy++) {
-        // first fill
-        pixPtr(xEnd,iy,ptr)[2] = (unsigned char) (pixPtr(xEnd,iy,ptr)[0] == 1);
-        for (int j=1; j<=nDiag; j++) {
-            pixPtr(xEnd,iy,ptr)[2] += (unsigned char) (pixPtr(xEnd-j,iy+j,ptr)[0] == 1);
-        }
-        //now go!
-        int jEnd = min(xEnd-xStart, yEnd-iy);
-        for (int j = 1; j <= jEnd; j++) {
-            pixPtr(xEnd-j,iy+j,ptr)[2] = pixPtr(xEnd-j+1,iy+j-1,ptr)[2] + (unsigned char) (pixPtr(xEnd-j-nDiag,iy+j+nDiag,ptr)[0] == 1);
-            pixPtr(xEnd-j,iy+j,ptr)[2] -= (unsigned char) (pixPtr(xEnd-j+1,iy+j-1,ptr)[0] == 1);
-        }
-        
-    }
-    
-    int    s1 = -1, s2 = -1, s3 = -1, s4 = -1;
-    if (topOrBottom==Top) {
-        if (leftOrRight==Left) {
-            s3 = 1;
-        }
-        else {
-            s4 = 1;
-        }
-    }
-    else {
-        if (leftOrRight==Left) {
-            s1 = 1; 
-        }
-        else {
-            s2 = 1;
-        }
-    }
-        
-    for (int iy = yStart; iy <= yEnd; iy++) {
-        for (int ix = xStart; ix < xEnd; ix++) {
-            countDiag =  s1 * (int) pixPtr(ix-nDiag, iy-nDiag, ptr)[1] +
-                s2 * (int) pixPtr(ix+nDiag, iy-nDiag, ptr)[2] +
-                s3 * (int) pixPtr(ix, iy, ptr)[2] +
-                s4 * (int) pixPtr(ix, iy, ptr)[1];
-            
-            ///
-            if (countDiag > maxDiag) {
-                maxDiag = countDiag;
-                if (topOrBottom==Top) {
-                    outValues.top.iX = ix;
-                    outValues.top.iY = iy;
-                }
-                else{
-                    outValues.bottom.iX = ix;
-                    outValues.bottom.iY = iy;
-                }
-            }
-        }
-    }
-    return 1;
-}
-
-///////
-
-int CMDetect::FindHornLeftRight(CardPoint leftOrRight, CardPoint topOrBottom)
+///
+int CMDetect::FindKeyPoint(KeyPointType whichKeyPoint, CardPoint leftOrRight, CardPoint topOrBottom)
 {
     int maxDiag = 0, countDiag;
     int xStart, xEnd, yStart, yEnd;
+    int s1,s2,s3,s4;
+    int nDiag;
     
-    
-    if (leftOrRight==Left) {
-        int hBord = min(rad2,max(40,rad2/4));
-//        xStart = max(0,outValues.center.iX - 6 * rad2/4);
-//        xEnd = min(IMAGE_W-1,outValues.center.iX - 2 * rad2/4);
-        xStart = max(0,outValues.center.iX - rad2 - hBord);
-        xEnd = min(IMAGE_W-1,outValues.center.iX - rad2 + hBord);
+    if (whichKeyPoint == LeftRightHorn)
+    {
+        if (leftOrRight==Left) {
+            int hBord = min(rad2,max(N_MIN_HBOARD,rad2/4));
+            xStart = max(0,outValues.center.iX - rad2 - hBord);
+            xEnd = min(IMAGE_W-1,outValues.center.iX - rad2 + hBord);
+        }
+        else {
+            int hBord = min(rad4,max(N_MIN_HBOARD,rad4/4));
+            xStart = max(0,outValues.center.iX+ rad4 - hBord);
+            xEnd = min(IMAGE_W-1,outValues.center.iX+ rad4 + hBord);
+        }
+        
+        yStart = max(0,outValues.center.iY-rad1);
+        yEnd =  min(IMAGE_H-1,outValues.center.iY+rad3);
+        
+        nDiag = (xEnd - xStart)/N_DIAG_RATIO;
+
+        s1 = s2 = s3 = s4 = -1;
+        
+        if (leftOrRight==Left) 
+            if (topOrBottom==Top) 
+                s2 = 1;
+            else 
+                s4 = 1;
+        else 
+            if (topOrBottom==Top) 
+                s1 = 1;
+            else 
+                s3 = 1;
     }
-    else {
-        int hBord = min(rad4,max(40,rad4/4));
-//        xStart = max(0,outValues.center.iX+ 2 * rad4/4);
-//        xEnd = min(IMAGE_W-1,outValues.center.iX+ 6 * rad4/4);
-        xStart = max(0,outValues.center.iX+ rad4 - hBord);
-        xEnd = min(IMAGE_W-1,outValues.center.iX+ rad4 + hBord);
+    else if (whichKeyPoint == TopBottomHorn)
+    {
+        if (topOrBottom==Top) {
+            int hBord = min(rad1,max(N_MIN_HBOARD,rad1/4));
+            yStart = max(0,outValues.center.iY - rad1 - hBord);
+            yEnd = min(IMAGE_H-1,outValues.center.iY - rad1 + hBord);
+        }
+        else {
+            int hBord = min(rad3,max(N_MIN_HBOARD,rad3/4));
+            yStart = max(0,outValues.center.iY + rad3 - hBord);
+            yEnd = min(IMAGE_H-1,outValues.center.iY + rad3 + hBord);
+        }
+        
+        xStart = max(0,outValues.center.iX-rad2);
+        xEnd =  min(IMAGE_W-1,outValues.center.iX+rad4);
+
+        nDiag = (yEnd - yStart)/N_DIAG_RATIO;
+
+        s1 = s2 = s3 = s4 = -1;
+        
+        if (topOrBottom==Top)
+            if (leftOrRight==Left)
+                s3 = 1;
+            else
+                s4 = 1;
+        else
+            if (leftOrRight==Left)
+                s1 = 1;
+            else
+                s2 = 1;
+    }
+    else    // Center
+    {
+        int hBord = min((rad1+rad2+rad3+rad4)/4,max(N_MIN_HBOARD,rad2/4));
+        
+        xStart = max(0,outValues.center.iX - hBord);
+        xEnd = min(IMAGE_W-1, outValues.center.iX + hBord);
+        
+        yStart = max(0, outValues.center.iY - hBord);
+        yEnd = min(IMAGE_H-1, outValues.center.iY + hBord);
+        
+        nDiag = (yEnd - yStart)/N_DIAG_RATIO;
+
+        s1 = s2 = s3 = s4 = 1;
+        
+        if (topOrBottom==Top)
+            if (leftOrRight==Left)
+                s1 = -1;
+            else
+                s2 = -1;
+        else
+            if (leftOrRight==Left)
+                s3 = -1;
+            else
+                s4 = -1;
     }
     
-    yStart = max(0,outValues.center.iY-rad1);
-    yEnd =  min(IMAGE_H-1,outValues.center.iY+rad3);
     
-    int nDiag = (xEnd - xStart)/N_DIAG_RATIO;
-    
-    if (nDiag < 10)
-        nDiag = 10;
+    // These should be parameters
+//    if (nDiag < 10)
+//        nDiag = 10;
+    if (nDiag < 5)
+        nDiag = 5;
     
     if (nDiag > 200) {
         nDiag = 200;
     }
-   
-    yStart += nDiag;
+    
+    //    yStart += nDiag;
     yEnd -= nDiag;
     if (yEnd < yStart)
         return 0;
     
     xEnd -= nDiag;
-    xStart += nDiag;
+    //    xStart += nDiag;
     if (xEnd < xStart)
         return 0;
+    
     // Prepare image
-   
+    
     
     // upper triangular
     for (int ix = xStart; ix <= xEnd; ix++){
@@ -1144,45 +1080,50 @@ int CMDetect::FindHornLeftRight(CardPoint leftOrRight, CardPoint topOrBottom)
         
     }
     
-    int    s1 = -1, s2 = -1, s3 = -1, s4 = -1;
+    int currMaxX = 0, currMaxY = 0;
     
-    if (leftOrRight==Left) {
-        if (topOrBottom==Top) {
-            s2 = 1;
-        }
-        else {
-            s4 = 1;
-        }
-    }
-    else {
-        if (topOrBottom==Top) {
-            s1 = 1;
-        }
-        else {
-            s3 = 1;
-        }
-    }
-    
-    for (int iy = yStart; iy <= yEnd; iy++) {
-        for (int ix = xStart; ix < xEnd; ix++) {
+    for (int iy = yStart + nDiag; iy <= yEnd; iy++) {
+        for (int ix = xStart + nDiag; ix < xEnd - nDiag; ix++) {
             countDiag =  s1 * (int) pixPtr(ix-nDiag, iy-nDiag, ptr)[1] +
             s2 * (int) pixPtr(ix+nDiag, iy-nDiag, ptr)[2] +
             s3 * (int) pixPtr(ix, iy, ptr)[2] +
             s4 * (int) pixPtr(ix, iy, ptr)[1];
-
+            
             if (countDiag > maxDiag) {
                 maxDiag = countDiag;
-                if (leftOrRight==Left) {
-                    outValues.left.iX = ix;
-                    outValues.left.iY = iy;
-                }
-                else{
-                    outValues.right.iX = ix;
-                    outValues.right.iY = iy;
-                }
+                currMaxX = ix;
+                currMaxY = iy;
             }
         }
     }
+    if (whichKeyPoint == LeftRightHorn)
+    {
+        if (leftOrRight==Left) {
+            outValues.left.iX = currMaxX;
+            outValues.left.iY = currMaxY;
+        }
+        else{
+            outValues.right.iX = currMaxX;
+            outValues.right.iY = currMaxY;
+        }        
+    }
+    else if (whichKeyPoint == TopBottomHorn)
+    {
+        if (topOrBottom==Top) {
+            outValues.top.iX = currMaxX;
+            outValues.top.iY = currMaxY;
+        }
+        else{
+            outValues.bottom.iX = currMaxX;
+            outValues.bottom.iY = currMaxY;
+        }        
+    }
+    else    // Center
+    {
+        outValues.center.iX = currMaxX;
+        outValues.center.iY = currMaxY;
+    }
+
     return 1;
 }
 
@@ -1394,9 +1335,10 @@ int CMDetect::ComputeKeypoints(int cx, int cy)
         case 3:
         case 4:
         case 5:
-            FindHornLeftRight(Left,Bottom);
+            FindKeyPoint(Center, Left, Top);
+            FindKeyPoint(LeftRightHorn, Left, Bottom);
+            FindKeyPoint(TopBottomHorn, Right, Top);
             FindOppositeLeftRight(Right);
-            FindHornTopBottom(Top,Right);
             FindOppositeTopBottom(Bottom);
             break;
             // white sector top right
@@ -1406,9 +1348,10 @@ int CMDetect::ComputeKeypoints(int cx, int cy)
         case 13:
         case 18:
         case 19:
-            FindHornLeftRight(Right,Bottom);
+            FindKeyPoint(Center, Right, Top);
+            FindKeyPoint(LeftRightHorn, Right, Bottom);
+            FindKeyPoint(TopBottomHorn, Left, Top);
             FindOppositeLeftRight(Left);
-            FindHornTopBottom(Top,Left);
             FindOppositeTopBottom(Bottom);
             break;
             // white sector bottom left
@@ -1418,9 +1361,10 @@ int CMDetect::ComputeKeypoints(int cx, int cy)
         case 16:
         case 20:
         case 22:
-            FindHornLeftRight(Left,Top);
+            FindKeyPoint(Center, Left, Bottom);
+            FindKeyPoint(LeftRightHorn, Left, Top);
+            FindKeyPoint(TopBottomHorn, Right, Bottom);
             FindOppositeLeftRight(Right);
-            FindHornTopBottom(Bottom,Right);
             FindOppositeTopBottom(Top);
             break;
             // white sector bottom right
@@ -1430,9 +1374,10 @@ int CMDetect::ComputeKeypoints(int cx, int cy)
         case 17:
         case 21:
         case 23:
-            FindHornLeftRight(Right,Top);
+            FindKeyPoint(Center, Right, Bottom);
+            FindKeyPoint(LeftRightHorn, Right, Top);
+            FindKeyPoint(TopBottomHorn, Left, Bottom);
             FindOppositeLeftRight(Left);
-            FindHornTopBottom(Bottom,Left);
             FindOppositeTopBottom(Top);
             break;
             
@@ -1628,12 +1573,19 @@ int CMDetect::LoadTable(){
         int maxY2 = min(255, (int) (classPar_m[id] * 255. +classPar_b2[id]));
         
         int maxXStart = min(maxX1, maxX2);
-        int maxXEnd = min(255,2 * max(maxX1, maxX2));
+        
+        // why was this multiplied by 2?
+//        int maxXEnd = min(255,2 * max(maxX1, maxX2));
+        int maxXEnd = min(255,max(maxX1, maxX2));
 
         int maxYStart = min(maxY1, maxY2);
-        int maxYEnd = min(255,2 * max(maxY1, maxY2));
+        
+        // why was this multiplied by 2?
+//        int maxYEnd = min(255,2 * max(maxY1, maxY2));
+        int maxYEnd = min(255,max(maxY1, maxY2));
         
         // anything below the smallest value found (divided by margin ratio) in each channel is set to '1' ('not detect')
+        
         
         for (int i=0; i < classPar_t_min_1[id]; i++)
             for (int j = 0; j <= 255; j++)
@@ -1645,19 +1597,23 @@ int CMDetect::LoadTable(){
         
         // anything above the largest value found (multiplied by margin ratio) in each channel is set to '1' ('not detect'). Unless the max is in thesaturation region. Then we assume that it can grow indefinitely, so we set to '0' ('detect') all values that could be obtained with that channel saturating.
         
+        // Changed RM 11-11-12. Now if the max of the strip inon any direction (x or y) hits the saturation value, we simply set to '0' the whole saturation strip. Seems to work much better.
+        
         if (classPar_t_max_1[id] < SAT_VALUE) {
-            for (int i=classPar_t_max_1[id]+1; i<=255; i++)
-                for (int j = 0; j <= 255; j++)
-                    LTF[id* 256 * 256 + j* 256 +i] = 1;
+            for (int i=classPar_t_max_1[id]+1; i<=255; i++)            
+                    for (int j = 0; j <= 255; j++)
+                        LTF[id* 256 * 256 + j* 256 +i] = 1;
         }
         else {
-            for (int j=maxYStart; j<=maxYEnd; j++) {
+            for (int j=0; j<=255; j++) {
+            //for (int j=maxYStart; j<=maxYEnd; j++) {
                 for (int i=SAT_VALUE; i<=255; i++) {
                     LTF[id* 256 * 256 + j* 256 +i] = 0;
                 }
             }
         }
-        
+    
+       
         if (classPar_t_max_2[id] < SAT_VALUE) {
             for (int j = classPar_t_max_2[id]+1; j<=255; j++)
                 for (int i=0; i <= 255; i++)
@@ -1665,7 +1621,9 @@ int CMDetect::LoadTable(){
             
         }
         else {
-            for (int i=maxXStart; i<=maxXEnd; i++) {
+
+            for (int i=0; i<=255; i++) {
+            //for (int i=maxXStart; i<=maxXEnd; i++) {
                 for (int j=SAT_VALUE; j<=255; j++) {
                     LTF[id* 256 * 256 + j* 256 +i] = 0;
                 }

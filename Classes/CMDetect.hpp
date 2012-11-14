@@ -56,9 +56,13 @@ inline CMColInd _ColInd(int _ind1, int _ind2, int _ind3){
 
 class CMDetect {
    
-    int P_SHIFT;   
+    int P_SHIFT;
     
-    int N_DIAG_RATIO;   
+    int SCAN_STEP;
+    
+    int N_DIAG_RATIO;
+    
+    int N_MIN_HBOARD;
     
     int TOL_SHIFT_RATIO,PT_CLUSTER_THRESHOLD,PT_DISTANCE_THRESHOLD2, MAX_PIXELS1;
     int ps_c1[24],ps_a1[24],ps_d1[24],ps_b1[24],ps_c2[24],ps_a2[24],ps_d2[24],ps_b2[24];
@@ -70,6 +74,8 @@ class CMDetect {
     int     cascadeLength;
 
     typedef enum{Top, Bottom, Left, Right} CardPoint;
+
+    typedef enum{TopBottomHorn, LeftRightHorn, Center} KeyPointType;
 
     CMColInd    colClass[18];
     
@@ -93,9 +99,13 @@ class CMDetect {
     
     int FindOppositeLeftRight(CardPoint);
     
+    int FindKeyPoint(KeyPointType, CardPoint, CardPoint);
+    
     int FindHornTopBottom(CardPoint,CardPoint);
     
     int FindHornLeftRight(CardPoint,CardPoint);
+
+    int FindCenter(CardPoint,CardPoint);
     
     int ComputeKeypoints(int,int);
     

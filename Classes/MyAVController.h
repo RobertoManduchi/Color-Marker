@@ -23,7 +23,9 @@
     float   time1,time2;
     
     
+    
 }
+
 
 - (IBAction)takeSnapshot:(id)sender;
 

@@ -1,14 +1,23 @@
+//#include <opencv2/opencv.hpp>
+//#include <opencv2/core/core.hpp>
 #import "MyAVController.h"
 #import "CMDetect.hpp"
 #import "CMAudio.h"
 
-
 int nRecorded = 0;
+int  framesPerSecond=0,frameCount = 0;
+float start_time, startTimeExpLock;
+
+
 // Test 9/1
 NSString * path = [[NSBundle mainBundle] pathForResource:  @"CMUserParams" ofType: @"xml"];
 std::string userParsFileName = [path cStringUsingEncoding:1];
 
-NSString * path2  = [[NSBundle mainBundle] pathForResource:  @"iPhone-9-21-12" ofType: @"xml"];
+/**** this works!!! ***/
+//NSString * path2  = [[NSBundle mainBundle] pathForResource:  @"iPhone-9-21-12" ofType: @"xml"];
+/*********************/
+
+NSString * path2  = [[NSBundle mainBundle] pathForResource:  @"iPhone-11-13-12" ofType: @"xml"];
 std::string classParsFileName = [path2 cStringUsingEncoding:1];
 
 CMDetect theDetector(userParsFileName,classParsFileName);
@@ -18,6 +27,8 @@ CMDetect theDetector(userParsFileName,classParsFileName);
 // RM 10/25
 CMAudio* theBeep1 = [[CMAudio alloc] initWithName:@"beep-1" andType:@"aif"];  // when am I going to deallocate it?x
 CMAudio* theBeep2 = [[CMAudio alloc] initWithName:@"beep-2" andType:@"aif"];  // when am I going to deallocate it?x
+
+
 
 // RM 10/26
 //NSString * outFilePath;
@@ -34,12 +45,6 @@ NSFileHandle *outFileHandler  = [NSFileHandle fileHandleForWritingToURL:
                    [NSURL fileURLWithPath:outFilePath] error:NULL];
 
 
-//NSString *content = @"One\nTwo\nThree\nFour\nFive";
-
-
-
-//    [outFileHandler writeData:[content dataUsingEncoding:NSUTF8StringEncoding]];
-//    [outFileHandler closeFile];
 
 
 ////
@@ -84,9 +89,24 @@ int nFrames;
 
    
 	/*We setup the input*/
-    AVCaptureDeviceInput *captureInput = [AVCaptureDeviceInput 
-										  deviceInputWithDevice:[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo] 
+    
+    
+    AVCaptureDevice     *theDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    AVCaptureDeviceInput *captureInput = [AVCaptureDeviceInput
+										  deviceInputWithDevice:theDevice
 										  error:nil];
+
+    
+    // test RM 11/11
+    [theDevice lockForConfiguration:(nil)];
+    
+//    theDevice.whiteBalanceMode  = AVCaptureWhiteBalanceModeLocked;
+    
+    [theDevice unlockForConfiguration];
+    
+    
+    
+    
 	/*We setupt the output*/
 	AVCaptureVideoDataOutput *captureOutput = [[AVCaptureVideoDataOutput alloc] init];
 	/*While a frame is processes in -captureOutput:didOutputSampleBuffer:fromConnection: delegate methods no other frames are added in the queue.
@@ -136,8 +156,7 @@ int nFrames;
     
     //Once startRunning is called the camera will start capturing frames 
 	[self.captureSession startRunning];
-    
-    
+        
 	
 }
 
@@ -150,7 +169,7 @@ int nFrames;
  didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer 
  fromConnection:(AVCaptureConnection *)connection 
  { 
- float start_time = clock();
+// float start_time = clock();
  
 //     printf("captureOutput was called \n");
  
@@ -173,26 +192,24 @@ int nFrames;
  
      // RM - test
      
-     // we should be able to allocate this buffer once and or all to save time
+     // we should be able to allocate this buffer once and or all to save time (tried - didn't help)
      uint8_t *base = (uint8_t *) malloc(bytesPerRow * height * sizeof(uint8_t));
      memcpy(base, baseAddress, bytesPerRow * height);
      CVPixelBufferUnlockBaseAddress(imageBuffer,0);
-      
-     //////
-//     // Test 9/1
-//     NSString * path = [[NSBundle mainBundle] pathForResource:  @"CMUserParams" ofType: @"xml"];
-//     std::string userParsFileName = [path cStringUsingEncoding:1];
-//
-//     path = [[NSBundle mainBundle] pathForResource:  @"test8-30_4" ofType: @"xml"];
-//     std::string classParsFileName = [path cStringUsingEncoding:1];
-//
-//     CMDetect theDetector(userParsFileName,classParsFileName);
      
      
 #if 1
      theDetector.AccessImage((unsigned char*)base, width, height ,bytesPerRow);
      if (theDetector.FindTarget())
      {
+         // good exposure - lock it!
+         AVCaptureDevice     *theDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+         [theDevice lockForConfiguration:(nil)];
+         theDevice.exposureMode = AVCaptureExposureModeLocked;
+         [theDevice unlockForConfiguration];
+         
+         startTimeExpLock = clock();
+
          [outFileHandler writeData:[[NSString stringWithFormat: @"<Quintuple id=\"%d\">\n",++nRecorded] dataUsingEncoding:NSUTF8StringEncoding]];
          [outFileHandler writeData:[[NSString stringWithFormat: @"<Center>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
          [outFileHandler writeData:[[NSString stringWithFormat: @"<X>"] dataUsingEncoding:NSUTF8StringEncoding]];
@@ -236,17 +253,6 @@ int nFrames;
          [outFileHandler writeData:[[NSString stringWithFormat: @"</Right>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
          [outFileHandler writeData:[[NSString stringWithFormat: @"</Quintuple>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
          
-//         NSString   *outString = [NSString stringWithFormat: @"%d\n %d\n %d\n %d\n %d %d\n %d %d\n %d %d\n\n ",
-//                                  theDetector.outValues.center.iX, theDetector.outValues.center.iY,
-//                                  theDetector.outValues.top.iX, theDetector.outValues.top.iY,
-//                                  theDetector.outValues.bottom.iX, theDetector.outValues.bottom.iY,
-//                                  theDetector.outValues.left.iX, theDetector.outValues.left.iY,
-//                                  theDetector.outValues.right.iX, theDetector.outValues.right.iY];
-//         
-//         
-//         [outFileHandler writeData:[outString dataUsingEncoding:NSUTF8StringEncoding]];
-//         
-         
          
          if ((theDetector.outValues.center.iX < theDetector.IMAGE_W * 3/5) &&
              (theDetector.outValues.center.iX > theDetector.IMAGE_W * 2/5)) {
@@ -272,6 +278,16 @@ int nFrames;
      {
          [theBeep1 pauseIt];
          [theBeep2 pauseIt];
+         
+         if ((clock() - startTimeExpLock) > 3 * (double)CLOCKS_PER_SEC) {
+             // unlock exposure
+             AVCaptureDevice     *theDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+             if (theDevice.exposureMode == AVCaptureExposureModeLocked) {             
+                 [theDevice lockForConfiguration:(nil)];
+                 theDevice.exposureMode = AVCaptureExposureModeContinuousAutoExposure;
+                 [theDevice unlockForConfiguration];
+             }
+         }
      }
      
      
@@ -317,7 +333,38 @@ int nFrames;
  
      // Create a bitmap graphics context with the sample buffer data
      CGContextRef context = CGBitmapContextCreate(baseAddress, width, height, 8, 
-                                                  bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst); 
+                                                  bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+     
+     ///// test 11/8/12 - show text
+     // compute fps
+//     int  framesPerSecond = (int) (1/ ((clock() - start_time) / (double)CLOCKS_PER_SEC));
+     if ((clock() - start_time) > (double)CLOCKS_PER_SEC) {
+         framesPerSecond = frameCount;
+         frameCount = 0;
+         start_time = clock();
+     }
+     else
+         frameCount++;
+     
+     NSString* fpsString = [NSString stringWithFormat:@"%i fps", framesPerSecond];
+     
+     //
+
+     
+     char* text	= (char *)[fpsString cStringUsingEncoding:NSASCIIStringEncoding];
+     CGContextSelectFont(context, "Arial", 25, kCGEncodingMacRoman);
+     CGContextSetTextDrawingMode(context, kCGTextFill);
+     CGContextSetRGBFillColor(context, 0, 0, 0, 1);
+     
+     
+     //rotate text
+     CGContextSetTextMatrix(context, CGAffineTransformMakeRotation( M_PI/2 ));
+     
+     CGContextShowTextAtPoint(context,30,30, text, strlen(text));
+    
+     
+     //////
+     
      // Create a Quartz image from the pixel data in the bitmap graphics context
      CGImageRef quartzImage = CGBitmapContextCreateImage(context); 
 
@@ -351,13 +398,22 @@ int nFrames;
           [pngData writeToFile:filePath atomically:YES]; //
          self.shouldTakeSnapshot = NO;
          
+         
+         
+         // test RM 11/11
+         AVCaptureDevice     *theDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+         
+         [theDevice lockForConfiguration:(nil)];
+         if (theDevice.exposureMode == AVCaptureExposureModeLocked) {
+             theDevice.exposureMode  = AVCaptureExposureModeContinuousAutoExposure;
+         }
+         else
+             theDevice.exposureMode = AVCaptureExposureModeLocked;
+         [theDevice unlockForConfiguration];
+
+         
      }
-     
-     //     NSString *filePath = @"/private/var/mobile/Media/DCIM/100APPLE/IMG_0050.JPG";
-//     [jpgData writeToFile:filePath atomically:NO]; //Write the file
-//     [jpgData writeToFile:@"/private/var/mobile/Media/DCIM/100APPLE/IMG_0050.JPG" atomically:NO]; //Write the file
- 
-//     UIImageWriteToSavedPhotosAlbum(image,nil,nil,nil);
+
      
      // Release the Quartz image
      CGImageRelease(quartzImage);     
@@ -370,8 +426,6 @@ int nFrames;
 //     }
      
 
-//    float time_in_seconds = (clock() - start_time) / (double)CLOCKS_PER_SEC;
-//    printf("%f time spent processing frame\n",time_in_seconds);
 
 
 [pool drain];
@@ -384,7 +438,7 @@ int nFrames;
 didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer 
 	   fromConnection:(AVCaptureConnection *)connection 
 { 
-    float start_time = clock();
+//    float start_time = clock();
 
     printf("captureOutput was called \n");
     
