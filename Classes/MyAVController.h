@@ -23,10 +23,16 @@
     float   time1,time2;
     
     
+//    IBOutlet UIStepper *setMaxFramesPerSecond;
+//    IBOutlet UILabel *maxFramesPerSecond;
     
 }
+//@property (retain, nonatomic) IBOutlet UILabel *maxFramesPerSecond;
+@property (retain, nonatomic) IBOutlet UILabel *actualFramesPerSecond;
+@property (retain, nonatomic) IBOutlet UIStepper *setMaxFramesPerSecond;
+@property (retain, nonatomic) IBOutlet UILabel *maxFramesPerSecond;
 
-
+// I think that this should be in the @interface
 - (IBAction)takeSnapshot:(id)sender;
 
 @property (nonatomic) BOOL shouldTakeSnapshot;

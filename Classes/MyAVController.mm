@@ -6,7 +6,11 @@
 
 int nRecorded = 0;
 int  framesPerSecond=0,frameCount = 0;
-float start_time, startTimeExpLock;
+float start_time, mainStartTime, startTimeExpLock;
+int countFramesForLock = 0;
+
+#define MIN_FRAMES_N_FOR_EXP_LOCK   2
+#define SECONDS_BEFORE_EXP_UNLOCK   2.
 
 
 // Test 9/1
@@ -164,14 +168,32 @@ int nFrames;
 
 
 /*** RM 6/15 - test ***/
-#if 1
- - (void)captureOutput:(AVCaptureOutput *)captureOutput 
+ - (void)captureOutput:(AVCaptureOutput *)captureOutput
  didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer 
  fromConnection:(AVCaptureConnection *)connection 
  { 
 // float start_time = clock();
  
 //     printf("captureOutput was called \n");
+     
+//     if (maxFramesPerSecond.text == nil) {
+//         NSString *myText = [[NSString alloc] initWithFormat:@"%d", (int)self.setMaxFramesPerSecond.value];
+     // then we need to clear it?
+
+//     [self.maxFramesPerSecond performSelectorOnMainThread : @ selector(setText : ) withObject:myText waitUntilDone:YES];
+
+      if ((int)self.setMaxFramesPerSecond.value != [self.maxFramesPerSecond.text intValue]) {
+          NSString *theText;
+          if (self.setMaxFramesPerSecond.value == 10) 
+              theText = @"- - -";
+          else
+              theText = [NSString stringWithFormat:@"%d", (int)self.setMaxFramesPerSecond.value];
+              
+          [self.maxFramesPerSecond performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
+
+//          self.maxFramesPerSecond.text = [NSString stringWithFormat:@"%d", (int)self.setMaxFramesPerSecond.value];
+     }
+//     printf("%d\n",(int) setMaxFramesPerSecond.value);
  
      /*We create an autorelease pool because as we are not in the main_queue our code is
      not executed in the main thread. So we have to create an autorelease pool for the thread we are in*/
@@ -199,17 +221,32 @@ int nFrames;
      
      
 #if 1
-     theDetector.AccessImage((unsigned char*)base, width, height ,bytesPerRow);
-     if (theDetector.FindTarget())
+     
+     double theMinPeriod;
+     if (self.setMaxFramesPerSecond.value == 10) // this is the max - should be set as parameter
+         theMinPeriod = 0.;
+     else
+         theMinPeriod = (double)CLOCKS_PER_SEC / (double)self.setMaxFramesPerSecond.value;
+     
+     if (clock() - mainStartTime > theMinPeriod)
      {
-         // good exposure - lock it!
-         AVCaptureDevice     *theDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-         [theDevice lockForConfiguration:(nil)];
-         theDevice.exposureMode = AVCaptureExposureModeLocked;
-         [theDevice unlockForConfiguration];
+         mainStartTime = clock();
          
-         startTimeExpLock = clock();
-
+         theDetector.AccessImage((unsigned char*)base, width, height ,bytesPerRow);
+     
+     
+     if ((theDetector.FindTarget()))
+     {
+         countFramesForLock++;
+         if (countFramesForLock >= MIN_FRAMES_N_FOR_EXP_LOCK) {
+             // good exposure - lock it!
+             AVCaptureDevice     *theDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+             [theDevice lockForConfiguration:(nil)];
+             theDevice.exposureMode = AVCaptureExposureModeLocked;
+             [theDevice unlockForConfiguration];
+             
+             startTimeExpLock = clock();
+         }
          [outFileHandler writeData:[[NSString stringWithFormat: @"<Quintuple id=\"%d\">\n",++nRecorded] dataUsingEncoding:NSUTF8StringEncoding]];
          [outFileHandler writeData:[[NSString stringWithFormat: @"<Center>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
          [outFileHandler writeData:[[NSString stringWithFormat: @"<X>"] dataUsingEncoding:NSUTF8StringEncoding]];
@@ -274,12 +311,16 @@ int nFrames;
              [theBeep1 pauseIt];
          }
      }     
-     else
+     else   // not found
      {
          [theBeep1 pauseIt];
          [theBeep2 pauseIt];
          
-         if ((clock() - startTimeExpLock) > 3 * (double)CLOCKS_PER_SEC) {
+         countFramesForLock = 0;
+         
+         if (((clock() - startTimeExpLock) > SECONDS_BEFORE_EXP_UNLOCK * (double)CLOCKS_PER_SEC))
+             
+         {
              // unlock exposure
              AVCaptureDevice     *theDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
              if (theDevice.exposureMode == AVCaptureExposureModeLocked) {             
@@ -289,27 +330,39 @@ int nFrames;
              }
          }
      }
-     
-     
-#ifdef INVERTEVERYFEWFFRAMES
-     if ((nFrames++ % 10) == 0){
-         nFrames = 1;
-         uint8_t *tp1, *tp2;
-         tp1 = base;
-         for (int iy=0;iy<height; iy++,tp1 += bytesPerRow){
-             tp2 = tp1;
-             for (int ix=0 ;ix<bytesPerRow;ix+=4,tp2+=4){
-                 *tp2 = 255 - *tp2;
-                 *(tp2+1) = 255 - *(tp2+1);
-                 *(tp2+2) = 255 - *(tp2+2);
-             }
+         ///// test 11/8/12 - show text
+         // compute fps
+         //     int  framesPerSecond = (int) (1/ ((clock() - start_time) / (double)CLOCKS_PER_SEC));
+         if ((clock() - start_time) > (double)CLOCKS_PER_SEC) {
+             framesPerSecond = frameCount;
+             frameCount = 0;
+             start_time = clock();
+             [self.actualFramesPerSecond performSelectorOnMainThread : @ selector(setText : )
+                   withObject:[NSString stringWithFormat:@"%d", (int)framesPerSecond]
+                waitUntilDone:NO];
          }
+         else
+             frameCount++;
+         
+         
+         
+         //     NSString* fpsString = [NSString stringWithFormat:@"%i fps", framesPerSecond];
+         //
+         //     //
+         //
+         //
+         //     char* text	= (char *)[fpsString cStringUsingEncoding:NSASCIIStringEncoding];
+         //     CGContextSelectFont(context, "Arial", 25, kCGEncodingMacRoman);
+         //     CGContextSetTextDrawingMode(context, kCGTextFill);
+         //     CGContextSetRGBFillColor(context, 0, 0, 0, 1);
+         //
+         //     
+         //     //rotate text
+         //     CGContextSetTextMatrix(context, CGAffineTransformMakeRotation( M_PI/2 ));
+         //     
+         //     CGContextShowTextAtPoint(context,30,400, text, strlen(text));
+         
      }
-#endif
-     
-     ////
-#else
-/// RM 6/15 
      uint8_t *tp1, *tp2;     
 //     tp1 = baseAddress;
      tp1 = base;
@@ -321,7 +374,6 @@ int nFrames;
          }
       }
      // RM - test
-#endif
      CVPixelBufferLockBaseAddress(imageBuffer,0);
      memcpy(baseAddress, base, bytesPerRow * height);
      free(base);
@@ -335,33 +387,6 @@ int nFrames;
      CGContextRef context = CGBitmapContextCreate(baseAddress, width, height, 8, 
                                                   bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
      
-     ///// test 11/8/12 - show text
-     // compute fps
-//     int  framesPerSecond = (int) (1/ ((clock() - start_time) / (double)CLOCKS_PER_SEC));
-     if ((clock() - start_time) > (double)CLOCKS_PER_SEC) {
-         framesPerSecond = frameCount;
-         frameCount = 0;
-         start_time = clock();
-     }
-     else
-         frameCount++;
-     
-     NSString* fpsString = [NSString stringWithFormat:@"%i fps", framesPerSecond];
-     
-     //
-
-     
-     char* text	= (char *)[fpsString cStringUsingEncoding:NSASCIIStringEncoding];
-     CGContextSelectFont(context, "Arial", 25, kCGEncodingMacRoman);
-     CGContextSetTextDrawingMode(context, kCGTextFill);
-     CGContextSetRGBFillColor(context, 0, 0, 0, 1);
-     
-     
-     //rotate text
-     CGContextSetTextMatrix(context, CGAffineTransformMakeRotation( M_PI/2 ));
-     
-     CGContextShowTextAtPoint(context,30,30, text, strlen(text));
-    
      
      //////
      
@@ -378,8 +403,7 @@ int nFrames;
      // Create an image object from the Quartz image
      // UIImage *image = [UIImage imageWithCGImage:quartzImage];
      UIImage *image = [UIImage imageWithCGImage:quartzImage scale:(CGFloat)1 orientation:UIImageOrientationRight];
-     
-     
+
      if ((self.shouldTakeSnapshot) && ((clock() - time1) / (double)CLOCKS_PER_SEC) > 1.) {
          NSMutableString *imageName = [NSMutableString string];
          
@@ -398,7 +422,8 @@ int nFrames;
           [pngData writeToFile:filePath atomically:YES]; //
          self.shouldTakeSnapshot = NO;
          
-         
+     }
+        
          
          // test RM 11/11
          AVCaptureDevice     *theDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
@@ -412,7 +437,6 @@ int nFrames;
          [theDevice unlockForConfiguration];
 
          
-     }
 
      
      // Release the Quartz image
@@ -424,6 +448,7 @@ int nFrames;
 //         nFrames = 1;
          [self.imageView performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:YES];
 //     }
+     
      
 
 
@@ -523,6 +548,10 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 	self.imageView = nil;
 	self.customLayer = nil;
 	self.prevLayer = nil;
+    self.setMaxFramesPerSecond = nil;
+    self.maxFramesPerSecond = nil;
+    
+    // should also set the outlets to nil…but instead it releases in dealloc!
 }
 
 - (void)dealloc {
@@ -534,6 +563,12 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [outFileHandler writeData:[[NSString stringWithFormat: @"</NumberOfQuintuples>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
     
     [outFileHandler closeFile];
+    [framesPerSecond release];
+    [_maxFramesPerSecond release];
+    [_setMaxFramesPerSecond release];
+    [_maxFramesPerSecond release];
+    [_maxFramesPerSecond release];
+    [_actualFramesPerSecond release];
     [super dealloc];
 }
 

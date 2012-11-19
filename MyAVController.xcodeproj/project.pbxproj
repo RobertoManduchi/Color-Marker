@@ -21,13 +21,13 @@
 		43D32BCE11D341F400AFA790 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D32BCD11D341F400AFA790 /* QuartzCore.framework */; };
 		7D2B5019164C7CEF00F056E7 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D2B5018164C7CEF00F056E7 /* ImageIO.framework */; };
 		7D2B501B164C7CFE00F056E7 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D2B501A164C7CFE00F056E7 /* libz.dylib */; };
-		7D57A44D163B5D1C004CFBAB /* beep-7.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7D57A44C163B5D1C004CFBAB /* beep-7.mp3 */; };
 		7D60E2F515F3202100C17888 /* CMUserParams.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7D60E2F315F3202100C17888 /* CMUserParams.xml */; };
 		7D60E2F715F3276B00C17888 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D60E2F615F3276B00C17888 /* libxml2.dylib */; };
 		7D60E2F915F328FC00C17888 /* test8-30_4.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7D60E2F815F328FC00C17888 /* test8-30_4.xml */; };
 		7D60E2FC15F3291000C17888 /* CMDetect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D60E2FA15F3291000C17888 /* CMDetect.cpp */; };
 		7D60FD5916535170000352F7 /* iPhone-11-11-12-noWB.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7D60FD5716535170000352F7 /* iPhone-11-11-12-noWB.xml */; };
 		7D60FD5A16535170000352F7 /* iPhone-11-13-12.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7D60FD5816535170000352F7 /* iPhone-11-13-12.xml */; };
+		7D92A49616598FDA0020FD78 /* beep-7.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7D92A49516598FDA0020FD78 /* beep-7.mp3 */; };
 		7DB91E4F160D41F00054F941 /* iPhone-9-21-12.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7DB91E4E160D41F00054F941 /* iPhone-9-21-12.xml */; };
 		7DEC12D31606DEBC0043202D /* MyAVController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DEC12D21606DEBC0043202D /* MyAVController.xib */; };
 		7DEC12D61606E60B0043202D /* Storyboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7DEC12D51606E60B0043202D /* Storyboard.storyboard */; };
@@ -58,7 +58,6 @@
 		43D32E2F11D3A1DB00AFA790 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		7D2B5018164C7CEF00F056E7 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		7D2B501A164C7CFE00F056E7 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		7D57A44C163B5D1C004CFBAB /* beep-7.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "beep-7.mp3"; sourceTree = "<group>"; };
 		7D60E2F315F3202100C17888 /* CMUserParams.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = CMUserParams.xml; sourceTree = "<group>"; };
 		7D60E2F615F3276B00C17888 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = ../../../../usr/lib/libxml2.dylib; sourceTree = "<group>"; };
 		7D60E2F815F328FC00C17888 /* test8-30_4.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "test8-30_4.xml"; sourceTree = "<group>"; };
@@ -66,6 +65,7 @@
 		7D60E2FB15F3291000C17888 /* CMDetect.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CMDetect.hpp; sourceTree = "<group>"; };
 		7D60FD5716535170000352F7 /* iPhone-11-11-12-noWB.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "iPhone-11-11-12-noWB.xml"; sourceTree = "<group>"; };
 		7D60FD5816535170000352F7 /* iPhone-11-13-12.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "iPhone-11-13-12.xml"; sourceTree = "<group>"; };
+		7D92A49516598FDA0020FD78 /* beep-7.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "beep-7.mp3"; sourceTree = "<group>"; };
 		7DB91E4E160D41F00054F941 /* iPhone-9-21-12.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "iPhone-9-21-12.xml"; sourceTree = "<group>"; };
 		7DEC12D21606DEBC0043202D /* MyAVController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MyAVController.xib; path = Classes/MyAVController.xib; sourceTree = "<group>"; };
 		7DEC12D51606E60B0043202D /* Storyboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Storyboard.storyboard; path = Classes/Storyboard.storyboard; sourceTree = "<group>"; };
@@ -146,9 +146,9 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				7D92A49516598FDA0020FD78 /* beep-7.mp3 */,
 				7D60FD5716535170000352F7 /* iPhone-11-11-12-noWB.xml */,
 				7D60FD5816535170000352F7 /* iPhone-11-13-12.xml */,
-				7D57A44C163B5D1C004CFBAB /* beep-7.mp3 */,
 				7DB91E4E160D41F00054F941 /* iPhone-9-21-12.xml */,
 				7DEC12D51606E60B0043202D /* Storyboard.storyboard */,
 				7DEC12D21606DEBC0043202D /* MyAVController.xib */,
@@ -247,9 +247,9 @@
 				7DEC12D31606DEBC0043202D /* MyAVController.xib in Resources */,
 				7DEC12D61606E60B0043202D /* Storyboard.storyboard in Resources */,
 				7DB91E4F160D41F00054F941 /* iPhone-9-21-12.xml in Resources */,
-				7D57A44D163B5D1C004CFBAB /* beep-7.mp3 in Resources */,
 				7D60FD5916535170000352F7 /* iPhone-11-11-12-noWB.xml in Resources */,
 				7D60FD5A16535170000352F7 /* iPhone-11-13-12.xml in Resources */,
+				7D92A49616598FDA0020FD78 /* beep-7.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
