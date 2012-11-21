@@ -182,6 +182,13 @@ int nFrames;
 
 //     [self.maxFramesPerSecond performSelectorOnMainThread : @ selector(setText : ) withObject:myText waitUntilDone:YES];
 
+     if ((int)self.setMarkerID != [self.markerID.text intValue]) {
+         NSString *theText;
+         theText = [NSString stringWithFormat:@"%d", (int)self.setMarkerID.value];
+         [self.markerID performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
+         
+     }
+     
       if ((int)self.setMaxFramesPerSecond.value != [self.maxFramesPerSecond.text intValue]) {
           NSString *theText;
           if (self.setMaxFramesPerSecond.value == 10) 
@@ -234,7 +241,9 @@ int nFrames;
          
          theDetector.AccessImage((unsigned char*)base, width, height ,bytesPerRow);
      
-     
+     // RM 11/20 - ID marker from UI
+         theDetector.SetMarkerID([self.markerID.text intValue]);
+         
      if ((theDetector.FindTarget()))
      {
          countFramesForLock++;
@@ -550,6 +559,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 	self.prevLayer = nil;
     self.setMaxFramesPerSecond = nil;
     self.maxFramesPerSecond = nil;
+    self.setMarkerID = nil;
+    self.markerID = nil;
     
     // should also set the outlets to nil…but instead it releases in dealloc!
 }
@@ -569,6 +580,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [_maxFramesPerSecond release];
     [_maxFramesPerSecond release];
     [_actualFramesPerSecond release];
+    [_setMarkerID release];
+    [_markerID release];
     [super dealloc];
 }
 

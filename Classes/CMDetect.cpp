@@ -428,6 +428,15 @@ int CMDetect::ParseClassifiersParsXML()
     return result;
 }
 
+/////////////
+// overrule
+///////////
+int CMDetect::SetMarkerID(int markerID)
+{
+    permIndices[0] = markerID;
+    nPerms = 1;
+}
+
 // This is the engine of the system. It detects candidate points, computes "clusters" of neairby points, selects the winner, computes a segmentation of the marker and applies consistency checks.
 
 int CMDetect::FindTarget()

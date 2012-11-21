@@ -125,6 +125,8 @@ public:
     int FindTarget();
     int ParseClassifiersParsXML();
     int ParseUserParsXML();
+    
+    int SetMarkerID(int);  // overrules initalization by ParseUserParsXML
 
     std::string  userParsFileName;
     
