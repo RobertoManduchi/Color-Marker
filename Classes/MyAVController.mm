@@ -13,10 +13,16 @@ int  framesPerSecond=0,frameCount = 0;
 float start_time, mainStartTime, startTimeExpLock;
 int countFramesForLock = 0;
 double  minTangent;
+double isTooInclinedStartTime;
+
+int focalLengthInPixels = 627;
 
 #define MIN_FRAMES_N_FOR_EXP_LOCK   2
 #define SECONDS_BEFORE_EXP_UNLOCK   2.
 #define MAX_INCLINATION_ANGLE       35.
+#define MIN_INCLINED_TIME_FOR_VIBRATION 1.
+#define DIST_TO_BEEP_FASTER         1.
+#define MARKER_HEIGHT               0.16
 
 // Test 9/1
 NSString * path = [[NSBundle mainBundle] pathForResource:  @"CMUserParams" ofType: @"xml"];
@@ -57,6 +63,7 @@ NSFileHandle *outFileHandler  = [NSFileHandle fileHandleForWritingToURL:
 
 // RM 12/3
 BOOL    IS_VIBRATING = NO;
+BOOL    IS_TOO_INCLINED = NO;
 
 
 ////
@@ -215,10 +222,21 @@ void MyAudioServicesSystemSoundCompletionProc (
      CMAccelerometerData *theAcceleration = motionManager.accelerometerData;
 
      // vibrate if inclination is MAX_INCLINATION_ANGLE degrees or more
-     if (fabs(theAcceleration.acceleration.y) > 0.1) {
-         if (fabs(theAcceleration.acceleration.x) / fabs(theAcceleration.acceleration.y) > tan(MAX_INCLINATION_ANGLE *3.14/180.)) {
-             [self vibratePhone];
+     if (fabs(theAcceleration.acceleration.y) > 0.1 &&
+         fabs(theAcceleration.acceleration.x) / fabs(theAcceleration.acceleration.y) > tan(MAX_INCLINATION_ANGLE *3.14/180.)) {
+         if (! IS_TOO_INCLINED){
+             IS_TOO_INCLINED = YES;
+             isTooInclinedStartTime = (double)clock();
          }
+         else {
+             if (((double)clock() - isTooInclinedStartTime) / (double)CLOCKS_PER_SEC > MIN_INCLINED_TIME_FOR_VIBRATION) {
+                  [self vibratePhone];
+             }
+             
+         }
+     }
+     else {
+         IS_TOO_INCLINED = NO;
      }
      ///////
      
@@ -343,15 +361,23 @@ void MyAudioServicesSystemSoundCompletionProc (
          
          
          if ((theDetector.outValues.center.iX < theDetector.IMAGE_W * 3/5) &&
-             (theDetector.outValues.center.iX > theDetector.IMAGE_W * 2/5)) {
+             (theDetector.outValues.center.iX > theDetector.IMAGE_W * 2/5) &&
+             (theDetector.outValues.center.iY < theDetector.IMAGE_H * 3/5) &&
+             (theDetector.outValues.center.iY > theDetector.IMAGE_H * 2/5)
+             ) {
              theBeep1.theAudio.volume = 1.;
              theBeep2.theAudio.volume = 1.;
          }
          else{
-             theBeep1.theAudio.volume = 0.1;
-             theBeep2.theAudio.volume = 0.1;
+             theBeep1.theAudio.volume = 0.05;
+             theBeep2.theAudio.volume = 0.05;
          }
-         if (theDetector.rad1 < 100)
+         
+         
+         // look at the marker's apparent height - remember we are in landscape mode
+         double markerImageHeightInPixels = sqrt((double) ((theDetector.outValues.right.iX -  theDetector.outValues.left.iX)*(theDetector.outValues.right.iX -  theDetector.outValues.left.iX) + (theDetector.outValues.right.iY -  theDetector.outValues.left.iY)*(theDetector.outValues.right.iY -  theDetector.outValues.left.iY)));
+         
+         if (markerImageHeightInPixels  / MARKER_HEIGHT < focalLengthInPixels / DIST_TO_BEEP_FASTER)
          {
              [theBeep1 playIt];
              [theBeep2 pauseIt];
