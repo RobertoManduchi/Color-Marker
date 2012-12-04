@@ -29,8 +29,9 @@
 		7D60E2FC15F3291000C17888 /* CMDetect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D60E2FA15F3291000C17888 /* CMDetect.cpp */; };
 		7D60FD5916535170000352F7 /* iPhone-11-11-12-noWB.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7D60FD5716535170000352F7 /* iPhone-11-11-12-noWB.xml */; };
 		7D60FD5A16535170000352F7 /* iPhone-11-13-12.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7D60FD5816535170000352F7 /* iPhone-11-13-12.xml */; };
-		7D92A49616598FDA0020FD78 /* beep-7.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7D92A49516598FDA0020FD78 /* beep-7.mp3 */; };
 		7DB91E4F160D41F00054F941 /* iPhone-9-21-12.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7DB91E4E160D41F00054F941 /* iPhone-9-21-12.xml */; };
+		7DBC25FD166E9A570015A999 /* beep-1.aif in Resources */ = {isa = PBXBuildFile; fileRef = 7DBC25FB166E9A570015A999 /* beep-1.aif */; };
+		7DBC25FE166E9A570015A999 /* beep-2.aif in Resources */ = {isa = PBXBuildFile; fileRef = 7DBC25FC166E9A570015A999 /* beep-2.aif */; };
 		7DEC12D31606DEBC0043202D /* MyAVController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DEC12D21606DEBC0043202D /* MyAVController.xib */; };
 		7DEC12D61606E60B0043202D /* Storyboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7DEC12D51606E60B0043202D /* Storyboard.storyboard */; };
 		7DF1A753163B6E7700208014 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 435D984A11D2089A009ADC4F /* AVFoundation.framework */; };
@@ -68,8 +69,9 @@
 		7D60E2FB15F3291000C17888 /* CMDetect.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CMDetect.hpp; sourceTree = "<group>"; };
 		7D60FD5716535170000352F7 /* iPhone-11-11-12-noWB.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "iPhone-11-11-12-noWB.xml"; sourceTree = "<group>"; };
 		7D60FD5816535170000352F7 /* iPhone-11-13-12.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "iPhone-11-13-12.xml"; sourceTree = "<group>"; };
-		7D92A49516598FDA0020FD78 /* beep-7.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "beep-7.mp3"; sourceTree = "<group>"; };
 		7DB91E4E160D41F00054F941 /* iPhone-9-21-12.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "iPhone-9-21-12.xml"; sourceTree = "<group>"; };
+		7DBC25FB166E9A570015A999 /* beep-1.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "beep-1.aif"; sourceTree = "<group>"; };
+		7DBC25FC166E9A570015A999 /* beep-2.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "beep-2.aif"; sourceTree = "<group>"; };
 		7DEC12D21606DEBC0043202D /* MyAVController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MyAVController.xib; path = Classes/MyAVController.xib; sourceTree = "<group>"; };
 		7DEC12D51606E60B0043202D /* Storyboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Storyboard.storyboard; path = Classes/Storyboard.storyboard; sourceTree = "<group>"; };
 		7DF1A754163B702300208014 /* CMAudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMAudio.h; sourceTree = "<group>"; };
@@ -152,7 +154,8 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				7D92A49516598FDA0020FD78 /* beep-7.mp3 */,
+				7DBC25FB166E9A570015A999 /* beep-1.aif */,
+				7DBC25FC166E9A570015A999 /* beep-2.aif */,
 				7D60FD5716535170000352F7 /* iPhone-11-11-12-noWB.xml */,
 				7D60FD5816535170000352F7 /* iPhone-11-13-12.xml */,
 				7DB91E4E160D41F00054F941 /* iPhone-9-21-12.xml */,
@@ -255,7 +258,8 @@
 				7DB91E4F160D41F00054F941 /* iPhone-9-21-12.xml in Resources */,
 				7D60FD5916535170000352F7 /* iPhone-11-11-12-noWB.xml in Resources */,
 				7D60FD5A16535170000352F7 /* iPhone-11-13-12.xml in Resources */,
-				7D92A49616598FDA0020FD78 /* beep-7.mp3 in Resources */,
+				7DBC25FD166E9A570015A999 /* beep-1.aif in Resources */,
+				7DBC25FE166E9A570015A999 /* beep-2.aif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
