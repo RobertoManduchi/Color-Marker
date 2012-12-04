@@ -21,6 +21,8 @@
 		43D32BCE11D341F400AFA790 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D32BCD11D341F400AFA790 /* QuartzCore.framework */; };
 		7D2B5019164C7CEF00F056E7 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D2B5018164C7CEF00F056E7 /* ImageIO.framework */; };
 		7D2B501B164C7CFE00F056E7 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D2B501A164C7CFE00F056E7 /* libz.dylib */; };
+		7D4AC933166D698D0011139D /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D32E2F11D3A1DB00AFA790 /* AudioToolbox.framework */; };
+		7D4AC936166D71180011139D /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D4AC935166D71180011139D /* CoreMotion.framework */; };
 		7D60E2F515F3202100C17888 /* CMUserParams.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7D60E2F315F3202100C17888 /* CMUserParams.xml */; };
 		7D60E2F715F3276B00C17888 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D60E2F615F3276B00C17888 /* libxml2.dylib */; };
 		7D60E2F915F328FC00C17888 /* test8-30_4.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7D60E2F815F328FC00C17888 /* test8-30_4.xml */; };
@@ -58,6 +60,7 @@
 		43D32E2F11D3A1DB00AFA790 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		7D2B5018164C7CEF00F056E7 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		7D2B501A164C7CFE00F056E7 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		7D4AC935166D71180011139D /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		7D60E2F315F3202100C17888 /* CMUserParams.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = CMUserParams.xml; sourceTree = "<group>"; };
 		7D60E2F615F3276B00C17888 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = ../../../../usr/lib/libxml2.dylib; sourceTree = "<group>"; };
 		7D60E2F815F328FC00C17888 /* test8-30_4.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "test8-30_4.xml"; sourceTree = "<group>"; };
@@ -80,6 +83,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7D4AC936166D71180011139D /* CoreMotion.framework in Frameworks */,
+				7D4AC933166D698D0011139D /* AudioToolbox.framework in Frameworks */,
 				7D2B501B164C7CFE00F056E7 /* libz.dylib in Frameworks */,
 				7D2B5019164C7CEF00F056E7 /* ImageIO.framework in Frameworks */,
 				7DF1A753163B6E7700208014 /* AVFoundation.framework in Frameworks */,
@@ -124,6 +129,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				7D4AC935166D71180011139D /* CoreMotion.framework */,
 				E871D4ED12E782BB00E59564 /* Libraries */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,

@@ -3,15 +3,20 @@
 #import "MyAVController.h"
 #import "CMDetect.hpp"
 #import "CMAudio.h"
+#import <AudioToolbox/AudioToolbox.h>
+#import <AudioToolbox/AudioServices.h>
+#import <UIKit/UIKit.h>
+#import <CoreMotion/CoreMotion.h>
 
 int nRecorded = 0;
 int  framesPerSecond=0,frameCount = 0;
 float start_time, mainStartTime, startTimeExpLock;
 int countFramesForLock = 0;
+double  minTangent;
 
 #define MIN_FRAMES_N_FOR_EXP_LOCK   2
 #define SECONDS_BEFORE_EXP_UNLOCK   2.
-
+#define MAX_INCLINATION_ANGLE       35.
 
 // Test 9/1
 NSString * path = [[NSBundle mainBundle] pathForResource:  @"CMUserParams" ofType: @"xml"];
@@ -32,7 +37,8 @@ CMDetect theDetector(userParsFileName,classParsFileName);
 CMAudio* theBeep1 = [[CMAudio alloc] initWithName:@"beep-1" andType:@"aif"];  // when am I going to deallocate it?x
 CMAudio* theBeep2 = [[CMAudio alloc] initWithName:@"beep-2" andType:@"aif"];  // when am I going to deallocate it?x
 
-
+// RM 12/2
+CMMotionManager *motionManager = [[CMMotionManager alloc] init];
 
 // RM 10/26
 //NSString * outFilePath;
@@ -49,6 +55,8 @@ NSFileHandle *outFileHandler  = [NSFileHandle fileHandleForWritingToURL:
                    [NSURL fileURLWithPath:outFilePath] error:NULL];
 
 
+// RM 12/3
+BOOL    IS_VIBRATING = NO;
 
 
 ////
@@ -61,6 +69,24 @@ NSFileHandle *outFileHandler  = [NSFileHandle fileHandleForWritingToURL:
 
 int nFrames;
 
+// RM 12/3 - vibration routines
+void MyAudioServicesSystemSoundCompletionProc (
+                                               SystemSoundID  ssID,
+                                               void           *clientData
+                                               )
+{
+   IS_VIBRATING = NO; 
+}
+
+- (void) vibratePhone {
+    if (!IS_VIBRATING) {
+        IS_VIBRATING = YES;
+        AudioServicesAddSystemSoundCompletion(kSystemSoundID_Vibrate, nil, nil, MyAudioServicesSystemSoundCompletionProc, (void*) self);
+        AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+    }
+}
+////////////
+
 #pragma mark -
 #pragma mark Initialization
 - (id)init {
@@ -72,6 +98,7 @@ int nFrames;
 		self.customLayer = nil;
         
         self.shouldTakeSnapshot = NO;
+        
 	}
 	return self;
 }
@@ -91,6 +118,7 @@ int nFrames;
     [theBeep2 playIt];
     [theBeep2.theAudio pause];
 
+    [motionManager startAccelerometerUpdates];
    
 	/*We setup the input*/
     
@@ -182,6 +210,19 @@ int nFrames;
 
 //     [self.maxFramesPerSecond performSelectorOnMainThread : @ selector(setText : ) withObject:myText waitUntilDone:YES];
 
+     // RM 12/3
+        
+     CMAccelerometerData *theAcceleration = motionManager.accelerometerData;
+
+     // vibrate if inclination is MAX_INCLINATION_ANGLE degrees or more
+     if (fabs(theAcceleration.acceleration.y) > 0.1) {
+         if (fabs(theAcceleration.acceleration.x) / fabs(theAcceleration.acceleration.y) > tan(MAX_INCLINATION_ANGLE *3.14/180.)) {
+             [self vibratePhone];
+         }
+     }
+     ///////
+     
+     
      if ((int)self.setMarkerID != [self.markerID.text intValue]) {
          NSString *theText;
          theText = [NSString stringWithFormat:@"%d", (int)self.setMarkerID.value];
@@ -246,6 +287,7 @@ int nFrames;
          
      if ((theDetector.FindTarget()))
      {
+         
          countFramesForLock++;
          if (countFramesForLock >= MIN_FRAMES_N_FOR_EXP_LOCK) {
              // good exposure - lock it!
@@ -561,6 +603,9 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     self.maxFramesPerSecond = nil;
     self.setMarkerID = nil;
     self.markerID = nil;
+    motionManager = nil;
+    theBeep1 = nil;
+    theBeep2 = nil;
     
     // should also set the outlets to nil…but instead it releases in dealloc!
 }
@@ -574,6 +619,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [outFileHandler writeData:[[NSString stringWithFormat: @"</NumberOfQuintuples>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
     
     [outFileHandler closeFile];
+    [motionManager stopAccelerometerUpdates];
+    [motionManager release];
     [framesPerSecond release];
     [_maxFramesPerSecond release];
     [_setMaxFramesPerSecond release];
