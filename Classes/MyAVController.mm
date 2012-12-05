@@ -239,7 +239,15 @@ void MyAudioServicesSystemSoundCompletionProc (
          IS_TOO_INCLINED = NO;
      }
      ///////
-     
+     if ((int)self.setMaxDistance != [self.maxDistance.text intValue]) {
+         NSString *theText;
+         if (self.setMaxDistance.value == 0)
+             theText = @"- - -";
+         else
+             theText = [NSString stringWithFormat:@"%d", (int)self.setMaxDistance.value];
+         
+         [self.maxDistance performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
+     }
      
      if ((int)self.setMarkerID != [self.markerID.text intValue]) {
          NSString *theText;
@@ -379,8 +387,19 @@ void MyAudioServicesSystemSoundCompletionProc (
          
          if (markerImageHeightInPixels  / MARKER_HEIGHT < focalLengthInPixels / DIST_TO_BEEP_FASTER)
          {
-             [theBeep1 playIt];
-             [theBeep2 pauseIt];
+             // it is furhter away than 1 meter
+             
+             // check if it is within the max distance
+             if ((double)self.setMaxDistance.value == 0 ||
+                 markerImageHeightInPixels  / MARKER_HEIGHT >
+                 focalLengthInPixels / (double)self.setMaxDistance.value) {
+                 [theBeep1 playIt];
+                 [theBeep2 pauseIt];
+             }
+             else{
+                 [theBeep1 pauseIt];
+                 [theBeep2 pauseIt];
+             }
          }
          else
          {
@@ -655,6 +674,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [_actualFramesPerSecond release];
     [_setMarkerID release];
     [_markerID release];
+    [_setMaxDistance release];
+    [_maxDistance release];
     [super dealloc];
 }
 
