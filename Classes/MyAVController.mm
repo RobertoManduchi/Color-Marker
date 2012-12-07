@@ -15,14 +15,15 @@ int countFramesForLock = 0;
 double  minTangent;
 double isTooInclinedStartTime;
 
-int focalLengthInPixels = 627;
+double focalLengthInPixels[3] = {627.,464.,260.};
 
-#define MIN_FRAMES_N_FOR_EXP_LOCK   2
-#define SECONDS_BEFORE_EXP_UNLOCK   2.
+#define MIN_FRAMES_N_FOR_EXP_LOCK   4
+#define SECONDS_BEFORE_EXP_UNLOCK   1.
 #define MAX_INCLINATION_ANGLE       35.
 #define MIN_INCLINED_TIME_FOR_VIBRATION 1.
 #define DIST_TO_BEEP_FASTER         1.
 #define MARKER_HEIGHT               0.16
+
 
 // Test 9/1
 NSString * path = [[NSBundle mainBundle] pathForResource:  @"CMUserParams" ofType: @"xml"];
@@ -62,6 +63,7 @@ NSFileHandle *outFileHandler  = [NSFileHandle fileHandleForWritingToURL:
 
 
 // RM 12/3
+BOOL    IS_BEEPING = NO;
 BOOL    IS_VIBRATING = NO;
 BOOL    IS_TOO_INCLINED = NO;
 
@@ -77,10 +79,10 @@ BOOL    IS_TOO_INCLINED = NO;
 int nFrames;
 
 // RM 12/3 - vibration routines
-void MyAudioServicesSystemSoundCompletionProc (
+void MyAudioServicesSystemVibrationCompletionProc (
                                                SystemSoundID  ssID,
                                                void           *clientData
-                                               )
+                                            )
 {
    IS_VIBRATING = NO; 
 }
@@ -88,11 +90,44 @@ void MyAudioServicesSystemSoundCompletionProc (
 - (void) vibratePhone {
     if (!IS_VIBRATING) {
         IS_VIBRATING = YES;
-        AudioServicesAddSystemSoundCompletion(kSystemSoundID_Vibrate, nil, nil, MyAudioServicesSystemSoundCompletionProc, (void*) self);
+        AudioServicesAddSystemSoundCompletion(kSystemSoundID_Vibrate, nil, nil, MyAudioServicesSystemVibrationCompletionProc, (void*) self);
         AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
     }
 }
 ////////////
+
+// RM 12/5 - trying new beeping modality
+//
+//SystemSoundID   beep1ID, beep2ID;
+//
+//CFURLRef urlBeep1, urlBeep2;
+//
+//
+//void MyAudioServicesSystemSoundCompletionProc (
+//                                               SystemSoundID  ssID,
+//                                               void           *clientData
+//                                               )
+//{
+//    IS_BEEPING = NO;
+//}
+//
+//- (void) beepPhone: (int) whichBeep {
+//    
+//    SystemSoundID theBeepID;
+//    
+//    if (!IS_BEEPING) {
+//        IS_BEEPING = YES;
+//        if (whichBeep==1) {
+//            theBeepID = beep1ID;
+//        }
+//        else {
+//             theBeepID = beep2ID;
+//        }
+//        AudioServicesAddSystemSoundCompletion(theBeepID, nil, nil, MyAudioServicesSystemSoundCompletionProc, (void*) self);
+//        AudioServicesPlaySystemSound(theBeepID);
+//    }
+//}
+//
 
 #pragma mark -
 #pragma mark Initialization
@@ -124,6 +159,13 @@ void MyAudioServicesSystemSoundCompletionProc (
     [theBeep1.theAudio pause];
     [theBeep2 playIt];
     [theBeep2.theAudio pause];
+    
+// - in case I need a beep
+//    urlBeep1 = (CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"beep-1" ofType:@"aif"]];
+//    urlBeep2 = (CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"beep-2" ofType:@"aif"]];
+//    
+//    AudioServicesCreateSystemSoundID((CFURLRef)urlBeep1, &beep1ID);
+//    AudioServicesCreateSystemSoundID((CFURLRef)urlBeep2, &beep2ID);
 
     [motionManager startAccelerometerUpdates];
    
@@ -196,7 +238,8 @@ void MyAudioServicesSystemSoundCompletionProc (
     //Once startRunning is called the camera will start capturing frames 
 	[self.captureSession startRunning];
         
-	
+	[theBeep1.theAudio prepareToPlay];
+	[theBeep2.theAudio prepareToPlay];
 }
 
 
@@ -216,7 +259,8 @@ void MyAudioServicesSystemSoundCompletionProc (
      // then we need to clear it?
 
 //     [self.maxFramesPerSecond performSelectorOnMainThread : @ selector(setText : ) withObject:myText waitUntilDone:YES];
-
+     
+     
      // RM 12/3
         
      CMAccelerometerData *theAcceleration = motionManager.accelerometerData;
@@ -239,6 +283,24 @@ void MyAudioServicesSystemSoundCompletionProc (
          IS_TOO_INCLINED = NO;
      }
      ///////
+     NSString *theText;
+     
+     switch ((int)self.setWhichLens.value) {
+         case 0:
+             theText = @"- - -";
+             break;
+         case 1:
+             theText = @"wide";
+             break;
+         case 2:
+             theText = @"fish";
+             break;
+         default:
+             break;
+     }
+     [self.whichLens performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
+
+     
      if ((int)self.setMaxDistance != [self.maxDistance.text intValue]) {
          NSString *theText;
          if (self.setMaxDistance.value == 0)
@@ -385,32 +447,32 @@ void MyAudioServicesSystemSoundCompletionProc (
          // look at the marker's apparent height - remember we are in landscape mode
          double markerImageHeightInPixels = sqrt((double) ((theDetector.outValues.right.iX -  theDetector.outValues.left.iX)*(theDetector.outValues.right.iX -  theDetector.outValues.left.iX) + (theDetector.outValues.right.iY -  theDetector.outValues.left.iY)*(theDetector.outValues.right.iY -  theDetector.outValues.left.iY)));
          
-         if (markerImageHeightInPixels  / MARKER_HEIGHT < focalLengthInPixels / DIST_TO_BEEP_FASTER)
+         if ((markerImageHeightInPixels  / MARKER_HEIGHT) < (focalLengthInPixels[(int)self.setWhichLens.value] / DIST_TO_BEEP_FASTER))
          {
              // it is furhter away than 1 meter
              
              // check if it is within the max distance
              if ((double)self.setMaxDistance.value == 0 ||
                  markerImageHeightInPixels  / MARKER_HEIGHT >
-                 focalLengthInPixels / (double)self.setMaxDistance.value) {
+                 focalLengthInPixels[(int)self.setWhichLens.value] / (double)self.setMaxDistance.value) {
                  [theBeep1 playIt];
-                 [theBeep2 pauseIt];
+                 [theBeep2 stopIt];
              }
              else{
-                 [theBeep1 pauseIt];
-                 [theBeep2 pauseIt];
+                 [theBeep1 stopIt];
+                 [theBeep2 stopIt];
              }
          }
          else
          {
              [theBeep2 playIt];
-             [theBeep1 pauseIt];
+             [theBeep1 stopIt];
          }
      }     
      else   // not found
      {
-         [theBeep1 pauseIt];
-         [theBeep2 pauseIt];
+         [theBeep1 stopIt];
+         [theBeep2 stopIt];
          
          countFramesForLock = 0;
          
@@ -676,6 +738,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [_markerID release];
     [_setMaxDistance release];
     [_maxDistance release];
+    [_setWhichLens release];
+    [_whichLens release];
     [super dealloc];
 }
 

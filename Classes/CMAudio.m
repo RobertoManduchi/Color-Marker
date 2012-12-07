@@ -34,14 +34,17 @@
 - (void) playIt {
     
     if (!self.theAudio.isPlaying) {
+        // RM 12/5
         [self.theAudio play];
     }
     
 }
-- (void) pauseIt {
+- (void) stopIt {
     
     if (self.theAudio.isPlaying) {
-        [self.theAudio pause];
+//        [self.theAudio pause];
+        [self.theAudio stop];
+        [self.theAudio prepareToPlay];
     }
     
 }

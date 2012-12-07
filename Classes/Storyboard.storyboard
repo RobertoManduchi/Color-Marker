@@ -93,6 +93,24 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <stepper opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" autorepeat="NO" wraps="YES" maximumValue="2" id="zKh-qD-09w">
+                                <rect key="frame" x="113" y="376" width="94" height="27"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            </stepper>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="lens" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="jtk-5p-e5h">
+                                <rect key="frame" x="144" y="354" width="32" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="- - -" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="liI-aE-2vn">
+                                <rect key="frame" x="139" y="338" width="42" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
@@ -104,6 +122,8 @@
                         <outlet property="setMarkerID" destination="KUm-pq-x82" id="ePu-jA-Kis"/>
                         <outlet property="setMaxDistance" destination="iVf-ML-sON" id="cKL-5h-m7c"/>
                         <outlet property="setMaxFramesPerSecond" destination="KS0-ZS-CnL" id="RCX-WY-e36"/>
+                        <outlet property="setWhichLens" destination="zKh-qD-09w" id="vu8-8p-b8I"/>
+                        <outlet property="whichLens" destination="liI-aE-2vn" id="enJ-7t-kcT"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ly9-cy-Ame" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -111,21 +131,6 @@
             <point key="canvasLocation" x="-50" y="65"/>
         </scene>
     </scenes>
-    <classes>
-        <class className="MyAVController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/MyAVController.h"/>
-            <relationships>
-                <relationship kind="action" name="takeSnapshot:"/>
-                <relationship kind="outlet" name="actualFramesPerSecond" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="markerID" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="maxDistance" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="maxFramesPerSecond" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="setMarkerID" candidateClass="UIStepper"/>
-                <relationship kind="outlet" name="setMaxDistance" candidateClass="UIStepper"/>
-                <relationship kind="outlet" name="setMaxFramesPerSecond" candidateClass="UIStepper"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

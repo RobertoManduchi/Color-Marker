@@ -20,6 +20,13 @@
 //    // RM 9/16
 //    [window addSubview:viewController.view];
 //    [window makeKeyAndVisible];
+    
+    // RM 12/6 - to avoide idle
+    [UIApplication sharedApplication].idleTimerDisabled=YES;
+    
+    // wold this be better?
+    // [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
+    
 //
     return YES;
 }

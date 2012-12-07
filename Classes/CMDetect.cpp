@@ -1595,6 +1595,10 @@ int CMDetect::LoadTable(){
         
         // anything below the smallest value found (divided by margin ratio) in each channel is set to '1' ('not detect')
         
+        // RM test 12/6
+        classPar_t_min_1[id] /=4;
+        classPar_t_min_2[id] /=4;
+        
         
         for (int i=0; i < classPar_t_min_1[id]; i++)
             for (int j = 0; j <= 255; j++)

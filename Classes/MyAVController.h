@@ -35,6 +35,9 @@
 @property (retain, nonatomic) IBOutlet UILabel *markerID;
 @property (retain, nonatomic) IBOutlet UIStepper *setMaxDistance;
 @property (retain, nonatomic) IBOutlet UILabel *maxDistance;
+@property (retain, nonatomic) IBOutlet UIStepper *setWhichLens; // 0: no additional lens; 1: wide angle; 2: fisheye
+
+@property (retain, nonatomic) IBOutlet UILabel *whichLens;
 
 // I think that this should be in the @interface
 - (IBAction)takeSnapshot:(id)sender;

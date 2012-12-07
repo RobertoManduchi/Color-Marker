@@ -32,6 +32,7 @@
 		7DB91E4F160D41F00054F941 /* iPhone-9-21-12.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7DB91E4E160D41F00054F941 /* iPhone-9-21-12.xml */; };
 		7DBC25FD166E9A570015A999 /* beep-1.aif in Resources */ = {isa = PBXBuildFile; fileRef = 7DBC25FB166E9A570015A999 /* beep-1.aif */; };
 		7DBC25FE166E9A570015A999 /* beep-2.aif in Resources */ = {isa = PBXBuildFile; fileRef = 7DBC25FC166E9A570015A999 /* beep-2.aif */; };
+		7DD4670B1671805300C6C5F4 /* ColorMarkerExample.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DD4670A1671805300C6C5F4 /* ColorMarkerExample.png */; };
 		7DEC12D31606DEBC0043202D /* MyAVController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DEC12D21606DEBC0043202D /* MyAVController.xib */; };
 		7DEC12D61606E60B0043202D /* Storyboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7DEC12D51606E60B0043202D /* Storyboard.storyboard */; };
 		7DF1A753163B6E7700208014 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 435D984A11D2089A009ADC4F /* AVFoundation.framework */; };
@@ -72,6 +73,7 @@
 		7DB91E4E160D41F00054F941 /* iPhone-9-21-12.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "iPhone-9-21-12.xml"; sourceTree = "<group>"; };
 		7DBC25FB166E9A570015A999 /* beep-1.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "beep-1.aif"; sourceTree = "<group>"; };
 		7DBC25FC166E9A570015A999 /* beep-2.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "beep-2.aif"; sourceTree = "<group>"; };
+		7DD4670A1671805300C6C5F4 /* ColorMarkerExample.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ColorMarkerExample.png; sourceTree = "<group>"; };
 		7DEC12D21606DEBC0043202D /* MyAVController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MyAVController.xib; path = Classes/MyAVController.xib; sourceTree = "<group>"; };
 		7DEC12D51606E60B0043202D /* Storyboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Storyboard.storyboard; path = Classes/Storyboard.storyboard; sourceTree = "<group>"; };
 		7DF1A754163B702300208014 /* CMAudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMAudio.h; sourceTree = "<group>"; };
@@ -154,6 +156,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				7DD4670A1671805300C6C5F4 /* ColorMarkerExample.png */,
 				7DBC25FB166E9A570015A999 /* beep-1.aif */,
 				7DBC25FC166E9A570015A999 /* beep-2.aif */,
 				7D60FD5716535170000352F7 /* iPhone-11-11-12-noWB.xml */,
@@ -260,6 +263,7 @@
 				7D60FD5A16535170000352F7 /* iPhone-11-13-12.xml in Resources */,
 				7DBC25FD166E9A570015A999 /* beep-1.aif in Resources */,
 				7DBC25FE166E9A570015A999 /* beep-2.aif in Resources */,
+				7DD4670B1671805300C6C5F4 /* ColorMarkerExample.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

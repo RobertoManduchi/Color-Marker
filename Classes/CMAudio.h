@@ -15,5 +15,5 @@
 -(id) initWithName:(NSString*)sndTxt andType:(NSString*)sndType;
 //-(void) playIt:(NSString*)sndTxt andType:(NSString*)sndType;
 -(void) playIt;
--(void) pauseIt;
+-(void) stopIt;
 @end
