@@ -29,6 +29,15 @@
 		7D60E2FC15F3291000C17888 /* CMDetect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D60E2FA15F3291000C17888 /* CMDetect.cpp */; };
 		7D60FD5916535170000352F7 /* iPhone-11-11-12-noWB.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7D60FD5716535170000352F7 /* iPhone-11-11-12-noWB.xml */; };
 		7D60FD5A16535170000352F7 /* iPhone-11-13-12.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7D60FD5816535170000352F7 /* iPhone-11-13-12.xml */; };
+		7D74D9E2167AA97700852A85 /* iPhone-12-13-12.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7D74D9E1167AA97700852A85 /* iPhone-12-13-12.xml */; };
+		7D74D9E4167AADF300852A85 /* rotateDown.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7D74D9E3167AADF300852A85 /* rotateDown.wav */; };
+		7D74D9EC167ABB8200852A85 /* rotateLeftAndUp.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7D74D9E5167ABB8200852A85 /* rotateLeftAndUp.wav */; };
+		7D74D9ED167ABB8200852A85 /* rotateLeft.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7D74D9E6167ABB8200852A85 /* rotateLeft.wav */; };
+		7D74D9EE167ABB8200852A85 /* rotateLeftAndDown.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7D74D9E7167ABB8200852A85 /* rotateLeftAndDown.wav */; };
+		7D74D9EF167ABB8200852A85 /* rotateRightAndDown.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7D74D9E8167ABB8200852A85 /* rotateRightAndDown.wav */; };
+		7D74D9F0167ABB8200852A85 /* rotateRight.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7D74D9E9167ABB8200852A85 /* rotateRight.wav */; };
+		7D74D9F1167ABB8200852A85 /* rotateRightAndUp.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7D74D9EA167ABB8200852A85 /* rotateRightAndUp.wav */; };
+		7D74D9F2167ABB8200852A85 /* rotateUp.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7D74D9EB167ABB8200852A85 /* rotateUp.wav */; };
 		7DB91E4F160D41F00054F941 /* iPhone-9-21-12.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7DB91E4E160D41F00054F941 /* iPhone-9-21-12.xml */; };
 		7DBC25FD166E9A570015A999 /* beep-1.aif in Resources */ = {isa = PBXBuildFile; fileRef = 7DBC25FB166E9A570015A999 /* beep-1.aif */; };
 		7DBC25FE166E9A570015A999 /* beep-2.aif in Resources */ = {isa = PBXBuildFile; fileRef = 7DBC25FC166E9A570015A999 /* beep-2.aif */; };
@@ -70,6 +79,15 @@
 		7D60E2FB15F3291000C17888 /* CMDetect.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CMDetect.hpp; sourceTree = "<group>"; };
 		7D60FD5716535170000352F7 /* iPhone-11-11-12-noWB.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "iPhone-11-11-12-noWB.xml"; sourceTree = "<group>"; };
 		7D60FD5816535170000352F7 /* iPhone-11-13-12.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "iPhone-11-13-12.xml"; sourceTree = "<group>"; };
+		7D74D9E1167AA97700852A85 /* iPhone-12-13-12.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "iPhone-12-13-12.xml"; sourceTree = "<group>"; };
+		7D74D9E3167AADF300852A85 /* rotateDown.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = rotateDown.wav; sourceTree = "<group>"; };
+		7D74D9E5167ABB8200852A85 /* rotateLeftAndUp.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = rotateLeftAndUp.wav; sourceTree = "<group>"; };
+		7D74D9E6167ABB8200852A85 /* rotateLeft.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = rotateLeft.wav; sourceTree = "<group>"; };
+		7D74D9E7167ABB8200852A85 /* rotateLeftAndDown.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = rotateLeftAndDown.wav; sourceTree = "<group>"; };
+		7D74D9E8167ABB8200852A85 /* rotateRightAndDown.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = rotateRightAndDown.wav; sourceTree = "<group>"; };
+		7D74D9E9167ABB8200852A85 /* rotateRight.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = rotateRight.wav; sourceTree = "<group>"; };
+		7D74D9EA167ABB8200852A85 /* rotateRightAndUp.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = rotateRightAndUp.wav; sourceTree = "<group>"; };
+		7D74D9EB167ABB8200852A85 /* rotateUp.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = rotateUp.wav; sourceTree = "<group>"; };
 		7DB91E4E160D41F00054F941 /* iPhone-9-21-12.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "iPhone-9-21-12.xml"; sourceTree = "<group>"; };
 		7DBC25FB166E9A570015A999 /* beep-1.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "beep-1.aif"; sourceTree = "<group>"; };
 		7DBC25FC166E9A570015A999 /* beep-2.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "beep-2.aif"; sourceTree = "<group>"; };
@@ -156,6 +174,15 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				7D74D9E5167ABB8200852A85 /* rotateLeftAndUp.wav */,
+				7D74D9E6167ABB8200852A85 /* rotateLeft.wav */,
+				7D74D9E7167ABB8200852A85 /* rotateLeftAndDown.wav */,
+				7D74D9E8167ABB8200852A85 /* rotateRightAndDown.wav */,
+				7D74D9E9167ABB8200852A85 /* rotateRight.wav */,
+				7D74D9EA167ABB8200852A85 /* rotateRightAndUp.wav */,
+				7D74D9EB167ABB8200852A85 /* rotateUp.wav */,
+				7D74D9E3167AADF300852A85 /* rotateDown.wav */,
+				7D74D9E1167AA97700852A85 /* iPhone-12-13-12.xml */,
 				7DD4670A1671805300C6C5F4 /* ColorMarkerExample.png */,
 				7DBC25FB166E9A570015A999 /* beep-1.aif */,
 				7DBC25FC166E9A570015A999 /* beep-2.aif */,
@@ -264,6 +291,15 @@
 				7DBC25FD166E9A570015A999 /* beep-1.aif in Resources */,
 				7DBC25FE166E9A570015A999 /* beep-2.aif in Resources */,
 				7DD4670B1671805300C6C5F4 /* ColorMarkerExample.png in Resources */,
+				7D74D9E2167AA97700852A85 /* iPhone-12-13-12.xml in Resources */,
+				7D74D9E4167AADF300852A85 /* rotateDown.wav in Resources */,
+				7D74D9EC167ABB8200852A85 /* rotateLeftAndUp.wav in Resources */,
+				7D74D9ED167ABB8200852A85 /* rotateLeft.wav in Resources */,
+				7D74D9EE167ABB8200852A85 /* rotateLeftAndDown.wav in Resources */,
+				7D74D9EF167ABB8200852A85 /* rotateRightAndDown.wav in Resources */,
+				7D74D9F0167ABB8200852A85 /* rotateRight.wav in Resources */,
+				7D74D9F1167ABB8200852A85 /* rotateRightAndUp.wav in Resources */,
+				7D74D9F2167ABB8200852A85 /* rotateUp.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -36,8 +36,9 @@
 @property (retain, nonatomic) IBOutlet UIStepper *setMaxDistance;
 @property (retain, nonatomic) IBOutlet UILabel *maxDistance;
 @property (retain, nonatomic) IBOutlet UIStepper *setWhichLens; // 0: no additional lens; 1: wide angle; 2: fisheye
-
 @property (retain, nonatomic) IBOutlet UILabel *whichLens;
+@property (retain, nonatomic) IBOutlet UIStepper *setModalityForDirections; // 0: noDirections; 1: volume; 2: volume + speech
+@property (retain, nonatomic) IBOutlet UILabel *modalityForDirections;
 
 // I think that this should be in the @interface
 - (IBAction)takeSnapshot:(id)sender;

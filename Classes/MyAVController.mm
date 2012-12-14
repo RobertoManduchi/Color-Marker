@@ -14,6 +14,7 @@ float start_time, mainStartTime, startTimeExpLock;
 int countFramesForLock = 0;
 double  minTangent;
 double isTooInclinedStartTime;
+double  timeSinceLastDirection = 0.;
 
 double focalLengthInPixels[3] = {627.,464.,260.};
 
@@ -23,6 +24,8 @@ double focalLengthInPixels[3] = {627.,464.,260.};
 #define MIN_INCLINED_TIME_FOR_VIBRATION 1.
 #define DIST_TO_BEEP_FASTER         1.
 #define MARKER_HEIGHT               0.16
+#define HALF_RELATIVE_WIDTH_CENTER  0.1
+#define MIN_TIME_BETWEEN_DIRECTIONS 3
 
 
 // Test 9/1
@@ -33,7 +36,8 @@ std::string userParsFileName = [path cStringUsingEncoding:1];
 //NSString * path2  = [[NSBundle mainBundle] pathForResource:  @"iPhone-9-21-12" ofType: @"xml"];
 /*********************/
 
-NSString * path2  = [[NSBundle mainBundle] pathForResource:  @"iPhone-11-13-12" ofType: @"xml"];
+//NSString * path2  = [[NSBundle mainBundle] pathForResource:  @"iPhone-11-13-12" ofType: @"xml"];
+NSString * path2  = [[NSBundle mainBundle] pathForResource:  @"iPhone-12-13-12" ofType: @"xml"];
 std::string classParsFileName = [path2 cStringUsingEncoding:1];
 
 CMDetect theDetector(userParsFileName,classParsFileName);
@@ -41,8 +45,18 @@ CMDetect theDetector(userParsFileName,classParsFileName);
 //////////
 
 // RM 10/25
-CMAudio* theBeep1 = [[CMAudio alloc] initWithName:@"beep-1" andType:@"aif"];  // when am I going to deallocate it?x
-CMAudio* theBeep2 = [[CMAudio alloc] initWithName:@"beep-2" andType:@"aif"];  // when am I going to deallocate it?x
+CMAudio* theBeep1 = [[CMAudio alloc] initWithName:@"beep-1" andType:@"aif" andLooping:FALSE];  // when am I going to deallocate it?x
+CMAudio* theBeep2 = [[CMAudio alloc] initWithName:@"beep-2" andType:@"aif" andLooping:YES];  // when am I going to deallocate it?x
+
+// RM 12/13
+CMAudio* rotateUp = [[CMAudio alloc] initWithName:@"rotateUp" andType:@"wav" andLooping:NO];
+CMAudio* rotateDown = [[CMAudio alloc] initWithName:@"rotateDown" andType:@"wav" andLooping:NO];
+CMAudio* rotateLeft = [[CMAudio alloc] initWithName:@"rotateLeft" andType:@"wav" andLooping:NO];
+CMAudio* rotateRight = [[CMAudio alloc] initWithName:@"rotateRight" andType:@"wav" andLooping:NO];
+CMAudio* rotateLeftAndUp = [[CMAudio alloc] initWithName:@"rotateLeftAndUp" andType:@"wav" andLooping:NO];
+CMAudio* rotateRightAndUp = [[CMAudio alloc] initWithName:@"rotateRightAndUp" andType:@"wav" andLooping:NO];
+CMAudio* rotateLeftAndDown = [[CMAudio alloc] initWithName:@"rotateLeftAndDown" andType:@"wav" andLooping:NO];
+CMAudio* rotateRightAndDown = [[CMAudio alloc] initWithName:@"rotateRightAndDown" andType:@"wav" andLooping:NO];
 
 // RM 12/2
 CMMotionManager *motionManager = [[CMMotionManager alloc] init];
@@ -159,6 +173,17 @@ void MyAudioServicesSystemVibrationCompletionProc (
     [theBeep1.theAudio pause];
     [theBeep2 playIt];
     [theBeep2.theAudio pause];
+    
+//    [theBeep1 prepareToPlay];
+//    [theBeep2 prepareToPlay];
+//    [rotateLeft prepareToPlay];
+//    [rotateRight prepareToPlay];
+//    [rotateUp prepareToPlay];
+//    [rotateDown prepareToPlay];
+//    [rotateLeftAndUp prepareToPlay];
+//    [rotateLeftAndDown prepareToPlay];
+//    [rotateRightAndUp prepareToPlay];
+//    [rotateRightAndDown prepareToPlay];
     
 // - in case I need a beep
 //    urlBeep1 = (CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"beep-1" ofType:@"aif"]];
@@ -300,6 +325,23 @@ void MyAudioServicesSystemVibrationCompletionProc (
      }
      [self.whichLens performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
 
+     switch ((int)self.setModalityForDirections.value) {
+         case 0:
+             theText = @"no dir";
+             break;
+         case 1:
+             theText = @"volume";
+             break;
+         case 2:
+             theText = @"speech";
+             break;
+         default:
+             break;
+     }
+     [self.modalityForDirections performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
+     
+     
+     
      
      if ((int)self.setMaxDistance != [self.maxDistance.text intValue]) {
          NSString *theText;
@@ -430,18 +472,97 @@ void MyAudioServicesSystemVibrationCompletionProc (
          [outFileHandler writeData:[[NSString stringWithFormat: @"</Quintuple>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
          
          
-         if ((theDetector.outValues.center.iX < theDetector.IMAGE_W * 3/5) &&
-             (theDetector.outValues.center.iX > theDetector.IMAGE_W * 2/5) &&
-             (theDetector.outValues.center.iY < theDetector.IMAGE_H * 3/5) &&
-             (theDetector.outValues.center.iY > theDetector.IMAGE_H * 2/5)
-             ) {
+         BOOL check1 = (theDetector.outValues.center.iX < theDetector.IMAGE_W * (0.5+HALF_RELATIVE_WIDTH_CENTER));
+         BOOL check2 = (theDetector.outValues.center.iX > theDetector.IMAGE_W * (0.5-HALF_RELATIVE_WIDTH_CENTER));
+         BOOL check3 = (theDetector.outValues.center.iY < theDetector.IMAGE_H * (0.5+HALF_RELATIVE_WIDTH_CENTER));
+         BOOL check4 = (theDetector.outValues.center.iY > theDetector.IMAGE_H * (0.5-HALF_RELATIVE_WIDTH_CENTER));
+         
+
+         if (check1 && check2 && check3 && check4) {
+             // center region
              theBeep1.theAudio.volume = 1.;
              theBeep2.theAudio.volume = 1.;
          }
          else{
-             theBeep1.theAudio.volume = 0.05;
-             theBeep2.theAudio.volume = 0.05;
+             if ((int)self.setModalityForDirections.value != 0) {
+                 theBeep1.theAudio.volume = 0.05;
+                 theBeep2.theAudio.volume = 0.05;
+                 if ((int)self.setModalityForDirections.value == 2) {
+                     if (check1 && check2 && !check3)
+                     {
+                         // W
+                         if ((clock() - timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
+                             timeSinceLastDirection = clock();
+                             [rotateLeft playIt];
+                         }
+                     }
+                     else if (check1 && check2 && !check4) {
+                         // E
+                         if ((clock() - timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
+                             timeSinceLastDirection = clock();
+                             [rotateRight playIt];
+                         }
+                     }
+                     else if (!check1 && check3 && check4){
+                         // S
+                         if ((clock() - timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
+                             timeSinceLastDirection = clock();
+                             [rotateDown playIt];
+                         }
+                     }
+                     else if (!check2 && check3 && check4){
+                         // N
+                         if ((clock() - timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
+                             timeSinceLastDirection = clock();
+                             [rotateUp playIt];
+                         }
+                     }
+                     else if (!check2 && !check4){
+                         // NW
+                         if ((clock() - timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
+                             timeSinceLastDirection = clock();
+                             [rotateLeftAndUp playIt];
+                         }
+                     }
+                     else if (!check1 && !check4){
+                         // SW
+                         if ((clock() - timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
+                             timeSinceLastDirection = clock();
+                             [rotateRightAndDown playIt];
+                         }
+                     }
+                     else if (!check2 && !check3){
+                         // NE
+                         if ((clock() - timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
+                             timeSinceLastDirection = clock();
+                             [rotateRightAndUp playIt];
+                         }
+                     }
+                     else if (!check1 && !check3){
+                         // SE
+                         if ((clock() - timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
+                             timeSinceLastDirection = clock();
+                             [rotateLeftAndDown playIt];
+                         }
+                     }
+                 }
+             }
          }
+        
+         
+         
+//         if ((theDetector.outValues.center.iX < theDetector.IMAGE_W * 3/5) &&
+//             (theDetector.outValues.center.iX > theDetector.IMAGE_W * 2/5) &&
+//             (theDetector.outValues.center.iY < theDetector.IMAGE_H * 3/5) &&
+//             (theDetector.outValues.center.iY > theDetector.IMAGE_H * 2/5)
+//             ) {
+//             theBeep1.theAudio.volume = 1.;
+//             theBeep2.theAudio.volume = 1.;
+//         }
+//         else{
+//             theBeep1.theAudio.volume = 0.05;
+//             theBeep2.theAudio.volume = 0.05;
+//         }
          
          
          // look at the marker's apparent height - remember we are in landscape mode
@@ -454,7 +575,10 @@ void MyAudioServicesSystemVibrationCompletionProc (
              // check if it is within the max distance
              if ((double)self.setMaxDistance.value == 0 ||
                  markerImageHeightInPixels  / MARKER_HEIGHT >
-                 focalLengthInPixels[(int)self.setWhichLens.value] / (double)self.setMaxDistance.value) {
+                 focalLengthInPixels[(int)self.setWhichLens.value] / (double)self.setMaxDistance.value ||
+                 theDetector.outValues.right.iX == height ||
+                 theDetector.outValues.left.iX == 0
+                 ) {
                  [theBeep1 playIt];
                  [theBeep2 stopIt];
              }
@@ -713,6 +837,14 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     motionManager = nil;
     theBeep1 = nil;
     theBeep2 = nil;
+    rotateLeft = nil;
+    rotateRight= nil;
+    rotateUp = nil;
+    rotateDown = nil;
+    rotateLeftAndUp = nil;
+    rotateLeftAndDown = nil;
+    rotateRightAndUp = nil;
+    rotateRightAndDown = nil;
     
     // should also set the outlets to nil…but instead it releases in dealloc!
 }
@@ -721,6 +853,15 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 	[self.captureSession release];
     [theBeep1 release];
     [theBeep2 release];
+    [rotateLeft release];
+    [rotateRight release];
+    [rotateUp release];
+    [rotateDown release];
+    [rotateLeftAndUp release];
+    [rotateLeftAndDown release];
+    [rotateRightAndUp release];
+    [rotateRightAndDown release];
+     
     [outFileHandler writeData:[[NSString stringWithFormat: @"<NumberOfQuintuples>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
     [outFileHandler writeData:[[NSString stringWithFormat: @"%d\n",nRecorded] dataUsingEncoding:NSUTF8StringEncoding]];
     [outFileHandler writeData:[[NSString stringWithFormat: @"</NumberOfQuintuples>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
@@ -740,6 +881,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [_maxDistance release];
     [_setWhichLens release];
     [_whichLens release];
+    [_setModalityForDirections release];
+    [_modalityForDirections release];
     [super dealloc];
 }
 
