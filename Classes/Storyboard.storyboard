@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="2844" systemVersion="11G63" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="R70-wG-7EZ">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="3084" systemVersion="11G63" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="R70-wG-7EZ">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="1930"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="2083"/>
     </dependencies>
     <scenes>
         <!--MyAV Controller-->
@@ -30,6 +30,9 @@
                             <stepper opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="10" minimumValue="1" maximumValue="10" id="KS0-ZS-CnL">
                                 <rect key="frame" x="222" y="365" width="94" height="27"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <connections>
+                                    <action selector="CMsetMaxFramesPerSecond:" destination="R70-wG-7EZ" eventType="valueChanged" id="WMJ-1a-tfN"/>
+                                </connections>
                             </stepper>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="- - -" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Pfo-Ys-fw5">
                                 <rect key="frame" x="261" y="324" width="42" height="21"/>
@@ -75,10 +78,16 @@
                             <stepper opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" wraps="YES" maximumValue="23" id="KUm-pq-x82">
                                 <rect key="frame" x="220" y="431" width="94" height="27"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <connections>
+                                    <action selector="CMSetMarkerID:" destination="R70-wG-7EZ" eventType="valueChanged" id="mCx-Aw-APz"/>
+                                </connections>
                             </stepper>
                             <stepper opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" autorepeat="NO" wraps="YES" maximumValue="2" id="iVf-ML-sON">
                                 <rect key="frame" x="9" y="365" width="94" height="27"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <connections>
+                                    <action selector="CMSetMaxDistance:" destination="R70-wG-7EZ" eventType="valueChanged" id="RmE-l0-qIt"/>
+                                </connections>
                             </stepper>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="max dst" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="uwh-gd-SSr">
                                 <rect key="frame" x="18" y="343" width="76" height="21"/>
@@ -97,6 +106,9 @@
                             <stepper opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" autorepeat="NO" wraps="YES" maximumValue="2" id="zKh-qD-09w">
                                 <rect key="frame" x="120" y="365" width="94" height="27"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <connections>
+                                    <action selector="CMSetWhichLens:" destination="R70-wG-7EZ" eventType="valueChanged" id="Yx9-YO-zqX"/>
+                                </connections>
                             </stepper>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="lens" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="jtk-5p-e5h">
                                 <rect key="frame" x="151" y="343" width="32" height="21"/>
@@ -115,6 +127,9 @@
                             <stepper opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" wraps="YES" maximumValue="2" id="KG2-0F-ZOA">
                                 <rect key="frame" x="120" y="431" width="94" height="27"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <connections>
+                                    <action selector="CMSetModalityForDirections:" destination="R70-wG-7EZ" eventType="valueChanged" id="Swm-t9-hyc"/>
+                                </connections>
                             </stepper>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="no dir" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Mje-9h-4nT">
                                 <rect key="frame" x="122" y="405" width="92" height="28"/>
@@ -129,15 +144,21 @@
                     <connections>
                         <outlet property="actualFramesPerSecond" destination="drb-B1-kjt" id="KJ3-Fr-Vv4"/>
                         <outlet property="markerID" destination="hh6-u3-Yzw" id="OMi-Pv-xCN"/>
+                        <outlet property="markerIDLabel" destination="3U2-Rf-drA" id="fOy-BR-4SU"/>
+                        <outlet property="markerIDSetter" destination="KUm-pq-x82" id="xGf-NS-vRW"/>
                         <outlet property="maxDistance" destination="Dhc-Zf-HwW" id="Yhp-Q9-uHq"/>
-                        <outlet property="maxFramesPerSecond" destination="Pfo-Ys-fw5" id="wcP-Ak-4IR"/>
+                        <outlet property="maxDistanceLabel" destination="uwh-gd-SSr" id="gmj-LU-UcJ"/>
+                        <outlet property="maxDistanceSetter" destination="iVf-ML-sON" id="emS-HI-1Aq"/>
+                        <outlet property="maxFramesPerSecond" destination="Pfo-Ys-fw5" id="cqQ-0v-6Qa"/>
+                        <outlet property="maxFramesPerSecondLabel" destination="SIu-mg-d5y" id="zCZ-5C-rg0"/>
+                        <outlet property="maxFramesPerSecondSetter" destination="KS0-ZS-CnL" id="FPi-dc-Wx4"/>
+                        <outlet property="modalityForDirectionLabel" destination="Mje-9h-4nT" id="6lp-Qr-AHl"/>
                         <outlet property="modalityForDirections" destination="Mje-9h-4nT" id="izW-LL-lbi"/>
-                        <outlet property="setMarkerID" destination="KUm-pq-x82" id="ePu-jA-Kis"/>
-                        <outlet property="setMaxDistance" destination="iVf-ML-sON" id="cKL-5h-m7c"/>
-                        <outlet property="setMaxFramesPerSecond" destination="KS0-ZS-CnL" id="RCX-WY-e36"/>
-                        <outlet property="setModalityForDirections" destination="KG2-0F-ZOA" id="9gf-A3-raV"/>
-                        <outlet property="setWhichLens" destination="zKh-qD-09w" id="vu8-8p-b8I"/>
+                        <outlet property="modalityForDirectionsSetter" destination="KG2-0F-ZOA" id="rjA-xJ-1vH"/>
+                        <outlet property="snapshotButton" destination="RYG-H4-HTW" id="n0A-IO-NZk"/>
                         <outlet property="whichLens" destination="liI-aE-2vn" id="enJ-7t-kcT"/>
+                        <outlet property="whichLensLabel" destination="jtk-5p-e5h" id="8nu-5O-J4T"/>
+                        <outlet property="whichLensSetter" destination="zKh-qD-09w" id="Tt3-mK-RDf"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ly9-cy-Ame" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -145,25 +166,6 @@
             <point key="canvasLocation" x="-50" y="65"/>
         </scene>
     </scenes>
-    <classes>
-        <class className="MyAVController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/MyAVController.h"/>
-            <relationships>
-                <relationship kind="action" name="takeSnapshot:"/>
-                <relationship kind="outlet" name="actualFramesPerSecond" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="markerID" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="maxDistance" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="maxFramesPerSecond" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="modalityForDirections" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="setMarkerID" candidateClass="UIStepper"/>
-                <relationship kind="outlet" name="setMaxDistance" candidateClass="UIStepper"/>
-                <relationship kind="outlet" name="setMaxFramesPerSecond" candidateClass="UIStepper"/>
-                <relationship kind="outlet" name="setModalityForDirections" candidateClass="UIStepper"/>
-                <relationship kind="outlet" name="setWhichLens" candidateClass="UIStepper"/>
-                <relationship kind="outlet" name="whichLens" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

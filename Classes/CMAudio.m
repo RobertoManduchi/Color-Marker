@@ -11,7 +11,7 @@
 
 @implementation CMAudio
 
-- (id) initWithName:(NSString*)sndTxt andType:(NSString*)sndType andLooping:(BOOL)shouldLoop
+- (id) initWithName:(NSString*)sndTxt andType:(NSString*)sndType andLooping:(int)shouldLoop
 {
 	NSString *path = [[NSBundle mainBundle] pathForResource:sndTxt ofType:sndType];
 
@@ -27,10 +27,10 @@
 	}
 	[self.theAudio setDelegate:self];
     
-    if (shouldLoop)
+    if (shouldLoop==1)
         self.theAudio.numberOfLoops = (NSInteger)-1;
-    
-        
+    else if (shouldLoop>0)
+        self.theAudio.numberOfLoops = (NSInteger)shouldLoop;
     
     return self;
 }

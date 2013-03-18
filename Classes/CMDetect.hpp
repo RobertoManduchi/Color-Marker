@@ -119,8 +119,11 @@ public:
     
     CMDetect (std::string _userParsFileName, std::string _classParsFileName);
     CMDetect (std::string _userParsFileName);
+    CMDetect();
     ~CMDetect();
     
+    void Init(std::string _userParsFileName, std::string _classParsFileName);
+
     int AccessImage(unsigned char*,int,int,int);
     int FindTarget();
     int ParseClassifiersParsXML();

@@ -35,6 +35,9 @@ using namespace std;
 #define DIAG_RATIO  6
 #define MIN_HBORD 15
 
+CMDetect::CMDetect(){
+}
+
 CMDetect::CMDetect(string _userParsFileName, string _classParsFileName){
     
     userParsFileName = _userParsFileName;
@@ -76,6 +79,27 @@ CMDetect::CMDetect(string _userParsFileName){
 CMDetect::~CMDetect(){
     
     delete [] LTF;
+}
+
+void CMDetect::Init(string _userParsFileName, string _classParsFileName){
+    
+    // Same as constructor
+    
+    userParsFileName = _userParsFileName;
+    classParsFileName = _classParsFileName;
+    assert(ParseUserParsXML());
+    assert(ParseClassifiersParsXML());
+    ///
+    LTF = new unsigned char [MAX_CASCADE*256*256];
+    LoadPars();
+    PermShift();
+    LoadTable();
+    ptr = 0;
+    P_SHIFT = 8;
+    SCAN_STEP = 2;
+    N_DIAG_RATIO = DIAG_RATIO;
+    N_MIN_HBOARD = MIN_HBORD;
+    N_CHANNELS = COLOR_CHANNELS;
 }
 
 // This is the entry port where we access the image data (basically an accessor method)
