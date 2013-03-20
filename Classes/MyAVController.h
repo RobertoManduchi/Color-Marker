@@ -78,6 +78,7 @@
 
 @property BOOL IS_TOO_INCLINED;
 
+@property BOOL CHECK_DISTANCE;
 // I think that this should be in the @interface
 - (IBAction)takeSnapshot:(id)sender;
 
@@ -120,6 +121,9 @@
 
 @property BOOL detectorIsRunning;
 
+@property int centerRegionHalfSizeX;
+@property int centerRegionHalfSizeY;
+
 //@property (retain, nonatomic) IBOutlet UIStepper *maxFramesPerSecond;
 
 /*!
@@ -135,7 +139,7 @@
 
 - (void) writeDataOut;
 
-- (void) utterDirectionsIfNeedBe:(BOOL)check1:(BOOL)check2:(BOOL)check3:(BOOL)check4  ;
+- (void) CMUtterDirections:(BOOL)check1:(BOOL)check2:(BOOL)check3:(BOOL)check4  ;
 
 - (void) setSoundOnDetection;
 

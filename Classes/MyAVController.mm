@@ -16,8 +16,9 @@
 #define MIN_INCLINED_TIME_FOR_VIBRATION 1.
 #define DIST_TO_BEEP_FASTER         1.
 #define MARKER_HEIGHT               0.16
-#define HALF_RELATIVE_WIDTH_CENTER  0.1
-#define MIN_TIME_BETWEEN_DIRECTIONS 3
+//#define HALF_RELATIVE_WIDTH_CENTER  0.1
+#define TAN_HALF_CENTER_ANGLE  0.15
+#define MIN_TIME_BETWEEN_DIRECTIONS 1.5
 
 //unfortunately I need this…
 BOOL IS_VIBRATING = NO;
@@ -43,12 +44,19 @@ CMDetect theDetector;
     [self.maxFramesPerSecond performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
 }
 
+// Should change name - originally set max distance, now toggles between distance interface on or off
 - (IBAction)CMSetMaxDistance:(id)sender {
     NSString *theText;
-    if (self.maxDistanceSetter.value == 0)
-        theText = @"- - -";
-    else
-        theText = [NSString stringWithFormat:@"%d", (int)self.maxDistanceSetter.value];
+    if (self.maxDistanceSetter.value == 0){
+//        theText = @"- - -";
+        theText = @"OFF";
+        self.CHECK_DISTANCE = FALSE;
+    }
+    else{
+//        theText = [NSString stringWithFormat:@"%d", (int)self.maxDistanceSetter.value];
+    theText = [NSString stringWithFormat:@"ON"];
+    self.CHECK_DISTANCE = TRUE;
+    }
     
     [self.maxDistance performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
 }
@@ -69,6 +77,12 @@ CMDetect theDetector;
         default:
             break;
     }
+
+    // Set the center region
+    self.centerRegionHalfSizeX = (int)(TAN_HALF_CENTER_ANGLE * focalLengthInPixels[(int)self.whichLensSetter.value]);
+    self.centerRegionHalfSizeY = (int)(TAN_HALF_CENTER_ANGLE * focalLengthInPixels[(int)self.whichLensSetter.value]);
+    
+    
     [self.whichLens performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
 }
 
@@ -141,7 +155,7 @@ CMDetect theDetector;
 //        
 //        [self.maxDistance performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
 //    }
-//    
+//
 //    if ((int)self.setMarkerID != [self.markerID.text intValue]) {
 //        NSString *theText;
 //        theText = [NSString stringWithFormat:@"%d", (int)self.setMarkerID.value];
@@ -210,12 +224,19 @@ CMDetect theDetector;
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Quintuple>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
 }
 
-- (void) utterDirectionsIfNeedBe:(BOOL)check1 :(BOOL)check2 :(BOOL)check3 :(BOOL)check4
+- (void) CMUtterDirections:(BOOL)check1 :(BOOL)check2 :(BOOL)check3 :(BOOL)check4
 {
-    self.theBeep1.theAudio.volume = 0.05;
-    self.theBeep2.theAudio.volume = 0.05;
-    self.theBeep2Short.theAudio.volume = 0.05;
+    // don't want to reduce volume if speaking modality selected
+    
+    if ((int)self.modalityForDirectionsSetter.value == 1) {
+        self.theBeep1.theAudio.volume = 0.05;
+        self.theBeep2.theAudio.volume = 0.05;
+        self.theBeep2Short.theAudio.volume = 0.05;
+    }
     if ((int)self.modalityForDirectionsSetter.value == 2) {
+        self.theBeep1.theAudio.volume = 0.25;
+        self.theBeep2.theAudio.volume = 0.25;
+        self.theBeep2Short.theAudio.volume = 0.25;
         if (check1 && check2 && !check3)
         {
             // W
@@ -249,7 +270,8 @@ CMDetect theDetector;
             // NW
             if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
                 self.timeSinceLastDirection = clock();
-                [self.rotateLeftAndUp playIt];
+//                [self.rotateLeftAndUp playIt];
+                [self.rotateRightAndUp playIt];
             }
         }
         else if (!check1 && !check4){
@@ -263,7 +285,8 @@ CMDetect theDetector;
             // NE
             if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
                 self.timeSinceLastDirection = clock();
-                [self.rotateRightAndUp playIt];
+//                [self.rotateRightAndUp playIt];
+                [self.rotateLeftAndUp playIt];
             }
         }
         else if (!check1 && !check3){
@@ -278,47 +301,74 @@ CMDetect theDetector;
 }
 
 - (void) setSoundOnDetection {
-    BOOL check1 = (theDetector.outValues.center.iX < theDetector.IMAGE_W * (0.5+HALF_RELATIVE_WIDTH_CENTER));
-    BOOL check2 = (theDetector.outValues.center.iX > theDetector.IMAGE_W * (0.5-HALF_RELATIVE_WIDTH_CENTER));
-    BOOL check3 = (theDetector.outValues.center.iY < theDetector.IMAGE_H * (0.5+HALF_RELATIVE_WIDTH_CENTER));
-    BOOL check4 = (theDetector.outValues.center.iY > theDetector.IMAGE_H * (0.5-HALF_RELATIVE_WIDTH_CENTER));
+//    BOOL check1 = (theDetector.outValues.center.iX < theDetector.IMAGE_W * (0.5+HALF_RELATIVE_WIDTH_CENTER));
+//    BOOL check2 = (theDetector.outValues.center.iX > theDetector.IMAGE_W * (0.5-HALF_RELATIVE_WIDTH_CENTER));
+//    BOOL check3 = (theDetector.outValues.center.iY < theDetector.IMAGE_H * (0.5+HALF_RELATIVE_WIDTH_CENTER));
+//    BOOL check4 = (theDetector.outValues.center.iY > theDetector.IMAGE_H * (0.5-HALF_RELATIVE_WIDTH_CENTER));
+    BOOL check1 = (theDetector.outValues.center.iX < theDetector.IMAGE_W * 0.5+self.centerRegionHalfSizeX);
+    BOOL check2 = (theDetector.outValues.center.iX > theDetector.IMAGE_W * 0.5-self.centerRegionHalfSizeX);
+    BOOL check3 = (theDetector.outValues.center.iY < theDetector.IMAGE_H * 0.5+self.centerRegionHalfSizeY);
+    BOOL check4 = (theDetector.outValues.center.iY > theDetector.IMAGE_H * 0.5-self.centerRegionHalfSizeY);
     
     
     if (check1 && check2 && check3 && check4) {
         // center region
-        self.theBeep1.theAudio.volume = 1.;
-        self.theBeep2.theAudio.volume = 1.;
-        self.theBeep2Short.theAudio.volume = 1.;
+        self.theBeep1.theAudio.volume = 0.25;
+        self.theBeep2.theAudio.volume = 0.25;
+        self.theBeep2Short.theAudio.volume = 0.25;
     }
     else{
-        if ((int)self.modalityForDirectionsSetter.value != 0) {
-            [self utterDirectionsIfNeedBe:check1 :check2 :check3 :check4];
+        switch ((int)self.modalityForDirectionsSetter.value) {
+            case 0:
+                self.theBeep1.theAudio.volume = 0.25;
+                self.theBeep2.theAudio.volume = 0.25;
+                self.theBeep2Short.theAudio.volume = 0.25;
+                break;
+            case 1:
+                self.theBeep1.theAudio.volume = 0.05;
+                self.theBeep2.theAudio.volume = 0.05;
+                self.theBeep2Short.theAudio.volume = 0.05;
+                break;
+            case 2:
+                [self CMUtterDirections:check1 :check2 :check3 :check4];
+            default:
+                break;
         }
     }
+    
+    // check if we reached the goal
+    if (theDetector.outValues.bottom.iY -  theDetector.outValues.top.iY >= 0.6*self.height){
+    // do something
+    }
+            
+    
     
     // look at the marker's apparent height - remember we are in landscape mode
     double markerImageHeightInPixels = sqrt((double) ((theDetector.outValues.right.iX -  theDetector.outValues.left.iX)*(theDetector.outValues.right.iX -  theDetector.outValues.left.iX) + (theDetector.outValues.right.iY -  theDetector.outValues.left.iY)*(theDetector.outValues.right.iY -  theDetector.outValues.left.iY)));
     
-    if ((markerImageHeightInPixels  / MARKER_HEIGHT) < (focalLengthInPixels[(int)self.whichLensSetter.value] / DIST_TO_BEEP_FASTER))
+    if (((markerImageHeightInPixels  / MARKER_HEIGHT) < (focalLengthInPixels[(int)self.whichLensSetter.value] / DIST_TO_BEEP_FASTER)) || self.maxDistanceSetter.value==0)
     {
         // it is furhter away than 1 meter
         
         // check if it is within the max distance
-        if ((double)self.maxDistanceSetter.value == 0 ||
-            markerImageHeightInPixels  / MARKER_HEIGHT >
-            focalLengthInPixels[(int)self.whichLensSetter.value] / (double)self.maxDistanceSetter.value ||
-            theDetector.outValues.right.iX == self.height ||
-            theDetector.outValues.left.iX == 0
-            ) {
+//        if ((double)self.maxDistanceSetter.value == 0 ||
+        // not anymore - we don't set a max distance anymore
+        
+//        if (markerImageHeightInPixels  / MARKER_HEIGHT >
+//            focalLengthInPixels[(int)self.whichLensSetter.value] / (double)self.maxDistanceSetter.value ||
+//            theDetector.outValues.right.iX == self.height ||
+//            theDetector.outValues.left.iX == 0
+//            )
+        {
             [self.theBeep1 playIt];
             [self.theBeep2 stopIt];
             [self.theBeep2Short stopIt];
         }
-        else{
-            [self.theBeep1 stopIt];
-            [self.theBeep2 stopIt];
-            [self.theBeep2Short stopIt];
-        }
+//        else{
+//            [self.theBeep1 stopIt];
+//            [self.theBeep2 stopIt];
+//            [self.theBeep2Short stopIt];
+//        }
     }
     else
     {
@@ -349,7 +399,7 @@ void MyAudioServicesSystemVibrationCompletionProc (
 }
 
 - (void) vibratePhone {
-    if (IS_VIBRATING) {
+    if (!IS_VIBRATING) {
         IS_VIBRATING = YES;
         AudioServicesAddSystemSoundCompletion(kSystemSoundID_Vibrate, nil, nil, MyAudioServicesSystemVibrationCompletionProc, (void*) self);
         AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
@@ -411,7 +461,7 @@ void MyAudioServicesSystemVibrationCompletionProc (
 	[self initCapture];
     
     UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
-    tapGesture.numberOfTapsRequired = 3;
+    tapGesture.numberOfTapsRequired = 4;
     [self.view addGestureRecognizer:tapGesture];
     [tapGesture release];
     
@@ -513,13 +563,21 @@ void MyAudioServicesSystemVibrationCompletionProc (
     
     // RM 12/13
     self.rotateUp = [[CMAudio alloc] initWithName:@"rotateUp" andType:@"wav" andLooping:NO];
+    self.rotateUp.theAudio.volume = 1.;
     self.rotateDown = [[CMAudio alloc] initWithName:@"rotateDown" andType:@"wav" andLooping:NO];
-    self.rotateLeft = [[CMAudio alloc] initWithName:@"rotateLeft" andType:@"wav" andLooping:NO];
+    self.rotateDown.theAudio.volume = 1.;
+   self.rotateLeft = [[CMAudio alloc] initWithName:@"rotateLeft" andType:@"wav" andLooping:NO];
+    self.rotateLeft.theAudio.volume = 1.;
     self.rotateRight = [[CMAudio alloc] initWithName:@"rotateRight" andType:@"wav" andLooping:NO];
+    self.rotateRight.theAudio.volume = 1.;
     self.rotateLeftAndUp = [[CMAudio alloc] initWithName:@"rotateLeftAndUp" andType:@"wav" andLooping:NO];
+    self.rotateLeftAndUp.theAudio.volume = 1.;
     self.rotateRightAndUp = [[CMAudio alloc] initWithName:@"rotateRightAndUp" andType:@"wav" andLooping:NO];
+    self.rotateRightAndUp.theAudio.volume = 1.;
     self.rotateLeftAndDown = [[CMAudio alloc] initWithName:@"rotateLeftAndDown" andType:@"wav" andLooping:NO];
+    self.rotateLeftAndDown.theAudio.volume = 1.;
     self.rotateRightAndDown = [[CMAudio alloc] initWithName:@"rotateRightAndDown" andType:@"wav" andLooping:NO];
+    self.rotateRightAndDown.theAudio.volume = 1.;
     
     NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDir = [documentPaths objectAtIndex:0];
@@ -536,14 +594,15 @@ void MyAudioServicesSystemVibrationCompletionProc (
     focalLengthInPixels[0] = 627.;
     focalLengthInPixels[1] = 464.;
     focalLengthInPixels[2] = 260.;
-
+    
     ////////
 
+    // I don't think this is necessary
+//    [self.theBeep1 playIt];
+//    [self.theBeep1.theAudio pause];
+//    [self.theBeep2 playIt];
+//    [self.theBeep2.theAudio pause];
     
-    [self.theBeep1 playIt];
-    [self.theBeep1.theAudio pause];
-    [self.theBeep2 playIt];
-    [self.theBeep2.theAudio pause];
     [self.motionManager startAccelerometerUpdates];
     
 	/*We setup the input*/
@@ -556,9 +615,9 @@ void MyAudioServicesSystemVibrationCompletionProc (
     
     
     // no white balance
-    [theDevice lockForConfiguration:(nil)];
-    theDevice.whiteBalanceMode  = AVCaptureWhiteBalanceModeLocked;
-    [theDevice unlockForConfiguration];
+//    [theDevice lockForConfiguration:(nil)];
+//    theDevice.whiteBalanceMode  = AVCaptureWhiteBalanceModeLocked;
+//    [theDevice unlockForConfiguration];
     
 	/*We setupt the output*/
 	AVCaptureVideoDataOutput *captureOutput = [[AVCaptureVideoDataOutput alloc] init];
@@ -612,6 +671,11 @@ void MyAudioServicesSystemVibrationCompletionProc (
     
 	[self.theBeep1.theAudio prepareToPlay];
 	[self.theBeep2.theAudio prepareToPlay];
+    
+    // Set the center region
+    self.centerRegionHalfSizeX = (int)(TAN_HALF_CENTER_ANGLE * focalLengthInPixels[(int)self.whichLensSetter.value]);
+    self.centerRegionHalfSizeY = (int)(TAN_HALF_CENTER_ANGLE * focalLengthInPixels[(int)self.whichLensSetter.value]);
+
 }
 
 
@@ -662,8 +726,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     self.width = CVPixelBufferGetWidth(imageBuffer);
     self.height = CVPixelBufferGetHeight(imageBuffer);
     
-    // RM - test
-    
     // we should be able to allocate this buffer once and or all to save time (tried - didn't help)
     uint8_t *base = (uint8_t *) malloc(bytesPerRow * self.height * sizeof(uint8_t));
     memcpy(base, baseAddress, bytesPerRow * self.height);
@@ -694,6 +756,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
                 AVCaptureDevice     *theDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
                 [theDevice lockForConfiguration:(nil)];
                 theDevice.exposureMode = AVCaptureExposureModeLocked;
+                theDevice.whiteBalanceMode  = AVCaptureWhiteBalanceModeLocked;
                 [theDevice unlockForConfiguration];
                 
                 self.startTimeExpLock = clock();
@@ -720,6 +783,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
                 if (theDevice.exposureMode == AVCaptureExposureModeLocked) {
                     [theDevice lockForConfiguration:(nil)];
                     theDevice.exposureMode = AVCaptureExposureModeContinuousAutoExposure;
+                    theDevice.whiteBalanceMode  = AVCaptureWhiteBalanceModeContinuousAutoWhiteBalance   ;
                     [theDevice unlockForConfiguration];
                 }
             }
@@ -823,11 +887,11 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     AVCaptureDevice     *theDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
     
     [theDevice lockForConfiguration:(nil)];
-    if (theDevice.exposureMode == AVCaptureExposureModeLocked) {
-        theDevice.exposureMode  = AVCaptureExposureModeContinuousAutoExposure;
-    }
-    else
-        theDevice.exposureMode = AVCaptureExposureModeLocked;
+//    if (theDevice.exposureMode == AVCaptureExposureModeLocked) {
+//        theDevice.exposureMode  = AVCaptureExposureModeContinuousAutoExposure;
+//    }
+//    else
+//        theDevice.exposureMode = AVCaptureExposureModeLocked;
     [theDevice unlockForConfiguration];
     
     

@@ -594,7 +594,7 @@ int CMDetect::FindTarget()
 
     for (int i = 0; i < cntr[perm]; i++)
     {
-        if ((scores[perm][i]>PT_CLUSTER_THRESHOLD) &&
+        if ((scores[perm][i]>=PT_CLUSTER_THRESHOLD) &&
             (abs(XYArray[perm][i].iX-XYArray[perm][indMaxScore].iX)<toler) &&
             (abs(XYArray[perm][i].iY-XYArray[perm][indMaxScore].iY)<toler))
         {
