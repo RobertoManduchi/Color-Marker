@@ -63,14 +63,15 @@
 @property CMAudio* theBeep2Short;
 
 // RM 12/13
-@property CMAudio* rotateUp;
-@property CMAudio* rotateDown;
-@property CMAudio* rotateLeft;
-@property CMAudio* rotateRight;
-@property CMAudio* rotateLeftAndUp;
-@property CMAudio* rotateRightAndUp;
-@property CMAudio* rotateLeftAndDown;
-@property CMAudio* rotateRightAndDown;
+@property CMAudio* turnUp;
+@property CMAudio* turnDown;
+@property CMAudio* turnLeft;
+@property CMAudio* turnRight;
+@property CMAudio* turnLeftAndUp;
+@property CMAudio* turnRightAndUp;
+@property CMAudio* turnLeftAndDown;
+@property CMAudio* turnRightAndDown;
+@property CMAudio* targetReached;
 
 @property CMMotionManager *motionManager;
 
@@ -145,7 +146,8 @@
 
 - (void) handleTapGesture:(UITapGestureRecognizer *) sender;
 
-- (void) setUI;
+- (BOOL) isAnySpeechPlaying;
+
 - (IBAction)CMsetMaxFramesPerSecond:(id)sender;
 - (IBAction)CMSetMaxDistance:(id)sender;
 - (IBAction)CMSetWhichLens:(id)sender;

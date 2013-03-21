@@ -19,6 +19,7 @@
 //#define HALF_RELATIVE_WIDTH_CENTER  0.1
 #define TAN_HALF_CENTER_ANGLE  0.15
 #define MIN_TIME_BETWEEN_DIRECTIONS 1.5
+#define SIZE_RATIO_FOR_SUCCESS  0.6
 
 //unfortunately I need this…
 BOOL IS_VIBRATING = NO;
@@ -28,6 +29,7 @@ CMDetect theDetector;
 
 ////
 @implementation MyAVController
+
 
 - (IBAction)CMsetMaxFramesPerSecond:(id)sender{
     NSString *theText;
@@ -112,71 +114,18 @@ CMDetect theDetector;
 }
 
 
-- (void) setUI{
-    // User interface. This is the *wrong* approach - should use a delegate instead.
-    NSString *theText;
+
+- (BOOL) isAnySpeechPlaying{
     
-//    switch ((int)self.setWhichLens.value) {
-//        case 0:
-//            theText = @"- - -";
-//            break;
-//        case 1:
-//            theText = @"wide";
-//            break;
-//        case 2:
-//            theText = @"fish";
-//            break;
-//        default:
-//            break;
-//    }
-//    [self.whichLens performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
-//    
-//    switch ((int)self.setModalityForDirections.value) {
-//        case 0:
-//            theText = @"no dir";
-//            break;
-//        case 1:
-//            theText = @"volume";
-//            break;
-//        case 2:
-//            theText = @"speech";
-//            break;
-//        default:
-//            break;
-//    }
-//    [self.modalityForDirections performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
-//    
-//    if ((int)self.setMaxDistance != [self.maxDistance.text intValue]) {
-//        NSString *theText;
-//        if (self.setMaxDistance.value == 0)
-//            theText = @"- - -";
-//        else
-//            theText = [NSString stringWithFormat:@"%d", (int)self.setMaxDistance.value];
-//        
-//        [self.maxDistance performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
-//    }
-//
-//    if ((int)self.setMarkerID != [self.markerID.text intValue]) {
-//        NSString *theText;
-//        theText = [NSString stringWithFormat:@"%d", (int)self.setMarkerID.value];
-//        [self.markerID performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
-//        
-//    }
-//
-//    if ((int)self.maxFramesPerSecond.value != [self.maxFramesPerSecond.text intValue]) {
-//        NSString *theText;
-//        if (self.maxFramesPerSecond.value == 10)
-//            theText = @"- - -";
-//        else
-//            theText = [NSString stringWithFormat:@"%d", (int)self.maxFramesPerSecond.value];
-//        
-//        if (self.maxFramesPerSecond.value == 1)
-//            useShortBeepSequence = TRUE;
-//        else
-//            useShortBeepSequence = FALSE;
-//        
-//        [self.maxFramesPerSecond performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
-//    }
+    return self.turnDown.theAudio.isPlaying ||
+        self.turnUp.theAudio.isPlaying ||
+        self.turnRightAndUp.theAudio.isPlaying ||
+        self.turnRightAndDown.theAudio.isPlaying ||
+        self.turnRight.theAudio.isPlaying ||
+        self.turnLeftAndUp.theAudio.isPlaying ||
+        self.turnLeftAndDown.theAudio.isPlaying ||
+        self.turnLeft.theAudio.isPlaying ||
+        self.targetReached.theAudio.isPlaying;
 }
 
 - (void) writeDataOut{
@@ -228,83 +177,71 @@ CMDetect theDetector;
 {
     // don't want to reduce volume if speaking modality selected
     
-    if ((int)self.modalityForDirectionsSetter.value == 1) {
-        self.theBeep1.theAudio.volume = 0.05;
-        self.theBeep2.theAudio.volume = 0.05;
-        self.theBeep2Short.theAudio.volume = 0.05;
-    }
-    if ((int)self.modalityForDirectionsSetter.value == 2) {
-        self.theBeep1.theAudio.volume = 0.25;
-        self.theBeep2.theAudio.volume = 0.25;
-        self.theBeep2Short.theAudio.volume = 0.25;
-        if (check1 && check2 && !check3)
-        {
-            // W
-            if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
-                self.timeSinceLastDirection = clock();
-                [self.rotateLeft playIt];
-            }
-        }
-        else if (check1 && check2 && !check4) {
-            // E
-            if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
-                self.timeSinceLastDirection = clock();
-                [self.rotateRight playIt];
-            }
-        }
-        else if (!check1 && check3 && check4){
-            // S
-            if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
-                self.timeSinceLastDirection = clock();
-                [self.rotateDown playIt];
-            }
-        }
-        else if (!check2 && check3 && check4){
-            // N
-            if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
-                self.timeSinceLastDirection = clock();
-                [self.rotateUp playIt];
-            }
-        }
-        else if (!check2 && !check4){
-            // NW
-            if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
-                self.timeSinceLastDirection = clock();
-//                [self.rotateLeftAndUp playIt];
-                [self.rotateRightAndUp playIt];
-            }
-        }
-        else if (!check1 && !check4){
-            // SW
-            if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
-                self.timeSinceLastDirection = clock();
-                [self.rotateRightAndDown playIt];
-            }
-        }
-        else if (!check2 && !check3){
-            // NE
-            if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
-                self.timeSinceLastDirection = clock();
-//                [self.rotateRightAndUp playIt];
-                [self.rotateLeftAndUp playIt];
-            }
-        }
-        else if (!check1 && !check3){
-            // SE
-            if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
-                self.timeSinceLastDirection = clock();
-                [self.rotateLeftAndDown playIt];
-            }
+    [self.theBeep1 stopIt];
+    [self.theBeep2 stopIt];
+    [self.theBeep2Short stopIt];
+    if (check1 && check2 && !check3)
+    {
+        // W
+        if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
+            self.timeSinceLastDirection = clock();
+            [self.turnLeft playIt];
         }
     }
-    
+    else if (check1 && check2 && !check4) {
+        // E
+        if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
+            self.timeSinceLastDirection = clock();
+            [self.turnRight playIt];
+        }
+    }
+    else if (!check1 && check3 && check4){
+        // S
+        if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
+            self.timeSinceLastDirection = clock();
+            [self.turnDown playIt];
+        }
+    }
+    else if (!check2 && check3 && check4){
+        // N
+        if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
+            self.timeSinceLastDirection = clock();
+            [self.turnUp playIt];
+        }
+    }
+    else if (!check2 && !check4){
+        // NW
+        if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
+            self.timeSinceLastDirection = clock();
+//                [self.turnLeftAndUp playIt];
+            [self.turnRightAndUp playIt];
+        }
+    }
+    else if (!check1 && !check4){
+        // SW
+        if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
+            self.timeSinceLastDirection = clock();
+            [self.turnRightAndDown playIt];
+        }
+    }
+    else if (!check2 && !check3){
+        // NE
+        if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
+            self.timeSinceLastDirection = clock();
+//                [self.turnRightAndUp playIt];
+            [self.turnLeftAndUp playIt];
+        }
+    }
+    else if (!check1 && !check3){
+        // SE
+        if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
+            self.timeSinceLastDirection = clock();
+            [self.turnLeftAndDown playIt];
+        }
+    }
 }
 
 - (void) setSoundOnDetection {
-//    BOOL check1 = (theDetector.outValues.center.iX < theDetector.IMAGE_W * (0.5+HALF_RELATIVE_WIDTH_CENTER));
-//    BOOL check2 = (theDetector.outValues.center.iX > theDetector.IMAGE_W * (0.5-HALF_RELATIVE_WIDTH_CENTER));
-//    BOOL check3 = (theDetector.outValues.center.iY < theDetector.IMAGE_H * (0.5+HALF_RELATIVE_WIDTH_CENTER));
-//    BOOL check4 = (theDetector.outValues.center.iY > theDetector.IMAGE_H * (0.5-HALF_RELATIVE_WIDTH_CENTER));
     BOOL check1 = (theDetector.outValues.center.iX < theDetector.IMAGE_W * 0.5+self.centerRegionHalfSizeX);
     BOOL check2 = (theDetector.outValues.center.iX > theDetector.IMAGE_W * 0.5-self.centerRegionHalfSizeX);
     BOOL check3 = (theDetector.outValues.center.iY < theDetector.IMAGE_H * 0.5+self.centerRegionHalfSizeY);
@@ -337,8 +274,13 @@ CMDetect theDetector;
     }
     
     // check if we reached the goal
-    if (theDetector.outValues.bottom.iY -  theDetector.outValues.top.iY >= 0.6*self.height){
-    // do something
+    if ((theDetector.outValues.bottom.iY -  theDetector.outValues.top.iY >= SIZE_RATIO_FOR_SUCCESS * self.height) ||
+        (theDetector.outValues.right.iX -  theDetector.outValues.left.iX >= SIZE_RATIO_FOR_SUCCESS * self.width)){
+        [self.theBeep1 stopIt];
+        [self.theBeep2 stopIt];
+        [self.theBeep2Short stopIt];
+        [self.targetReached playIt];
+        
     }
             
     
@@ -360,7 +302,8 @@ CMDetect theDetector;
 //            theDetector.outValues.left.iX == 0
 //            )
         {
-            [self.theBeep1 playIt];
+            if (![self isAnySpeechPlaying])
+                [self.theBeep1 playIt];
             [self.theBeep2 stopIt];
             [self.theBeep2Short stopIt];
         }
@@ -373,11 +316,13 @@ CMDetect theDetector;
     else
     {
         if (useShortBeepSequence){
-            [self.theBeep2Short playIt];
+            if (![self isAnySpeechPlaying])
+                [self.theBeep2Short playIt];
             [self.theBeep2 stopIt];
         }
         else{
-            [self.theBeep2 playIt];
+            if (![self isAnySpeechPlaying])
+                [self.theBeep2 playIt];
             [self.theBeep2Short stopIt];
         }
             
@@ -405,40 +350,6 @@ void MyAudioServicesSystemVibrationCompletionProc (
         AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
     }
 }
-////////////
-
-// RM 12/5 - trying new beeping modality
-//
-//SystemSoundID   beep1ID, beep2ID;
-//
-//CFURLRef urlBeep1, urlBeep2;
-//
-//
-//void MyAudioServicesSystemSoundCompletionProc (
-//                                               SystemSoundID  ssID,
-//                                               void           *clientData
-//                                               )
-//{
-//    IS_BEEPING = NO;
-//}
-//
-//- (void) beepPhone: (int) whichBeep {
-//
-//    SystemSoundID theBeepID;
-//
-//    if (!IS_BEEPING) {
-//        IS_BEEPING = YES;
-//        if (whichBeep==1) {
-//            theBeepID = beep1ID;
-//        }
-//        else {
-//             theBeepID = beep2ID;
-//        }
-//        AudioServicesAddSystemSoundCompletion(theBeepID, nil, nil, MyAudioServicesSystemSoundCompletionProc, (void*) self);
-//        AudioServicesPlaySystemSound(theBeepID);
-//    }
-//}
-//
 
 - (id)init {
 	self = [super init];
@@ -562,22 +473,24 @@ void MyAudioServicesSystemVibrationCompletionProc (
     self.theBeep2Short = [[CMAudio alloc] initWithName:@"beep-2" andType:@"aif" andLooping:3];
     
     // RM 12/13
-    self.rotateUp = [[CMAudio alloc] initWithName:@"rotateUp" andType:@"wav" andLooping:NO];
-    self.rotateUp.theAudio.volume = 1.;
-    self.rotateDown = [[CMAudio alloc] initWithName:@"rotateDown" andType:@"wav" andLooping:NO];
-    self.rotateDown.theAudio.volume = 1.;
-   self.rotateLeft = [[CMAudio alloc] initWithName:@"rotateLeft" andType:@"wav" andLooping:NO];
-    self.rotateLeft.theAudio.volume = 1.;
-    self.rotateRight = [[CMAudio alloc] initWithName:@"rotateRight" andType:@"wav" andLooping:NO];
-    self.rotateRight.theAudio.volume = 1.;
-    self.rotateLeftAndUp = [[CMAudio alloc] initWithName:@"rotateLeftAndUp" andType:@"wav" andLooping:NO];
-    self.rotateLeftAndUp.theAudio.volume = 1.;
-    self.rotateRightAndUp = [[CMAudio alloc] initWithName:@"rotateRightAndUp" andType:@"wav" andLooping:NO];
-    self.rotateRightAndUp.theAudio.volume = 1.;
-    self.rotateLeftAndDown = [[CMAudio alloc] initWithName:@"rotateLeftAndDown" andType:@"wav" andLooping:NO];
-    self.rotateLeftAndDown.theAudio.volume = 1.;
-    self.rotateRightAndDown = [[CMAudio alloc] initWithName:@"rotateRightAndDown" andType:@"wav" andLooping:NO];
-    self.rotateRightAndDown.theAudio.volume = 1.;
+    self.turnUp = [[CMAudio alloc] initWithName:@"turnUp" andType:@"wav" andLooping:NO];
+    self.turnUp.theAudio.volume = 1.;
+    self.turnDown = [[CMAudio alloc] initWithName:@"turnDown" andType:@"wav" andLooping:NO];
+    self.turnDown.theAudio.volume = 1.;
+   self.turnLeft = [[CMAudio alloc] initWithName:@"turnLeft" andType:@"wav" andLooping:NO];
+    self.turnLeft.theAudio.volume = 1.;
+    self.turnRight = [[CMAudio alloc] initWithName:@"turnRight" andType:@"wav" andLooping:NO];
+    self.turnRight.theAudio.volume = 1.;
+    self.turnLeftAndUp = [[CMAudio alloc] initWithName:@"turnLeftAndUp" andType:@"wav" andLooping:NO];
+    self.turnLeftAndUp.theAudio.volume = 1.;
+    self.turnRightAndUp = [[CMAudio alloc] initWithName:@"turnRightAndUp" andType:@"wav" andLooping:NO];
+    self.turnRightAndUp.theAudio.volume = 1.;
+    self.turnLeftAndDown = [[CMAudio alloc] initWithName:@"turnLeftAndDown" andType:@"wav" andLooping:NO];
+    self.turnLeftAndDown.theAudio.volume = 1.;
+    self.turnRightAndDown = [[CMAudio alloc] initWithName:@"turnRightAndDown" andType:@"wav" andLooping:NO];
+    self.turnRightAndDown.theAudio.volume = 1.;
+    self.targetReached = [[CMAudio alloc] initWithName:@"targetReached" andType:@"wav" andLooping:NO];
+    self.targetReached.theAudio.volume = 1.;
     
     NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDir = [documentPaths objectAtIndex:0];
@@ -597,11 +510,6 @@ void MyAudioServicesSystemVibrationCompletionProc (
     
     ////////
 
-    // I don't think this is necessary
-//    [self.theBeep1 playIt];
-//    [self.theBeep1.theAudio pause];
-//    [self.theBeep2 playIt];
-//    [self.theBeep2.theAudio pause];
     
     [self.motionManager startAccelerometerUpdates];
     
@@ -614,10 +522,6 @@ void MyAudioServicesSystemVibrationCompletionProc (
 										  error:nil];
     
     
-    // no white balance
-//    [theDevice lockForConfiguration:(nil)];
-//    theDevice.whiteBalanceMode  = AVCaptureWhiteBalanceModeLocked;
-//    [theDevice unlockForConfiguration];
     
 	/*We setupt the output*/
 	AVCaptureVideoDataOutput *captureOutput = [[AVCaptureVideoDataOutput alloc] init];
@@ -707,7 +611,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         self.IS_TOO_INCLINED = NO;
     }
     
-    [self setUI];
     
     /*We create an autorelease pool because as we are not in the main_queue our code is
      not executed in the main thread. So we have to create an autorelease pool for the thread we are in*/
@@ -815,7 +718,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         //     CGContextSetRGBFillColor(context, 0, 0, 0, 1);
         //
         //
-        //     //rotate text
+        //     //turn text
         //     CGContextSetTextMatrix(context, CGAffineTransformMakeRotation( M_PI/2 ));
         //
         //     CGContextShowTextAtPoint(context,30,400, text, strlen(text));
@@ -963,14 +866,15 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 	[self.captureSession release];
     [self.theBeep1 release];
     [self.theBeep2 release];
-    [self.rotateLeft release];
-    [self.rotateRight release];
-    [self.rotateUp release];
-    [self.rotateDown release];
-    [self.rotateLeftAndUp release];
-    [self.rotateLeftAndDown release];
-    [self.rotateRightAndUp release];
-    [self.rotateRightAndDown release];
+    [self.turnLeft release];
+    [self.turnRight release];
+    [self.turnUp release];
+    [self.turnDown release];
+    [self.turnLeftAndUp release];
+    [self.turnLeftAndDown release];
+    [self.turnRightAndUp release];
+    [self.turnRightAndDown release];
+    [self.targetReached release];
     
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<NumberOfQuintuples>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"%d\n",self.nRecorded] dataUsingEncoding:NSUTF8StringEncoding]];

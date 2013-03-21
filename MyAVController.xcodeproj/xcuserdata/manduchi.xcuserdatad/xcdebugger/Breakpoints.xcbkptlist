@@ -26,7 +26,7 @@
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "598"
          endingLineNumber = "598"
-         landmarkName = "-initCapture"
+         landmarkName = "-captureOutput:didOutputSampleBuffer:fromConnection:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -39,7 +39,7 @@
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "593"
          endingLineNumber = "593"
-         landmarkName = "-initCapture"
+         landmarkName = "-captureOutput:didOutputSampleBuffer:fromConnection:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -52,7 +52,7 @@
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "183"
          endingLineNumber = "183"
-         landmarkName = "-writeDataOut"
+         landmarkName = "-CMUtterDirections::::"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -78,8 +78,8 @@
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "33"
          endingLineNumber = "33"
-         landmarkName = "-CMsetMaxFramesPerSecond:"
-         landmarkType = "5">
+         landmarkName = "@implementation MyAVController"
+         landmarkType = "3">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -91,7 +91,7 @@
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "481"
          endingLineNumber = "481"
-         landmarkName = "-handleTapGesture:"
+         landmarkName = "-initCapture"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -104,8 +104,8 @@
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "1005"
          endingLineNumber = "1005"
-         landmarkName = "-dealloc"
-         landmarkType = "5">
+         landmarkName = "@implementation MyAVController"
+         landmarkType = "3">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -117,7 +117,7 @@
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "404"
          endingLineNumber = "404"
-         landmarkName = "-vibratePhone"
+         landmarkName = "-handleTapGesture:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -130,8 +130,8 @@
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "400"
          endingLineNumber = "400"
-         landmarkName = "MyAudioServicesSystemVibrationCompletionProc ( SystemSoundID ssID, void *clientData )"
-         landmarkType = "7">
+         landmarkName = "-handleTapGesture:"
+         landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -143,7 +143,7 @@
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "405"
          endingLineNumber = "405"
-         landmarkName = "-vibratePhone"
+         landmarkName = "-handleTapGesture:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -208,8 +208,8 @@
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "340"
          endingLineNumber = "340"
-         landmarkName = "-setSoundOnDetection"
-         landmarkType = "5">
+         landmarkName = "MyAudioServicesSystemVibrationCompletionProc ( SystemSoundID ssID, void *clientData )"
+         landmarkType = "7">
       </FileBreakpoint>
    </FileBreakpoints>
 </Bucket>
