@@ -7,6 +7,7 @@
 #import <AudioToolbox/AudioServices.h>
 #import <UIKit/UIKit.h>
 #import <CoreMotion/CoreMotion.h>
+#import <math.h>
 
 
 
@@ -19,7 +20,8 @@
 //#define HALF_RELATIVE_WIDTH_CENTER  0.1
 #define TAN_HALF_CENTER_ANGLE  0.15
 #define MIN_TIME_BETWEEN_DIRECTIONS 1.5
-#define SIZE_RATIO_FOR_SUCCESS  0.6
+#define MAX_DIST_FOR_SUCCESS  0.3
+#define MAX_ANGLE_TO_TARGET_IN_DEGREES 10
 
 //unfortunately I need this…
 BOOL IS_VIBRATING = NO;
@@ -125,7 +127,8 @@ CMDetect theDetector;
         self.turnLeftAndUp.theAudio.isPlaying ||
         self.turnLeftAndDown.theAudio.isPlaying ||
         self.turnLeft.theAudio.isPlaying ||
-        self.targetReached.theAudio.isPlaying;
+        self.targetReached.theAudio.isPlaying||
+        self.backUp.theAudio.isPlaying;
 }
 
 - (void) writeDataOut{
@@ -177,160 +180,130 @@ CMDetect theDetector;
 {
     // don't want to reduce volume if speaking modality selected
     
-    [self.theBeep1 stopIt];
-    [self.theBeep2 stopIt];
-    [self.theBeep2Short stopIt];
-    if (check1 && check2 && !check3)
-    {
-        // W
-        if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
-            self.timeSinceLastDirection = clock();
-            [self.turnLeft playIt];
-        }
-    }
-    else if (check1 && check2 && !check4) {
-        // E
-        if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
-            self.timeSinceLastDirection = clock();
-            [self.turnRight playIt];
-        }
-    }
-    else if (!check1 && check3 && check4){
-        // S
-        if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
-            self.timeSinceLastDirection = clock();
-            [self.turnDown playIt];
-        }
-    }
-    else if (!check2 && check3 && check4){
-        // N
-        if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
-            self.timeSinceLastDirection = clock();
-            [self.turnUp playIt];
-        }
-    }
-    else if (!check2 && !check4){
-        // NW
-        if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
-            self.timeSinceLastDirection = clock();
-//                [self.turnLeftAndUp playIt];
-            [self.turnRightAndUp playIt];
-        }
-    }
-    else if (!check1 && !check4){
-        // SW
-        if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
-            self.timeSinceLastDirection = clock();
-            [self.turnRightAndDown playIt];
-        }
-    }
-    else if (!check2 && !check3){
-        // NE
-        if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
-            self.timeSinceLastDirection = clock();
-//                [self.turnRightAndUp playIt];
-            [self.turnLeftAndUp playIt];
-        }
-    }
-    else if (!check1 && !check3){
-        // SE
-        if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
-            self.timeSinceLastDirection = clock();
-            [self.turnLeftAndDown playIt];
-        }
-    }
-}
-
-- (void) setSoundOnDetection {
-    BOOL check1 = (theDetector.outValues.center.iX < theDetector.IMAGE_W * 0.5+self.centerRegionHalfSizeX);
-    BOOL check2 = (theDetector.outValues.center.iX > theDetector.IMAGE_W * 0.5-self.centerRegionHalfSizeX);
-    BOOL check3 = (theDetector.outValues.center.iY < theDetector.IMAGE_H * 0.5+self.centerRegionHalfSizeY);
-    BOOL check4 = (theDetector.outValues.center.iY > theDetector.IMAGE_H * 0.5-self.centerRegionHalfSizeY);
-    
-    
-    if (check1 && check2 && check3 && check4) {
-        // center region
-        self.theBeep1.theAudio.volume = 0.25;
-        self.theBeep2.theAudio.volume = 0.25;
-        self.theBeep2Short.theAudio.volume = 0.25;
-    }
-    else{
-        switch ((int)self.modalityForDirectionsSetter.value) {
-            case 0:
-                self.theBeep1.theAudio.volume = 0.25;
-                self.theBeep2.theAudio.volume = 0.25;
-                self.theBeep2Short.theAudio.volume = 0.25;
-                break;
-            case 1:
-                self.theBeep1.theAudio.volume = 0.05;
-                self.theBeep2.theAudio.volume = 0.05;
-                self.theBeep2Short.theAudio.volume = 0.05;
-                break;
-            case 2:
-                [self CMUtterDirections:check1 :check2 :check3 :check4];
-            default:
-                break;
-        }
-    }
-    
-    // check if we reached the goal
-    if ((theDetector.outValues.bottom.iY -  theDetector.outValues.top.iY >= SIZE_RATIO_FOR_SUCCESS * self.height) ||
-        (theDetector.outValues.right.iX -  theDetector.outValues.left.iX >= SIZE_RATIO_FOR_SUCCESS * self.width)){
+    if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
+        self.timeSinceLastDirection = clock();
         [self.theBeep1 stopIt];
         [self.theBeep2 stopIt];
         [self.theBeep2Short stopIt];
-        [self.targetReached playIt];
-        
-    }
-            
-    
-    
-    // look at the marker's apparent height - remember we are in landscape mode
-    double markerImageHeightInPixels = sqrt((double) ((theDetector.outValues.right.iX -  theDetector.outValues.left.iX)*(theDetector.outValues.right.iX -  theDetector.outValues.left.iX) + (theDetector.outValues.right.iY -  theDetector.outValues.left.iY)*(theDetector.outValues.right.iY -  theDetector.outValues.left.iY)));
-    
-    if (((markerImageHeightInPixels  / MARKER_HEIGHT) < (focalLengthInPixels[(int)self.whichLensSetter.value] / DIST_TO_BEEP_FASTER)) || self.maxDistanceSetter.value==0)
-    {
-        // it is furhter away than 1 meter
-        
-        // check if it is within the max distance
-//        if ((double)self.maxDistanceSetter.value == 0 ||
-        // not anymore - we don't set a max distance anymore
-        
-//        if (markerImageHeightInPixels  / MARKER_HEIGHT >
-//            focalLengthInPixels[(int)self.whichLensSetter.value] / (double)self.maxDistanceSetter.value ||
-//            theDetector.outValues.right.iX == self.height ||
-//            theDetector.outValues.left.iX == 0
-//            )
+        if ((!check2 && !check4)
+            ||(theDetector.outValues.borderReached.top && theDetector.outValues.borderReached.left))
         {
+            // NW
+            [self.turnRightAndUp playIt];
+        }
+        else if ((!check1 && !check4)
+                 ||(theDetector.outValues.borderReached.top && theDetector.outValues.borderReached.right))
+        {
+            // SW
+            [self.turnRightAndDown playIt];
+        }
+        else if ((!check2 && !check3)
+                 ||(theDetector.outValues.borderReached.bottom && theDetector.outValues.borderReached.left))
+        {
+            // NE
+            [self.turnLeftAndUp playIt];
+        }
+        else if ((!check1 && !check3)
+                 ||(theDetector.outValues.borderReached.bottom && theDetector.outValues.borderReached.right))
+        {
+            // SE
+            [self.turnLeftAndDown playIt];
+        }
+        else if ((check1 && check2 && !check3)
+            || theDetector.outValues.borderReached.bottom)
+        {
+            // W
+                [self.turnLeft playIt];
+        }
+        else if ((check1 && check2 && !check4)
+                 || theDetector.outValues.borderReached.top) {
+            // E
+                [self.turnRight playIt];
+        }
+        else if ((!check1 && check3 && check4)
+                 || theDetector.outValues.borderReached.right){
+            // S
+                [self.turnDown playIt];
+        }
+        else if ((!check2 && check3 && check4)
+                 || theDetector.outValues.borderReached.left){
+            // N
+                [self.turnUp playIt];
+        }
+     }
+}
+
+- (void) CMSoundOnDetection {
+//    BOOL check1 = (theDetector.outValues.center.iX < theDetector.IMAGE_W * 0.5+self.centerRegionHalfSizeX);
+//    BOOL check2 = (theDetector.outValues.center.iX > theDetector.IMAGE_W * 0.5-self.centerRegionHalfSizeX);
+//    BOOL check3 = (theDetector.outValues.center.iY < theDetector.IMAGE_H * 0.5+self.centerRegionHalfSizeY);
+//    BOOL check4 = (theDetector.outValues.center.iY > theDetector.IMAGE_H * 0.5-self.centerRegionHalfSizeY);
+    BOOL check2 = _anglesToMarkerInDegrees.hor > - MAX_ANGLE_TO_TARGET_IN_DEGREES;
+    BOOL check1 = _anglesToMarkerInDegrees.hor < MAX_ANGLE_TO_TARGET_IN_DEGREES;
+    BOOL check4 = _anglesToMarkerInDegrees.ver > - MAX_ANGLE_TO_TARGET_IN_DEGREES;
+    BOOL check3 = _anglesToMarkerInDegrees.ver < MAX_ANGLE_TO_TARGET_IN_DEGREES;
+    
+    
+        
+    switch ((int)self.modalityForDirectionsSetter.value) {
+        case 0:
+            self.theBeep1.theAudio.volume = 0.25;
+            self.theBeep2.theAudio.volume = 0.25;
+            self.theBeep2Short.theAudio.volume = 0.25;
+            break;
+        case 1:
+            if (check1 && check2 && check3 && check4) {
+                self.theBeep1.theAudio.volume = 0.25;
+                self.theBeep2.theAudio.volume = 0.25;
+                self.theBeep2Short.theAudio.volume = 0.25;
+            }
+            else {
+                self.theBeep1.theAudio.volume = 0.05;
+                self.theBeep2.theAudio.volume = 0.05;
+                self.theBeep2Short.theAudio.volume = 0.05;
+            }
+            break;
+        case 2:
+            self.theBeep1.theAudio.volume = 0.25;
+            self.theBeep2.theAudio.volume = 0.25;
+            self.theBeep2Short.theAudio.volume = 0.25;
+            [self CMUtterDirections:check1 :check2 :check3 :check4];
+            break;
+        default:
+            break;
+    }
+    
+    if ((self.distanceToMarker <= MAX_DIST_FOR_SUCCESS) && (!theDetector.outValues.borderReached.top)
+        && (!theDetector.outValues.borderReached.bottom)&& (!theDetector.outValues.borderReached.left)&& (!theDetector.outValues.borderReached.right)) {
+        if (![self isAnySpeechPlaying]) {
+            [self.theBeep1 stopIt];
+            [self.theBeep2 stopIt];
+            [self.theBeep2Short stopIt];
+            [self.targetReached playIt];
+        }
+    }
+                       
+    if (self.distanceToMarker > DIST_TO_BEEP_FASTER)
+    {
+            [self.theBeep2 stopIt];
+            [self.theBeep2Short stopIt];
             if (![self isAnySpeechPlaying])
                 [self.theBeep1 playIt];
-            [self.theBeep2 stopIt];
-            [self.theBeep2Short stopIt];
         }
-//        else{
-//            [self.theBeep1 stopIt];
-//            [self.theBeep2 stopIt];
-//            [self.theBeep2Short stopIt];
-//        }
-    }
     else
     {
+        [self.theBeep1 stopIt];
         if (useShortBeepSequence){
+            [self.theBeep2 stopIt];
             if (![self isAnySpeechPlaying])
                 [self.theBeep2Short playIt];
-            [self.theBeep2 stopIt];
         }
         else{
+            [self.theBeep2Short stopIt];
             if (![self isAnySpeechPlaying])
                 [self.theBeep2 playIt];
-            [self.theBeep2Short stopIt];
         }
-            
-        [self.theBeep1 stopIt];
     }
-
-    
-
 }
 
 
@@ -448,6 +421,31 @@ void MyAudioServicesSystemVibrationCompletionProc (
     }
 }
 
+- (void) computeDistanceToMarker {
+    
+    // Note: this is only called if a marker is found
+    
+    // First check if too close
+    if (theDetector.outValues.borderReached.top || theDetector.outValues.borderReached.bottom ||
+        theDetector.outValues.borderReached.left || theDetector.outValues.borderReached.right) {
+        // impossible to compute distance - a border has been reached
+        self.distanceToMarker = -1;
+    }
+    else {
+        // this is a very simplified distance computation that assumes that the phone is centered in one of the two planes orthogonal to the marker 
+        
+        double markerImageHeightInPixels = sqrt((double) ((theDetector.outValues.right.iX -  theDetector.outValues.left.iX)*(theDetector.outValues.right.iX -  theDetector.outValues.left.iX) + (theDetector.outValues.right.iY -  theDetector.outValues.left.iY)*(theDetector.outValues.right.iY -  theDetector.outValues.left.iY)));
+        double markerImageWidthInPixels = sqrt((double) ((theDetector.outValues.top.iX -  theDetector.outValues.bottom.iX)*(theDetector.outValues.top.iX -  theDetector.outValues.bottom.iX) + (theDetector.outValues.top.iY -  theDetector.outValues.bottom.iY)*(theDetector.outValues.top.iY -  theDetector.outValues.bottom.iY)));
+        double maxHeightInPixels = MAX(markerImageHeightInPixels,markerImageWidthInPixels);
+        self.distanceToMarker = (double)(focalLengthInPixels[(int)self.whichLensSetter.value]  * MARKER_HEIGHT) / (double) maxHeightInPixels;
+    }
+}
+
+- (void) computeAnglesToMarker {
+    _anglesToMarkerInDegrees.hor = atan((double(theDetector.outValues.center.iX) - double(self.width) / 2.) / double(focalLengthInPixels[(int)self.whichLensSetter.value])) * 180 / 3.14;
+    _anglesToMarkerInDegrees.ver = atan((double(theDetector.outValues.center.iY) - double(self.height) / 2.) / double(focalLengthInPixels[(int)self.whichLensSetter.value])) * 180. / 3.14;
+}
+
 
 - (void)initCapture {
     
@@ -491,6 +489,8 @@ void MyAudioServicesSystemVibrationCompletionProc (
     self.turnRightAndDown.theAudio.volume = 1.;
     self.targetReached = [[CMAudio alloc] initWithName:@"targetReached" andType:@"wav" andLooping:NO];
     self.targetReached.theAudio.volume = 1.;
+    self.backUp = [[CMAudio alloc] initWithName:@"backUp" andType:@"wav" andLooping:NO];
+    self.backUp.theAudio.volume = 1.;
     
     NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDir = [documentPaths objectAtIndex:0];
@@ -506,7 +506,8 @@ void MyAudioServicesSystemVibrationCompletionProc (
     
     focalLengthInPixels[0] = 627.;
     focalLengthInPixels[1] = 464.;
-    focalLengthInPixels[2] = 260.;
+//    focalLengthInPixels[2] = 260.;
+    focalLengthInPixels[2] = 330.;
     
     ////////
 
@@ -652,6 +653,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         theDetector.SetMarkerID(self.markerIDSetter.value);
         if ((theDetector.FindTarget()))
         {
+            [self computeDistanceToMarker];
+            [self computeAnglesToMarker];
             
             self.countFramesForLock++;
             if (self.countFramesForLock >= MIN_FRAMES_N_FOR_EXP_LOCK) {
@@ -667,7 +670,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
             
             [self writeDataOut];
             
-            [self setSoundOnDetection];
+            [self CMSoundOnDetection];
             
          }
         else   // not found
@@ -707,22 +710,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         
         
         
-        //     NSString* fpsString = [NSString stringWithFormat:@"%i fps", self.framesPerSecond];
-        //
-        //     //
-        //
-        //
-        //     char* text	= (char *)[fpsString cStringUsingEncoding:NSASCIIStringEncoding];
-        //     CGContextSelectFont(context, "Arial", 25, kCGEncodingMacRoman);
-        //     CGContextSetTextDrawingMode(context, kCGTextFill);
-        //     CGContextSetRGBFillColor(context, 0, 0, 0, 1);
-        //
-        //
-        //     //turn text
-        //     CGContextSetTextMatrix(context, CGAffineTransformMakeRotation( M_PI/2 ));
-        //
-        //     CGContextShowTextAtPoint(context,30,400, text, strlen(text));
-        
     }
 //    uint8_t *tp1, *tp2;
 //    //     tp1 = baseAddress;
@@ -750,7 +737,29 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
     
     //////
+    ////////////
     
+    //        NSString* fpsString = [NSString stringWithFormat:@"%i fps", self.framesPerSecond];
+//    NSString* fpsString = [NSString stringWithFormat:@"%i cm %i in", (int)(self.distanceToMarker * 100.), (int)(self.distanceToMarker * 39.37)];
+    NSString* fpsString = [NSString stringWithFormat:@"%i deg %i deg", (int)(_anglesToMarkerInDegrees.hor), (int)(_anglesToMarkerInDegrees.ver)];
+    
+    //
+    
+    
+    char* text	= (char *)[fpsString cStringUsingEncoding:NSASCIIStringEncoding];
+    CGContextSelectFont(context, "Arial", 25, kCGEncodingMacRoman);
+    CGContextSetTextDrawingMode(context, kCGTextFill);
+    CGContextSetRGBFillColor(context, 1, 0, 0, 1);
+    
+    
+    //turn text
+    CGContextSetTextMatrix(context, CGAffineTransformMakeRotation( M_PI/2 ));
+    
+//    CGContextShowTextAtPoint(context,30,400, text, strlen(text));
+    CGContextShowTextAtPoint(context,30,30, text, strlen(text));
+    
+    
+   
     // Create a Quartz image from the pixel data in the bitmap graphics context
     CGImageRef quartzImage = CGBitmapContextCreateImage(context);
     
@@ -809,8 +818,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     //         nFrames = 1;
     [self.imageView performSelectorOnMainThread:@selector(setImage:) withObject:image waitUntilDone:YES];
     //     }
-    
-    
     
     
     
@@ -875,6 +882,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [self.turnRightAndUp release];
     [self.turnRightAndDown release];
     [self.targetReached release];
+    [self.backUp release];
     
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<NumberOfQuintuples>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"%d\n",self.nRecorded] dataUsingEncoding:NSUTF8StringEncoding]];

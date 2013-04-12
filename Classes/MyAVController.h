@@ -72,6 +72,7 @@
 @property CMAudio* turnLeftAndDown;
 @property CMAudio* turnRightAndDown;
 @property CMAudio* targetReached;
+@property CMAudio* backUp;
 
 @property CMMotionManager *motionManager;
 
@@ -125,6 +126,14 @@
 @property int centerRegionHalfSizeX;
 @property int centerRegionHalfSizeY;
 
+@property double distanceToMarker;
+
+struct Angles {
+    double hor;
+    double ver;};
+
+@property struct Angles anglesToMarkerInDegrees;
+
 //@property (retain, nonatomic) IBOutlet UIStepper *maxFramesPerSecond;
 
 /*!
@@ -142,9 +151,12 @@
 
 - (void) CMUtterDirections:(BOOL)check1:(BOOL)check2:(BOOL)check3:(BOOL)check4  ;
 
-- (void) setSoundOnDetection;
+- (void) CMSoundOnDetection;
 
 - (void) handleTapGesture:(UITapGestureRecognizer *) sender;
+
+- (void) computeDistanceToMarker;
+- (void) computeAnglesToMarker;
 
 - (BOOL) isAnySpeechPlaying;
 

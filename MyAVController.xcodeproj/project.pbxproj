@@ -39,6 +39,7 @@
 		7D751A6C16FAB88D00D5C77A /* turnRightAndDown.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7D751A6316FAB88D00D5C77A /* turnRightAndDown.wav */; };
 		7D751A6D16FAB88D00D5C77A /* turnRightAndUp.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7D751A6416FAB88D00D5C77A /* turnRightAndUp.wav */; };
 		7D751A6E16FAB88D00D5C77A /* turnUp.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7D751A6516FAB88D00D5C77A /* turnUp.wav */; };
+		7DB30976171757CD003C577C /* backUp.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7DB30975171757CD003C577C /* backUp.wav */; };
 		7DB91E4F160D41F00054F941 /* iPhone-9-21-12.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7DB91E4E160D41F00054F941 /* iPhone-9-21-12.xml */; };
 		7DBC25FD166E9A570015A999 /* beep-1.aif in Resources */ = {isa = PBXBuildFile; fileRef = 7DBC25FB166E9A570015A999 /* beep-1.aif */; };
 		7DBC25FE166E9A570015A999 /* beep-2.aif in Resources */ = {isa = PBXBuildFile; fileRef = 7DBC25FC166E9A570015A999 /* beep-2.aif */; };
@@ -90,6 +91,7 @@
 		7D751A6316FAB88D00D5C77A /* turnRightAndDown.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = turnRightAndDown.wav; sourceTree = "<group>"; };
 		7D751A6416FAB88D00D5C77A /* turnRightAndUp.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = turnRightAndUp.wav; sourceTree = "<group>"; };
 		7D751A6516FAB88D00D5C77A /* turnUp.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = turnUp.wav; sourceTree = "<group>"; };
+		7DB30975171757CD003C577C /* backUp.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = backUp.wav; sourceTree = "<group>"; };
 		7DB91E4E160D41F00054F941 /* iPhone-9-21-12.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "iPhone-9-21-12.xml"; sourceTree = "<group>"; };
 		7DBC25FB166E9A570015A999 /* beep-1.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "beep-1.aif"; sourceTree = "<group>"; };
 		7DBC25FC166E9A570015A999 /* beep-2.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "beep-2.aif"; sourceTree = "<group>"; };
@@ -176,6 +178,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				7DB30975171757CD003C577C /* backUp.wav */,
 				7D751A5D16FAB88D00D5C77A /* targetReached.wav */,
 				7D751A5E16FAB88D00D5C77A /* turnDown.wav */,
 				7D751A5F16FAB88D00D5C77A /* turnLeft.wav */,
@@ -304,6 +307,7 @@
 				7D751A6C16FAB88D00D5C77A /* turnRightAndDown.wav in Resources */,
 				7D751A6D16FAB88D00D5C77A /* turnRightAndUp.wav in Resources */,
 				7D751A6E16FAB88D00D5C77A /* turnUp.wav in Resources */,
+				7DB30976171757CD003C577C /* backUp.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

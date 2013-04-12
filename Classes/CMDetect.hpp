@@ -33,6 +33,14 @@ struct CMColInd {
     int ind3;
 };
 
+
+struct CMSides {
+    int top;
+    int bottom;
+    int left;
+    int right;
+};
+
 struct  CMOutput {
     CMPoint center;
     CMPoint top;
@@ -40,6 +48,7 @@ struct  CMOutput {
     CMPoint left;
     CMPoint right;
     int     perm;
+    CMSides     borderReached;
 };
 
 inline CMColInd _ColInd(int _ind1, int _ind2, int _ind3){
@@ -111,6 +120,7 @@ class CMDetect {
     
     int FloodSegment(int,int, short*, short*, short*, short*);
     
+    CMSides IsBorderReached();
     
     int N_CHANNELS;
     
