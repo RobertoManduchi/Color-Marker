@@ -8,6 +8,7 @@
 #import <UIKit/UIKit.h>
 #import <CoreMotion/CoreMotion.h>
 #import <math.h>
+#include <stdlib.h>
 
 
 
@@ -17,97 +18,21 @@
 #define MIN_INCLINED_TIME_FOR_VIBRATION 1.
 #define DIST_TO_BEEP_FASTER         1.
 #define MARKER_HEIGHT               0.16
-//#define HALF_RELATIVE_WIDTH_CENTER  0.1
-#define TAN_HALF_CENTER_ANGLE  0.15
 #define MIN_TIME_BETWEEN_DIRECTIONS 1.5
 #define MAX_DIST_FOR_SUCCESS  0.3
 #define MAX_ANGLE_TO_TARGET_IN_DEGREES 10
+#define MIN_FRAME_RATE_WHEN_SET     1
 
 //unfortunately I need this…
 BOOL IS_VIBRATING = NO;
 CMDetect theDetector;
 
+int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
 
 
 ////
 @implementation MyAVController
 
-
-- (IBAction)CMsetMaxFramesPerSecond:(id)sender{
-    NSString *theText;
-    if (self.maxFramesPerSecondSetter.value == 10)
-        theText = @"- - -";
-    else
-        theText = [NSString stringWithFormat:@"%d", (int)self.maxFramesPerSecondSetter.value];
-    
-    if (self.maxFramesPerSecondSetter.value == 1)
-        useShortBeepSequence = TRUE;
-    else
-        useShortBeepSequence = FALSE;
-    
-    [self.maxFramesPerSecond performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
-}
-
-// Should change name - originally set max distance, now toggles between distance interface on or off
-- (IBAction)CMSetMaxDistance:(id)sender {
-    NSString *theText;
-    if (self.maxDistanceSetter.value == 0){
-//        theText = @"- - -";
-        theText = @"OFF";
-        self.CHECK_DISTANCE = FALSE;
-    }
-    else{
-//        theText = [NSString stringWithFormat:@"%d", (int)self.maxDistanceSetter.value];
-    theText = [NSString stringWithFormat:@"ON"];
-    self.CHECK_DISTANCE = TRUE;
-    }
-    
-    [self.maxDistance performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
-}
-
-- (IBAction)CMSetWhichLens:(id)sender {
-    NSString *theText;
-    
-    switch ((int)self.whichLensSetter.value) {
-        case 0:
-            theText = @"- - -";
-            break;
-        case 1:
-            theText = @"wide";
-            break;
-        case 2:
-            theText = @"fish";
-            break;
-        default:
-            break;
-    }
-
-    // Set the center region
-    self.centerRegionHalfSizeX = (int)(TAN_HALF_CENTER_ANGLE * focalLengthInPixels[(int)self.whichLensSetter.value]);
-    self.centerRegionHalfSizeY = (int)(TAN_HALF_CENTER_ANGLE * focalLengthInPixels[(int)self.whichLensSetter.value]);
-    
-    
-    [self.whichLens performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
-}
-
-- (IBAction)CMSetModalityForDirections:(id)sender {
-    NSString *theText;
-
-    switch ((int)self.modalityForDirectionsSetter.value) {
-        case 0:
-            theText = @"no dir";
-            break;
-        case 1:
-            theText = @"volume";
-            break;
-        case 2:
-            theText = @"speech";
-            break;
-        default:
-            break;
-    }
-    [self.modalityForDirections performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
-}
 
 - (IBAction)CMSetMarkerID:(id)sender {
     NSString *theText;
@@ -115,7 +40,67 @@ CMDetect theDetector;
     [self.markerID performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
 }
 
+- (IBAction)CMSetLens:(id)sender {
+    if (self.lensSetter.selectedSegmentIndex==1){
+        self.whichLensSelected = 3;
+    }
+    else {
+        self.whichLensSelected = 0;
+     }
+    unsigned int theSeed = 1 + self.lensSetter.selectedSegmentIndex + 2*self.fpsSetter.selectedSegmentIndex;
+    srand(theSeed);
+}
 
+- (IBAction)CMSetFPS:(id)sender {
+    if (self.fpsSetter.selectedSegmentIndex==1) {
+        self.minFramePeriod = (double)CLOCKS_PER_SEC / (double)MIN_FRAME_RATE_WHEN_SET;
+        useShortBeepSequence = YES;
+    }
+    else {
+        self.minFramePeriod = 0.;
+        useShortBeepSequence = NO;
+    }
+    unsigned int theSeed = 1 + self.lensSetter.selectedSegmentIndex + 2*self.fpsSetter.selectedSegmentIndex;
+    srand(theSeed);
+}
+
+- (IBAction)CMForward:(id)sender {
+    
+    // select new marker
+    int newID;
+    
+    newID = availableMarkerIDs[rand() % 8];
+    self.markerIDSetter.value = (double) newID;
+    NSString *theText = [NSString stringWithFormat:@"%d", (int)self.markerIDSetter.value];
+    [self.markerID performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
+    self.detectorIsRunning = TRUE;
+    [self CMLockScreen];    
+    
+}
+
+- (void) CMLockScreen{
+    [self.lensSetter setEnabled:NO];
+    [self.fpsSetter setEnabled:NO];
+    [self.markerIDSetter setEnabled:NO];
+    self.markerIDSetter.tintColor = [UIColor clearColor];
+    [self.markerID setEnabled:NO];
+    [self.markerIDLabel setEnabled:NO];
+    [self.snapshotButton setEnabled:NO];
+    self.snapshotButton.titleLabel.textColor = [UIColor lightGrayColor];
+    [self.forwardButton setEnabled:NO];
+}
+
+- (void) CMUnlockScreen{
+    [self.lensSetter setEnabled:YES];
+    self.markerIDSetter.tintColor = [UIColor lightGrayColor];
+    [self.markerID setEnabled:YES];
+    [self.markerIDLabel setEnabled:YES];
+    [self.lensSetter setEnabled:YES];
+    [self.fpsSetter setEnabled:YES];
+    [self.snapshotButton setEnabled:YES];
+    self.snapshotButton.titleLabel.textColor = [UIColor blackColor];
+    [self.forwardButton setEnabled:YES];
+}
 
 - (BOOL) isAnySpeechPlaying{
     
@@ -234,44 +219,41 @@ CMDetect theDetector;
 }
 
 - (void) CMSoundOnDetection {
-//    BOOL check1 = (theDetector.outValues.center.iX < theDetector.IMAGE_W * 0.5+self.centerRegionHalfSizeX);
-//    BOOL check2 = (theDetector.outValues.center.iX > theDetector.IMAGE_W * 0.5-self.centerRegionHalfSizeX);
-//    BOOL check3 = (theDetector.outValues.center.iY < theDetector.IMAGE_H * 0.5+self.centerRegionHalfSizeY);
-//    BOOL check4 = (theDetector.outValues.center.iY > theDetector.IMAGE_H * 0.5-self.centerRegionHalfSizeY);
     BOOL check2 = _anglesToMarkerInDegrees.hor > - MAX_ANGLE_TO_TARGET_IN_DEGREES;
     BOOL check1 = _anglesToMarkerInDegrees.hor < MAX_ANGLE_TO_TARGET_IN_DEGREES;
     BOOL check4 = _anglesToMarkerInDegrees.ver > - MAX_ANGLE_TO_TARGET_IN_DEGREES;
     BOOL check3 = _anglesToMarkerInDegrees.ver < MAX_ANGLE_TO_TARGET_IN_DEGREES;
     
+    [self CMUtterDirections:check1 :check2 :check3 :check4];
     
-        
-    switch ((int)self.modalityForDirectionsSetter.value) {
-        case 0:
-            self.theBeep1.theAudio.volume = 0.25;
-            self.theBeep2.theAudio.volume = 0.25;
-            self.theBeep2Short.theAudio.volume = 0.25;
-            break;
-        case 1:
-            if (check1 && check2 && check3 && check4) {
-                self.theBeep1.theAudio.volume = 0.25;
-                self.theBeep2.theAudio.volume = 0.25;
-                self.theBeep2Short.theAudio.volume = 0.25;
-            }
-            else {
-                self.theBeep1.theAudio.volume = 0.05;
-                self.theBeep2.theAudio.volume = 0.05;
-                self.theBeep2Short.theAudio.volume = 0.05;
-            }
-            break;
-        case 2:
-            self.theBeep1.theAudio.volume = 0.25;
-            self.theBeep2.theAudio.volume = 0.25;
-            self.theBeep2Short.theAudio.volume = 0.25;
-            [self CMUtterDirections:check1 :check2 :check3 :check4];
-            break;
-        default:
-            break;
-    }
+//    
+//    switch ((int)self.modalityForDirectionsSetter.value) {
+//        case 0:
+//            self.theBeep1.theAudio.volume = 0.25;
+//            self.theBeep2.theAudio.volume = 0.25;
+//            self.theBeep2Short.theAudio.volume = 0.25;
+//            break;
+//        case 1:
+//            if (check1 && check2 && check3 && check4) {
+//                self.theBeep1.theAudio.volume = 0.25;
+//                self.theBeep2.theAudio.volume = 0.25;
+//                self.theBeep2Short.theAudio.volume = 0.25;
+//            }
+//            else {
+//                self.theBeep1.theAudio.volume = 0.05;
+//                self.theBeep2.theAudio.volume = 0.05;
+//                self.theBeep2Short.theAudio.volume = 0.05;
+//            }
+//            break;
+//        case 2:
+//            self.theBeep1.theAudio.volume = 0.25;
+//            self.theBeep2.theAudio.volume = 0.25;
+//            self.theBeep2Short.theAudio.volume = 0.25;
+//            [self CMUtterDirections:check1 :check2 :check3 :check4];
+//            break;
+//        default:
+//            break;
+//    }
     
     if ((self.distanceToMarker <= MAX_DIST_FOR_SUCCESS) && (!theDetector.outValues.borderReached.top)
         && (!theDetector.outValues.borderReached.bottom)&& (!theDetector.outValues.borderReached.left)&& (!theDetector.outValues.borderReached.right)) {
@@ -355,69 +337,13 @@ void MyAudioServicesSystemVibrationCompletionProc (
 - (void)handleTapGesture:(UITapGestureRecognizer *)sender {
     if (sender.state == UIGestureRecognizerStateRecognized) {
         if (self.detectorIsRunning) {
- 
             self.detectorIsRunning = FALSE;
-            
-            self.whichLensSetter.enabled = TRUE;
-            self.whichLensSetter.tintColor = [UIColor lightGrayColor];
-            self.whichLens.textColor = [UIColor grayColor];
-            self.whichLensLabel.textColor = [UIColor blackColor];
-            
-            self.maxFramesPerSecondSetter.enabled = TRUE;
-            self.maxFramesPerSecondSetter.tintColor = [UIColor lightGrayColor];
-            self.maxFramesPerSecond.textColor = [UIColor grayColor];
-            self.maxFramesPerSecondLabel.textColor = [UIColor blackColor];
-            
-            self.markerIDSetter.enabled = TRUE;
-            self.markerIDSetter.tintColor = [UIColor lightGrayColor];
-            self.markerID.textColor = [UIColor grayColor];
-            self.markerIDLabel.textColor = [UIColor blackColor];
-            
-            self.maxDistanceSetter.enabled = TRUE;
-            self.maxDistanceSetter.tintColor = [UIColor lightGrayColor];
-            self.maxDistance.textColor = [UIColor grayColor];
-            self.maxDistanceLabel.textColor = [UIColor blackColor];
-            
-            self.modalityForDirectionsSetter.enabled = TRUE;
-            self.modalityForDirectionsSetter.tintColor = [UIColor lightGrayColor];
-            self.modalityForDirections.textColor = [UIColor grayColor];
-            self.modalityForDirectionLabel.textColor = [UIColor blackColor];
-            
-            self.snapshotButton.enabled = TRUE;
-            self.snapshotButton.titleLabel.textColor = [UIColor blackColor];
-            
+            [self CMUnlockScreen];
         }
         else{
             self.detectorIsRunning = TRUE;
-            
-            self.whichLensSetter.enabled = FALSE;
-            self.whichLensSetter.tintColor = [UIColor clearColor];
-            self.whichLens.textColor = [UIColor lightGrayColor];
-            self.whichLensLabel.textColor = [UIColor lightGrayColor];
-            
-            self.maxFramesPerSecondSetter.enabled = FALSE;
-            self.maxFramesPerSecondSetter.tintColor = [UIColor clearColor];
-            self.maxFramesPerSecond.textColor = [UIColor lightGrayColor];
-            self.maxFramesPerSecondLabel.textColor = [UIColor lightGrayColor];
-            
-            self.markerIDSetter.enabled = FALSE;
-            self.markerIDSetter.tintColor = [UIColor clearColor];
-            self.markerID.textColor = [UIColor lightGrayColor];
-            self.markerIDLabel.textColor = [UIColor lightGrayColor];
-            
-            self.maxDistanceSetter.enabled = FALSE;
-            self.maxDistanceSetter.tintColor = [UIColor clearColor];
-            self.maxDistance.textColor = [UIColor lightGrayColor];
-            self.maxDistanceLabel.textColor = [UIColor lightGrayColor];
-            
-            self.modalityForDirectionsSetter.enabled = FALSE;
-            self.modalityForDirectionsSetter.tintColor = [UIColor clearColor];
-            self.modalityForDirections.textColor = [UIColor grayColor];
-            self.modalityForDirectionLabel.textColor = [UIColor lightGrayColor];
-            
-            self.snapshotButton.enabled = FALSE;
-            self.snapshotButton.titleLabel.textColor = [UIColor lightGrayColor];
-       }
+            [self CMLockScreen];
+        }
     }
 }
 
@@ -437,13 +363,13 @@ void MyAudioServicesSystemVibrationCompletionProc (
         double markerImageHeightInPixels = sqrt((double) ((theDetector.outValues.right.iX -  theDetector.outValues.left.iX)*(theDetector.outValues.right.iX -  theDetector.outValues.left.iX) + (theDetector.outValues.right.iY -  theDetector.outValues.left.iY)*(theDetector.outValues.right.iY -  theDetector.outValues.left.iY)));
         double markerImageWidthInPixels = sqrt((double) ((theDetector.outValues.top.iX -  theDetector.outValues.bottom.iX)*(theDetector.outValues.top.iX -  theDetector.outValues.bottom.iX) + (theDetector.outValues.top.iY -  theDetector.outValues.bottom.iY)*(theDetector.outValues.top.iY -  theDetector.outValues.bottom.iY)));
         double maxHeightInPixels = MAX(markerImageHeightInPixels,markerImageWidthInPixels);
-        self.distanceToMarker = (double)(focalLengthInPixels[(int)self.whichLensSetter.value]  * MARKER_HEIGHT) / (double) maxHeightInPixels;
+        self.distanceToMarker = (double)(focalLengthInPixels[self.whichLensSelected]  * MARKER_HEIGHT) / (double) maxHeightInPixels;
     }
 }
 
 - (void) computeAnglesToMarker {
-    _anglesToMarkerInDegrees.hor = atan((double(theDetector.outValues.center.iX) - double(self.width) / 2.) / double(focalLengthInPixels[(int)self.whichLensSetter.value])) * 180 / 3.14;
-    _anglesToMarkerInDegrees.ver = atan((double(theDetector.outValues.center.iY) - double(self.height) / 2.) / double(focalLengthInPixels[(int)self.whichLensSetter.value])) * 180. / 3.14;
+    _anglesToMarkerInDegrees.hor = atan((double(theDetector.outValues.center.iX) - double(self.width) / 2.) / double(focalLengthInPixels[self.whichLensSelected])) * 180 / 3.14;
+    _anglesToMarkerInDegrees.ver = atan((double(theDetector.outValues.center.iY) - double(self.height) / 2.) / double(focalLengthInPixels[self.whichLensSelected])) * 180. / 3.14;
 }
 
 
@@ -577,9 +503,6 @@ void MyAudioServicesSystemVibrationCompletionProc (
 	[self.theBeep1.theAudio prepareToPlay];
 	[self.theBeep2.theAudio prepareToPlay];
     
-    // Set the center region
-    self.centerRegionHalfSizeX = (int)(TAN_HALF_CENTER_ANGLE * focalLengthInPixels[(int)self.whichLensSetter.value]);
-    self.centerRegionHalfSizeY = (int)(TAN_HALF_CENTER_ANGLE * focalLengthInPixels[(int)self.whichLensSetter.value]);
 
 }
 
@@ -636,20 +559,13 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     CVPixelBufferUnlockBaseAddress(imageBuffer,0);
     
     
-    double theMinPeriod;
-    if (self.maxFramesPerSecondSetter.value == 10) // this is the max - should be set as parameter
-        theMinPeriod = 0.;
-    else
-        theMinPeriod = (double)CLOCKS_PER_SEC / (double)self.maxFramesPerSecondSetter.value;
     
-    if (clock() - self.mainStartTime > theMinPeriod)
+    if (clock() - self.mainStartTime > self.minFramePeriod)
     {
         self.mainStartTime = clock();
         
         theDetector.AccessImage((unsigned char*)base, self.width, self.height ,bytesPerRow);
         
-        // RM 11/20 - ID marker from UI
-//        theDetector.SetMarkerID([self.markerID.text intValue]);
         theDetector.SetMarkerID(self.markerIDSetter.value);
         if ((theDetector.FindTarget()))
         {
@@ -861,8 +777,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 	self.imageView = nil;
 	self.customLayer = nil;
 	self.prevLayer = nil;
-    self.maxFramesPerSecondSetter = nil;
-    self.maxFramesPerSecond = nil;
+//    self.maxFramesPerSecondSetter = nil;
+//    self.maxFramesPerSecond = nil;
     self.markerIDSetter = nil;
     self.markerID = nil;
     
@@ -892,28 +808,32 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [self.motionManager stopAccelerometerUpdates];
     [self.motionManager release];
     [self.framesPerSecond release];
-    [_maxFramesPerSecondSetter release];
-    [_maxFramesPerSecond release];
+//    [_maxFramesPerSecondSetter release];
+//    [_maxFramesPerSecond release];
     [_actualFramesPerSecond release];
     [_markerIDSetter release];
     [_markerID release];
 //    [_setMaxDistance release];
-    [_maxDistance release];
-    [_whichLensSetter release];
-    [_whichLens release];
-    [_modalityForDirectionsSetter release];
-    [_modalityForDirections release];
-    [_maxFramesPerSecond release];
-    [_maxDistanceSetter release];
-    [_whichLensSetter release];
-    [_modalityForDirectionsSetter release];
+//    [_maxDistance release];
+//    [_whichLensSetter release];
+//    [_whichLens release];
+//    [_modalityForDirectionsSetter release];
+//    [_modalityForDirections release];
+//    [_maxFramesPerSecond release];
+//    [_maxDistanceSetter release];
+//    [_whichLensSetter release];
+//    [_modalityForDirectionsSetter release];
     [_markerIDSetter release];
-    [_whichLensLabel release];
-    [_maxDistanceLabel release];
-    [_maxFramesPerSecondLabel release];
-    [_modalityForDirectionLabel release];
+//    [_whichLensLabel release];
+//    [_maxDistanceLabel release];
+//    [_maxFramesPerSecondLabel release];
+//    [_modalityForDirectionLabel release];
     [_markerIDLabel release];
     [_snapshotButton release];
+    [_lensSetter release];
+    [_fpsSetter release];
+    [_fpsSetter release];
+    [_forwardButton release];
     [super dealloc];
 }
 

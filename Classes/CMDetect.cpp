@@ -742,7 +742,8 @@ int CMDetect::FindTarget()
     if (CONSISTENCYCHECK2) {
         float 	theoreticalArea;
         theoreticalArea = (3./4.)*3.14*(float)SemiAxis.iX*(float)SemiAxis.iY;
-        if (! (((float)Area > (3./4.)*theoreticalArea) && (theoreticalArea > (3./4.)*(float)Area)) )
+        float areaTolerance = 0.5;
+        if (! (((float)Area > areaTolerance*theoreticalArea) && (theoreticalArea > areaTolerance*(float)Area)) )
 //            return 12;
             return 0;
     }

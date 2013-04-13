@@ -30,30 +30,37 @@
 
 @property (retain, nonatomic) IBOutlet UILabel *actualFramesPerSecond;
 //@property (retain, nonatomic) IBOutlet UIStepper *setMaxFramesPerSecond;
-@property (retain, nonatomic) IBOutlet UIStepper *maxFramesPerSecondSetter;
+//@property (retain, nonatomic) IBOutlet UIStepper *maxFramesPerSecondSetter;
+////@property (retain, nonatomic) IBOutlet UILabel *maxFramesPerSecond;
 //@property (retain, nonatomic) IBOutlet UILabel *maxFramesPerSecond;
-@property (retain, nonatomic) IBOutlet UILabel *maxFramesPerSecond;
-@property (retain, nonatomic) IBOutlet UILabel *maxFramesPerSecondLabel;
+//@property (retain, nonatomic) IBOutlet UILabel *maxFramesPerSecondLabel;
 
 //@property (retain, nonatomic) IBOutlet UIStepper *setMarkerID;
 @property (retain, nonatomic) IBOutlet UIStepper *markerIDSetter;
 @property (retain, nonatomic) IBOutlet UILabel *markerID;
 //@property (retain, nonatomic) IBOutlet UIStepper *setMaxDistance;
-@property (retain, nonatomic) IBOutlet UIStepper *maxDistanceSetter;
+//@property (retain, nonatomic) IBOutlet UIStepper *maxDistanceSetter;
 @property (retain, nonatomic) IBOutlet UILabel *markerIDLabel;
 
-@property (retain, nonatomic) IBOutlet UILabel *maxDistance;
-@property (retain, nonatomic) IBOutlet UILabel *maxDistanceLabel;
+//@property (retain, nonatomic) IBOutlet UILabel *maxDistance;
+//@property (retain, nonatomic) IBOutlet UILabel *maxDistanceLabel;
+@property (retain, nonatomic) IBOutlet UISegmentedControl *lensSetter;
+
+@property (retain, nonatomic) IBOutlet UISegmentedControl *fpsSetter;
+
+@property double minFramePeriod;
+@property int   whichLensSelected;
+@property (retain, nonatomic) IBOutlet UIButton *forwardButton;
 
 //@property (retain, nonatomic) IBOutlet UIStepper *setWhichLens; // 0: no additional lens; 1: wide angle; 2: fisheye
-@property (retain, nonatomic) IBOutlet UIStepper *whichLensSetter;
-@property (retain, nonatomic) IBOutlet UILabel *whichLens;
-@property (retain, nonatomic) IBOutlet UILabel *whichLensLabel;
+//@property (retain, nonatomic) IBOutlet UIStepper *whichLensSetter;
+//@property (retain, nonatomic) IBOutlet UILabel *whichLens;
+//@property (retain, nonatomic) IBOutlet UILabel *whichLensLabel;
 
 //@property (retain, nonatomic) IBOutlet UIStepper *setModalityForDirections; // 0: noDirections; 1: volume; 2: volume + speech
-@property (retain, nonatomic) IBOutlet UIStepper *modalityForDirectionsSetter;
-@property (retain, nonatomic) IBOutlet UILabel *modalityForDirections;
-@property (retain, nonatomic) IBOutlet UILabel *modalityForDirectionLabel;
+//@property (retain, nonatomic) IBOutlet UIStepper *modalityForDirectionsSetter;
+//@property (retain, nonatomic) IBOutlet UILabel *modalityForDirections;
+//@property (retain, nonatomic) IBOutlet UILabel *modalityForDirectionLabel;
 
 @property (retain, nonatomic) IBOutlet UIButton *snapshotButton;
 
@@ -155,16 +162,23 @@ struct Angles {
 
 - (void) handleTapGesture:(UITapGestureRecognizer *) sender;
 
+- (void) CMLockScreen;
+- (void) CMUnlockScreen;
+
 - (void) computeDistanceToMarker;
 - (void) computeAnglesToMarker;
 
 - (BOOL) isAnySpeechPlaying;
 
-- (IBAction)CMsetMaxFramesPerSecond:(id)sender;
-- (IBAction)CMSetMaxDistance:(id)sender;
-- (IBAction)CMSetWhichLens:(id)sender;
+//- (IBAction)CMsetMaxFramesPerSecond:(id)sender;
+//- (IBAction)CMSetMaxDistance:(id)sender;
+//- (IBAction)CMSetWhichLens:(id)sender;
 - (IBAction)CMSetModalityForDirections:(id)sender;
 - (IBAction)CMSetMarkerID:(id)sender;
+- (IBAction)CMSetLens:(id)sender;
+
+- (IBAction)CMSetFPS:(id)sender;
+- (IBAction)CMForward:(id)sender;
 
 @end
 

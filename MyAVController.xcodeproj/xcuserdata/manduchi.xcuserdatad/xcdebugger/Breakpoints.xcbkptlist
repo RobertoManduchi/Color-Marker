@@ -21,11 +21,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/MyAVController.mm"
-         timestampString = "387423873.995051"
+         timestampString = "387508165.227018"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "599"
-         endingLineNumber = "599"
+         startingLineNumber = "522"
+         endingLineNumber = "522"
          landmarkName = "-captureOutput:didOutputSampleBuffer:fromConnection:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -34,11 +34,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/MyAVController.mm"
-         timestampString = "387423873.995051"
+         timestampString = "387508165.227018"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "594"
-         endingLineNumber = "594"
+         startingLineNumber = "517"
+         endingLineNumber = "517"
          landmarkName = "-captureOutput:didOutputSampleBuffer:fromConnection:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -47,11 +47,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/MyAVController.mm"
-         timestampString = "387423873.995051"
+         timestampString = "387508165.227018"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "710"
-         endingLineNumber = "710"
+         startingLineNumber = "626"
+         endingLineNumber = "626"
          landmarkName = "-captureOutput:didOutputSampleBuffer:fromConnection:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -60,24 +60,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/MyAVController.mm"
-         timestampString = "387413310.656274"
+         timestampString = "387508165.227018"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "35"
-         endingLineNumber = "35"
-         landmarkName = "@implementation MyAVController"
-         landmarkType = "3">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "Classes/MyAVController.mm"
-         timestampString = "387423873.995051"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "479"
-         endingLineNumber = "479"
+         startingLineNumber = "405"
+         endingLineNumber = "405"
          landmarkName = "-initCapture"
          landmarkType = "5">
       </FileBreakpoint>
@@ -86,11 +73,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/MyAVController.mm"
-         timestampString = "387423873.995051"
+         timestampString = "387508165.227018"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1013"
-         endingLineNumber = "1013"
+         startingLineNumber = "933"
+         endingLineNumber = "933"
          landmarkName = "@implementation MyAVController"
          landmarkType = "3">
       </FileBreakpoint>
@@ -99,51 +86,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/MyAVController.mm"
-         timestampString = "387423873.995051"
+         timestampString = "387508165.227018"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "377"
-         endingLineNumber = "377"
-         landmarkName = "-handleTapGesture:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "Classes/MyAVController.mm"
-         timestampString = "387423873.995051"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "373"
-         endingLineNumber = "373"
-         landmarkName = "-handleTapGesture:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "Classes/MyAVController.mm"
-         timestampString = "387423873.995051"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "378"
-         endingLineNumber = "378"
-         landmarkName = "-handleTapGesture:"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "Classes/MyAVController.mm"
-         timestampString = "387423873.995051"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "301"
-         endingLineNumber = "301"
-         landmarkName = "-setSoundOnDetection"
+         startingLineNumber = "283"
+         endingLineNumber = "283"
+         landmarkName = "-CMSoundOnDetection"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -177,11 +125,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/MyAVController.mm"
-         timestampString = "387423873.995051"
+         timestampString = "387508165.227018"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "313"
-         endingLineNumber = "313"
+         startingLineNumber = "295"
+         endingLineNumber = "295"
          landmarkName = "MyAudioServicesSystemVibrationCompletionProc ( SystemSoundID ssID, void *clientData )"
          landmarkType = "7">
       </FileBreakpoint>
@@ -190,11 +138,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/MyAVController.h"
-         timestampString = "387413310.656274"
+         timestampString = "387505725.776731"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "158"
-         endingLineNumber = "158"
+         startingLineNumber = "168"
+         endingLineNumber = "168"
          landmarkName = "-computeDistanceToMarker"
          landmarkType = "4">
       </FileBreakpoint>
@@ -203,11 +151,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/CMDetect.cpp"
-         timestampString = "387406083.61294"
+         timestampString = "387494521.48908"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1362"
-         endingLineNumber = "1362"
+         startingLineNumber = "1363"
+         endingLineNumber = "1363"
          landmarkName = "CMDetect::IsBorderReached()"
          landmarkType = "5">
       </FileBreakpoint>
@@ -216,11 +164,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/CMDetect.cpp"
-         timestampString = "387406083.61294"
+         timestampString = "387494521.48908"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1369"
-         endingLineNumber = "1369"
+         startingLineNumber = "1370"
+         endingLineNumber = "1370"
          landmarkName = "CMDetect::IsBorderReached()"
          landmarkType = "5">
       </FileBreakpoint>
@@ -229,11 +177,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/CMDetect.cpp"
-         timestampString = "387406083.61294"
+         timestampString = "387494521.48908"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1376"
-         endingLineNumber = "1376"
+         startingLineNumber = "1377"
+         endingLineNumber = "1377"
          landmarkName = "CMDetect::IsBorderReached()"
          landmarkType = "5">
       </FileBreakpoint>
@@ -242,11 +190,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/CMDetect.cpp"
-         timestampString = "387406083.61294"
+         timestampString = "387494521.48908"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1383"
-         endingLineNumber = "1383"
+         startingLineNumber = "1384"
+         endingLineNumber = "1384"
          landmarkName = "CMDetect::IsBorderReached()"
          landmarkType = "5">
       </FileBreakpoint>
@@ -255,11 +203,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/MyAVController.mm"
-         timestampString = "387423873.995051"
+         timestampString = "387508165.227018"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "619"
-         endingLineNumber = "619"
+         startingLineNumber = "542"
+         endingLineNumber = "542"
          landmarkName = "-captureOutput:didOutputSampleBuffer:fromConnection:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -268,25 +216,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/MyAVController.mm"
-         timestampString = "387423873.995051"
+         timestampString = "387508165.227018"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "446"
-         endingLineNumber = "446"
-         landmarkName = "-computeAnglesToMarker"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "Classes/MyAVController.mm"
-         timestampString = "387423873.995051"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "445"
-         endingLineNumber = "445"
-         landmarkName = "-computeAnglesToMarker"
+         startingLineNumber = "563"
+         endingLineNumber = "563"
+         landmarkName = "-captureOutput:didOutputSampleBuffer:fromConnection:"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

@@ -13,7 +13,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="RYG-H4-HTW">
-                                <rect key="frame" x="0.0" y="423" width="112" height="37"/>
+                                <rect key="frame" x="0.0" y="423" width="94" height="37"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <state key="normal" title="Snapshot">
@@ -27,26 +27,6 @@
                                     <action selector="takeSnapshot:" destination="R70-wG-7EZ" eventType="touchUpInside" id="okY-r4-tH6"/>
                                 </connections>
                             </button>
-                            <stepper opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" wraps="YES" value="10" minimumValue="1" maximumValue="10" id="KS0-ZS-CnL">
-                                <rect key="frame" x="222" y="365" width="94" height="27"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <connections>
-                                    <action selector="CMsetMaxFramesPerSecond:" destination="R70-wG-7EZ" eventType="valueChanged" id="WMJ-1a-tfN"/>
-                                </connections>
-                            </stepper>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="- - -" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Pfo-Ys-fw5">
-                                <rect key="frame" x="261" y="324" width="42" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="max fps" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="SIu-mg-d5y">
-                                <rect key="frame" x="235" y="343" width="68" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" red="0.50196081399917603" green="0.50196081399917603" blue="0.50196081399917603" alpha="1" colorSpace="calibratedRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="fps" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="iY3-cX-3Sg">
                                 <rect key="frame" x="255" y="283" width="55" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -62,103 +42,75 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="hh6-u3-Yzw">
-                                <rect key="frame" x="246" y="391" width="42" height="21"/>
+                                <rect key="frame" x="26" y="347" width="42" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Marker ID" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="3U2-Rf-drA">
-                                <rect key="frame" x="214" y="408" width="100" height="21"/>
+                                <rect key="frame" x="0.0" y="366" width="100" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" red="0.60000002384185791" green="0.60000002384185791" blue="0.60000002384185791" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <stepper opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" wraps="YES" maximumValue="23" id="KUm-pq-x82">
-                                <rect key="frame" x="220" y="431" width="94" height="27"/>
+                                <rect key="frame" x="0.0" y="388" width="94" height="27"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <connections>
                                     <action selector="CMSetMarkerID:" destination="R70-wG-7EZ" eventType="valueChanged" id="mCx-Aw-APz"/>
                                 </connections>
                             </stepper>
-                            <stepper opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" autorepeat="NO" wraps="YES" value="1" maximumValue="1" id="iVf-ML-sON">
-                                <rect key="frame" x="9" y="365" width="94" height="27"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" id="Rbs-AV-3T8">
+                                <rect key="frame" x="203" y="416" width="117" height="44"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <segments>
+                                    <segment title=""/>
+                                    <segment title="Lens"/>
+                                </segments>
                                 <connections>
-                                    <action selector="CMSetMaxDistance:" destination="R70-wG-7EZ" eventType="valueChanged" id="RmE-l0-qIt"/>
+                                    <action selector="CMSetLens:" destination="R70-wG-7EZ" eventType="valueChanged" id="7XH-95-1NW"/>
                                 </connections>
-                            </stepper>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="dist" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="uwh-gd-SSr">
-                                <rect key="frame" x="18" y="343" width="76" height="21"/>
+                            </segmentedControl>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" id="Bhh-Sf-Ekn">
+                                <rect key="frame" x="203" y="372" width="117" height="44"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" red="0.50196081399917603" green="0.50196081399917603" blue="0.50196081399917603" alpha="1" colorSpace="calibratedRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="ON" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Dhc-Zf-HwW">
-                                <rect key="frame" x="35" y="327" width="42" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <stepper opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" autorepeat="NO" wraps="YES" maximumValue="2" id="zKh-qD-09w">
-                                <rect key="frame" x="120" y="365" width="94" height="27"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <segments>
+                                    <segment title=""/>
+                                    <segment title="1fps"/>
+                                </segments>
                                 <connections>
-                                    <action selector="CMSetWhichLens:" destination="R70-wG-7EZ" eventType="valueChanged" id="Yx9-YO-zqX"/>
+                                    <action selector="CMSetFPS:" destination="R70-wG-7EZ" eventType="valueChanged" id="gqr-B0-7Kd"/>
                                 </connections>
-                            </stepper>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="lens" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="jtk-5p-e5h">
-                                <rect key="frame" x="151" y="343" width="32" height="21"/>
+                            </segmentedControl>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Xvg-DG-UqO">
+                                <rect key="frame" x="106" y="372" width="89" height="69"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" red="0.50196081399917603" green="0.50196081399917603" blue="0.50196081399917603" alpha="1" colorSpace="calibratedRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="- - -" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="liI-aE-2vn">
-                                <rect key="frame" x="146" y="327" width="42" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <stepper opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" wraps="YES" maximumValue="2" id="KG2-0F-ZOA">
-                                <rect key="frame" x="120" y="431" width="94" height="27"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Forward!" image="Forward.jpg">
+                                    <color key="titleColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
                                 <connections>
-                                    <action selector="CMSetModalityForDirections:" destination="R70-wG-7EZ" eventType="valueChanged" id="Swm-t9-hyc"/>
+                                    <action selector="CMForward:" destination="R70-wG-7EZ" eventType="touchUpInside" id="MKc-9c-7e3"/>
                                 </connections>
-                            </stepper>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="no dir" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Mje-9h-4nT">
-                                <rect key="frame" x="122" y="405" width="92" height="28"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <connections>
                         <outlet property="actualFramesPerSecond" destination="drb-B1-kjt" id="KJ3-Fr-Vv4"/>
+                        <outlet property="forwardButton" destination="Xvg-DG-UqO" id="Yxu-4d-bwP"/>
+                        <outlet property="fpsSetter" destination="Bhh-Sf-Ekn" id="wST-Ny-Uc0"/>
+                        <outlet property="lensSetter" destination="Rbs-AV-3T8" id="t3R-1z-FeF"/>
                         <outlet property="markerID" destination="hh6-u3-Yzw" id="OMi-Pv-xCN"/>
                         <outlet property="markerIDLabel" destination="3U2-Rf-drA" id="fOy-BR-4SU"/>
                         <outlet property="markerIDSetter" destination="KUm-pq-x82" id="xGf-NS-vRW"/>
-                        <outlet property="maxDistance" destination="Dhc-Zf-HwW" id="Yhp-Q9-uHq"/>
-                        <outlet property="maxDistanceLabel" destination="uwh-gd-SSr" id="gmj-LU-UcJ"/>
-                        <outlet property="maxDistanceSetter" destination="iVf-ML-sON" id="emS-HI-1Aq"/>
-                        <outlet property="maxFramesPerSecond" destination="Pfo-Ys-fw5" id="cqQ-0v-6Qa"/>
-                        <outlet property="maxFramesPerSecondLabel" destination="SIu-mg-d5y" id="zCZ-5C-rg0"/>
-                        <outlet property="maxFramesPerSecondSetter" destination="KS0-ZS-CnL" id="FPi-dc-Wx4"/>
-                        <outlet property="modalityForDirectionLabel" destination="Mje-9h-4nT" id="6lp-Qr-AHl"/>
-                        <outlet property="modalityForDirections" destination="Mje-9h-4nT" id="izW-LL-lbi"/>
-                        <outlet property="modalityForDirectionsSetter" destination="KG2-0F-ZOA" id="rjA-xJ-1vH"/>
                         <outlet property="snapshotButton" destination="RYG-H4-HTW" id="n0A-IO-NZk"/>
-                        <outlet property="whichLens" destination="liI-aE-2vn" id="enJ-7t-kcT"/>
-                        <outlet property="whichLensLabel" destination="jtk-5p-e5h" id="8nu-5O-J4T"/>
-                        <outlet property="whichLensSetter" destination="zKh-qD-09w" id="Tt3-mK-RDf"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ly9-cy-Ame" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -166,36 +118,9 @@
             <point key="canvasLocation" x="-50" y="65"/>
         </scene>
     </scenes>
-    <classes>
-        <class className="MyAVController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/MyAVController.h"/>
-            <relationships>
-                <relationship kind="action" name="CMSetMarkerID:"/>
-                <relationship kind="action" name="CMSetMaxDistance:"/>
-                <relationship kind="action" name="CMSetModalityForDirections:"/>
-                <relationship kind="action" name="CMSetWhichLens:"/>
-                <relationship kind="action" name="CMsetMaxFramesPerSecond:"/>
-                <relationship kind="action" name="takeSnapshot:"/>
-                <relationship kind="outlet" name="actualFramesPerSecond" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="markerID" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="markerIDLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="markerIDSetter" candidateClass="UIStepper"/>
-                <relationship kind="outlet" name="maxDistance" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="maxDistanceLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="maxDistanceSetter" candidateClass="UIStepper"/>
-                <relationship kind="outlet" name="maxFramesPerSecond" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="maxFramesPerSecondLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="maxFramesPerSecondSetter" candidateClass="UIStepper"/>
-                <relationship kind="outlet" name="modalityForDirectionLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="modalityForDirections" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="modalityForDirectionsSetter" candidateClass="UIStepper"/>
-                <relationship kind="outlet" name="snapshotButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="whichLens" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="whichLensLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="whichLensSetter" candidateClass="UIStepper"/>
-            </relationships>
-        </class>
-    </classes>
+    <resources>
+        <image name="Forward.jpg" width="462" height="331"/>
+    </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>
