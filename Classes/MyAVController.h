@@ -79,7 +79,7 @@
 @property CMAudio* turnLeftAndDown;
 @property CMAudio* turnRightAndDown;
 @property CMAudio* targetReached;
-@property CMAudio* backUp;
+//@property CMAudio* backUp;
 
 @property CMMotionManager *motionManager;
 

@@ -116,8 +116,8 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
         self.turnLeftAndUp.theAudio.isPlaying ||
         self.turnLeftAndDown.theAudio.isPlaying ||
         self.turnLeft.theAudio.isPlaying ||
-        self.targetReached.theAudio.isPlaying||
-        self.backUp.theAudio.isPlaying;
+        self.targetReached.theAudio.isPlaying;
+//        ||self.backUp.theAudio.isPlaying;
 }
 
 - (void) writeDataOut{
@@ -210,7 +210,8 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
 }
 - (void) CMUtterDirections:(BOOL)check1 :(BOOL)check2 :(BOOL)check3 :(BOOL)check4
 {
-    // don't want to reduce volume if speaking modality selected
+    if ([self isAnySpeechPlaying])
+        return;
     
     if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
         self.timeSinceLastDirection = clock();
@@ -271,7 +272,9 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
     BOOL check4 = _anglesToMarkerInDegrees.ver > - MAX_ANGLE_TO_TARGET_IN_DEGREES;
     BOOL check3 = _anglesToMarkerInDegrees.ver < MAX_ANGLE_TO_TARGET_IN_DEGREES;
     
-    [self CMUtterDirections:check1 :check2 :check3 :check4];
+    if (!check1 || !check2 || !check3 || !check4) {
+        [self CMUtterDirections:check1 :check2 :check3 :check4];
+    }
     
 //    
 //    switch ((int)self.modalityForDirectionsSetter.value) {
@@ -301,20 +304,35 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
 //        default:
 //            break;
 //    }
+
+    if (self.distanceToMarkerInMillimiters < 0){
+        // couldn't compute distance - do nothing
+        return;
+    }
     
-    if ((self.distanceToMarkerInMillimiters <= MAX_DIST_FOR_SUCCESS_IN_MILLIMITERS ) && (!theDetector.outValues.borderReached.top)
-        && (!theDetector.outValues.borderReached.bottom)&& (!theDetector.outValues.borderReached.left)&& (!theDetector.outValues.borderReached.right)) {
-        if (![self isAnySpeechPlaying]) {
-            [self.theBeep1 stopIt];
-            [self.theBeep2 stopIt];
-            [self.theBeep2Short stopIt];
-            [self.targetReached playIt];
-            if (self.outFileHandler){
+    if ((self.distanceToMarkerInMillimiters <= MAX_DIST_FOR_SUCCESS_IN_MILLIMITERS )
+        && check1 && check2 && check3 && check4) {
+        // Target reached!
+        // Stop everything!
+        // This should be structured differently
+        [self.theBeep1 stopIt];
+        [self.theBeep2 stopIt];
+        [self.theBeep2Short stopIt];
+        [self.turnDown stopIt];
+        [self.turnUp stopIt];
+        [self.turnRightAndUp stopIt];
+        [self.turnRightAndDown stopIt];
+        [self.turnRight stopIt];
+        [self.turnLeftAndUp stopIt];
+        [self.turnLeftAndDown stopIt];
+        [self.turnLeft stopIt];
+        [self.targetReached playIt];
+        
+        if (self.outFileHandler){
             [self.outFileHandler writeData:[[NSString stringWithFormat: @"<SpokenOutput>%@</SpokenOutput>",@"TargetReached"]dataUsingEncoding:NSUTF8StringEncoding]];
-            }
         }
     }
-                       
+        
     if (self.distanceToMarkerInMillimiters > DIST_TO_BEEP_FASTER_IN_MILLIMITERS )
     {
             [self.theBeep2 stopIt];
@@ -337,7 +355,6 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
         }
     }
 }
-
 
 // RM 12/3 - vibration routines
 void MyAudioServicesSystemVibrationCompletionProc (
@@ -465,13 +482,14 @@ void MyAudioServicesSystemVibrationCompletionProc (
     self.turnRightAndDown.theAudio.volume = 1.;
     self.targetReached = [[CMAudio alloc] initWithName:@"targetReached" andType:@"wav" andLooping:NO];
     self.targetReached.theAudio.volume = 1.;
-    self.backUp = [[CMAudio alloc] initWithName:@"backUp" andType:@"wav" andLooping:NO];
-    self.backUp.theAudio.volume = 1.;
+//    self.backUp = [[CMAudio alloc] initWithName:@"backUp" andType:@"wav" andLooping:NO];
+//    self.backUp.theAudio.volume = 1.;
+
     self.IS_TOO_INCLINED = NO;
     
     focalLengthInPixels[0] = 627.;
     focalLengthInPixels[1] = 464.;
-//    focalLengthInPixels[2] = 260.;
+//    focalLengthInPixels[2] = 260.; // This seems to be wrong
     focalLengthInPixels[2] = 330.;
     
     ////////
@@ -481,14 +499,10 @@ void MyAudioServicesSystemVibrationCompletionProc (
     
 	/*We setup the input*/
     
-    
     AVCaptureDevice     *theDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
     AVCaptureDeviceInput *captureInput = [AVCaptureDeviceInput
 										  deviceInputWithDevice:theDevice
 										  error:nil];
-    
-    
-    
 	/*We setupt the output*/
 	AVCaptureVideoDataOutput *captureOutput = [[AVCaptureVideoDataOutput alloc] init];
 	/*While a frame is processes in -captureOutput:didOutputSampleBuffer:fromConnection: delegate methods no other frames are added in the queue.
@@ -541,19 +555,13 @@ void MyAudioServicesSystemVibrationCompletionProc (
     
 	[self.theBeep1.theAudio prepareToPlay];
 	[self.theBeep2.theAudio prepareToPlay];
-    
-
 }
-
-
-
 
 /*** RM 6/15 - test ***/
 - (void)captureOutput:(AVCaptureOutput *)captureOutput
 didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
        fromConnection:(AVCaptureConnection *)connection
-{
-    
+{    
     CMAccelerometerData *theAcceleration = self.motionManager.accelerometerData;
     
     // vibrate if inclination is MAX_INCLINATION_ANGLE degrees or more
@@ -596,8 +604,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     uint8_t *base = (uint8_t *) malloc(bytesPerRow * self.height * sizeof(uint8_t));
     memcpy(base, baseAddress, bytesPerRow * self.height);
     CVPixelBufferUnlockBaseAddress(imageBuffer,0);
-    
-    
     
     if (clock() - self.mainStartTime > self.minFramePeriod)
     {
@@ -692,8 +698,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     // Create a bitmap graphics context with the sample buffer data
     CGContextRef context = CGBitmapContextCreate(baseAddress, self.width, self.height, 8,
                                                  bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
-    
-    
     //////
     ////////////
     
@@ -703,20 +707,16 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
     //
     
-    
     char* text	= (char *)[fpsString cStringUsingEncoding:NSASCIIStringEncoding];
     CGContextSelectFont(context, "Arial", 25, kCGEncodingMacRoman);
     CGContextSetTextDrawingMode(context, kCGTextFill);
-    CGContextSetRGBFillColor(context, 1, 0, 0, 1);
-    
+    CGContextSetRGBFillColor(context, 1, 0, 0, 1);    
     
     //turn text
     CGContextSetTextMatrix(context, CGAffineTransformMakeRotation( M_PI/2 ));
     
 //    CGContextShowTextAtPoint(context,30,400, text, strlen(text));
     CGContextShowTextAtPoint(context,30,30, text, strlen(text));
-    
-    
    
     // Create a Quartz image from the pixel data in the bitmap graphics context
     CGImageRef quartzImage = CGBitmapContextCreateImage(context);
@@ -840,7 +840,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [self.turnRightAndUp release];
     [self.turnRightAndDown release];
     [self.targetReached release];
-    [self.backUp release];
+//    [self.backUp release];
     
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<NumberOfQuintuples>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"%d\n",self.nRecorded] dataUsingEncoding:NSUTF8StringEncoding]];
