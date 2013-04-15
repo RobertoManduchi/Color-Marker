@@ -215,9 +215,12 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
     
     if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
         self.timeSinceLastDirection = clock();
-        [self.theBeep1 stopIt];
-        [self.theBeep2 stopIt];
-        [self.theBeep2Short stopIt];
+        self.theBeep1.theAudio.volume = 0.01;
+        self.theBeep2.theAudio.volume = 0.01;
+        self.theBeep2Short.theAudio.volume = 0.01;
+//        [self.theBeep1 stopIt];
+//        [self.theBeep2 stopIt];
+//        [self.theBeep2Short stopIt];
         if ((!check2 && !check4)
             ||(theDetector.outValues.borderReached.top && theDetector.outValues.borderReached.left))
         {
@@ -305,10 +308,15 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
 //            break;
 //    }
 
-    if (self.distanceToMarkerInMillimiters < 0){
-        // couldn't compute distance - do nothing
-        return;
+    if (![self isAnySpeechPlaying]) {
+        self.theBeep1.theAudio.volume = 0.25;
+        self.theBeep2.theAudio.volume = 0.25;
+        self.theBeep2Short.theAudio.volume = 0.25;
     }
+//    if (self.distanceToMarkerInMillimiters < 0){
+//        // couldn't compute distance - do nothing
+//        return;
+//    }
     
     if ((self.distanceToMarkerInMillimiters <= MAX_DIST_FOR_SUCCESS_IN_MILLIMITERS )
         && check1 && check2 && check3 && check4) {
@@ -331,8 +339,10 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
         if (self.outFileHandler){
             [self.outFileHandler writeData:[[NSString stringWithFormat: @"<SpokenOutput>%@</SpokenOutput>",@"TargetReached"]dataUsingEncoding:NSUTF8StringEncoding]];
         }
+        return;
     }
-        
+
+    
     if (self.distanceToMarkerInMillimiters > DIST_TO_BEEP_FASTER_IN_MILLIMITERS )
     {
             [self.theBeep2 stopIt];
