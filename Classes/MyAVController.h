@@ -170,6 +170,10 @@ struct Angles {
 
 - (BOOL) isAnySpeechPlaying;
 
+- (void) CMStartNewFile;
+- (void) CMWriteTimestampOnOutputFile;
+- (void) CMWriteParametersOnOutputFile;
+
 //- (IBAction)CMsetMaxFramesPerSecond:(id)sender;
 //- (IBAction)CMSetMaxDistance:(id)sender;
 //- (IBAction)CMSetWhichLens:(id)sender;

@@ -42,7 +42,7 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
 
 - (IBAction)CMSetLens:(id)sender {
     if (self.lensSetter.selectedSegmentIndex==1){
-        self.whichLensSelected = 3;
+        self.whichLensSelected = 2;
     }
     else {
         self.whichLensSelected = 0;
@@ -74,7 +74,10 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
     NSString *theText = [NSString stringWithFormat:@"%d", (int)self.markerIDSetter.value];
     [self.markerID performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
     self.detectorIsRunning = TRUE;
-    [self CMLockScreen];    
+    [self CMLockScreen];
+    
+    [self CMStartNewFile];
+    [self CMWriteParametersOnOutputFile];
     
 }
 
@@ -92,6 +95,7 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
 
 - (void) CMUnlockScreen{
     [self.lensSetter setEnabled:YES];
+    [self.markerIDSetter setEnabled:YES];
     self.markerIDSetter.tintColor = [UIColor lightGrayColor];
     [self.markerID setEnabled:YES];
     [self.markerIDLabel setEnabled:YES];
@@ -117,50 +121,89 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
 }
 
 - (void) writeDataOut{
-    [self.outFileHandler writeData:[[NSString stringWithFormat: @"<Quintuple id=\"%d\">\n",++(self.nRecorded)] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat: @"<Center>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+    if (!self.outFileHandler)
+        return;
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"<Quintuple id=\"%d\">",++(self.nRecorded)] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"<Center>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<X>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.center.iX] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</X>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</X>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<Y>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.center.iY] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Y>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Center>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat:          @"<Top>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Y>"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Center>"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat:          @"<Top>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<X>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.top.iX] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</X>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</X>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<Y>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.top.iY] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Y>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Top>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat:          @"<Bottom>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Y>"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Top>"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat:          @"<Bottom>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<X>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.bottom.iX] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"</X>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<Y>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.bottom.iY] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Y>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Bottom>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat:          @"<Left>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Y>"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Bottom>"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat:          @"<Left>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<X>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.left.iX] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</X>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</X>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<Y>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.left.iY] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Y>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Left>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat:          @"<Right>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Y>"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Left>"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat:          @"<Right>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<X>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.right.iX] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</X>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</X>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<Y>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.right.iY] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Y>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Right>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Quintuple>\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Y>"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Right>"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Quintuple>"] dataUsingEncoding:NSUTF8StringEncoding]];
+}
+- (void) CMWriteTimestampOnOutputFile{
+    if (!self.outFileHandler)
+        return;
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"<Time>%i</Time>",(int)(1000.*clock()/(double)CLOCKS_PER_SEC)] dataUsingEncoding:NSUTF8StringEncoding]];
 }
 
+- (void) CMWriteParametersOnOutputFile{
+    if (!self.outFileHandler)
+        return;
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"<MarkerID>%i</MarkerID>",(int)self.markerIDSetter.value]dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"<LensType>%i</LensType>",(int)self.lensSetter.selectedSegmentIndex]dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"<MinFramePeriod>%i</MinFramePeriod>",(int)self.fpsSetter.selectedSegmentIndex]dataUsingEncoding:NSUTF8StringEncoding]];
+}
+- (void) CMStartNewFile{
+    NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDir = [documentPaths objectAtIndex:0];
+    
+    // get current date/time
+    NSDate *now = [NSDate date];
+    unsigned unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit;
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+    NSDateComponents *dateComponents = [gregorian components:unitFlags fromDate:now];
+    NSString *dateString = [NSString stringWithFormat:(@"%d.%d.%d.%d.%d.%d.xml"),
+                  [dateComponents year],[dateComponents month],
+                  [dateComponents day],[dateComponents hour],
+                  [dateComponents minute],[dateComponents second]
+                  ];
+    NSString *outFilePath = [[NSString alloc] initWithFormat:@"%@",[documentsDir stringByAppendingPathComponent:dateString]];
+    
+    //        BOOL openedFile = [[NSFileManager defaultManager] createFileAtPath:outFilePath contents:nil attributes:nil];
+    [[NSFileManager defaultManager] createFileAtPath:outFilePath contents:nil attributes:nil];
+    // close the current file. Hopefully this is the right way…
+    [self.outFileHandler closeFile];
+    // new file handler
+    self.outFileHandler  = [NSFileHandle fileHandleForWritingToURL:
+                            [NSURL fileURLWithPath:outFilePath] error:nil];
+    
+}
 - (void) CMUtterDirections:(BOOL)check1 :(BOOL)check2 :(BOOL)check3 :(BOOL)check4
 {
     // don't want to reduce volume if speaking modality selected
@@ -262,6 +305,9 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
             [self.theBeep2 stopIt];
             [self.theBeep2Short stopIt];
             [self.targetReached playIt];
+            if (self.outFileHandler){
+            [self.outFileHandler writeData:[[NSString stringWithFormat: @"<SpokenOutput>%@</SpokenOutput>",@"TargetReached"]dataUsingEncoding:NSUTF8StringEncoding]];
+            }
         }
     }
                        
@@ -417,17 +463,6 @@ void MyAudioServicesSystemVibrationCompletionProc (
     self.targetReached.theAudio.volume = 1.;
     self.backUp = [[CMAudio alloc] initWithName:@"backUp" andType:@"wav" andLooping:NO];
     self.backUp.theAudio.volume = 1.;
-    
-    NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDir = [documentPaths objectAtIndex:0];
-    NSString *outFilePath = [[NSString alloc] initWithFormat:@"%@",[documentsDir stringByAppendingPathComponent:@"Points.xml"]];
-    
-    //        BOOL openedFile = [[NSFileManager defaultManager] createFileAtPath:outFilePath contents:nil attributes:nil];
-    [[NSFileManager defaultManager] createFileAtPath:outFilePath contents:nil attributes:nil];
-    
-    self.outFileHandler  = [NSFileHandle fileHandleForWritingToURL:
-                        [NSURL fileURLWithPath:outFilePath] error:nil];
-    
     self.IS_TOO_INCLINED = NO;
     
     focalLengthInPixels[0] = 627.;
@@ -569,6 +604,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         theDetector.SetMarkerID(self.markerIDSetter.value);
         if ((theDetector.FindTarget()))
         {
+            [self CMWriteTimestampOnOutputFile];
+            
             [self computeDistanceToMarker];
             [self computeAnglesToMarker];
             
@@ -591,6 +628,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
          }
         else   // not found
         {
+            [self CMWriteTimestampOnOutputFile];
             [self.theBeep1 stopIt];
             [self.theBeep2 stopIt];
             [self.theBeep2Short stopIt];
