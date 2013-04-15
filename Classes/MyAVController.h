@@ -133,7 +133,7 @@
 @property int centerRegionHalfSizeX;
 @property int centerRegionHalfSizeY;
 
-@property double distanceToMarker;
+@property double distanceToMarkerInMillimiters;
 
 struct Angles {
     double hor;

@@ -16,10 +16,10 @@
 #define SECONDS_BEFORE_EXP_UNLOCK   1.
 #define MAX_INCLINATION_ANGLE       35.
 #define MIN_INCLINED_TIME_FOR_VIBRATION 1.
-#define DIST_TO_BEEP_FASTER         1.
+#define DIST_TO_BEEP_FASTER_IN_MILLIMITERS         500.
 #define MARKER_HEIGHT               0.16
 #define MIN_TIME_BETWEEN_DIRECTIONS 1.5
-#define MAX_DIST_FOR_SUCCESS  0.3
+#define MAX_DIST_FOR_SUCCESS_IN_MILLIMITERS        300.
 #define MAX_ANGLE_TO_TARGET_IN_DEGREES 10
 #define MIN_FRAME_RATE_WHEN_SET     1
 
@@ -165,6 +165,10 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Y>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Right>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Quintuple>"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"<Distance>%i</Distance>",(int)self.distanceToMarkerInMillimiters]dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"<AngleX>%i</AngleX>",(int)self.anglesToMarkerInDegrees.hor]dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"<AngleY>%i</AngleY>",(int)self.anglesToMarkerInDegrees.ver]dataUsingEncoding:NSUTF8StringEncoding]];
+    
 }
 - (void) CMWriteTimestampOnOutputFile{
     if (!self.outFileHandler)
@@ -298,7 +302,7 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
 //            break;
 //    }
     
-    if ((self.distanceToMarker <= MAX_DIST_FOR_SUCCESS) && (!theDetector.outValues.borderReached.top)
+    if ((self.distanceToMarkerInMillimiters <= MAX_DIST_FOR_SUCCESS_IN_MILLIMITERS ) && (!theDetector.outValues.borderReached.top)
         && (!theDetector.outValues.borderReached.bottom)&& (!theDetector.outValues.borderReached.left)&& (!theDetector.outValues.borderReached.right)) {
         if (![self isAnySpeechPlaying]) {
             [self.theBeep1 stopIt];
@@ -311,7 +315,7 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
         }
     }
                        
-    if (self.distanceToMarker > DIST_TO_BEEP_FASTER)
+    if (self.distanceToMarkerInMillimiters > DIST_TO_BEEP_FASTER_IN_MILLIMITERS )
     {
             [self.theBeep2 stopIt];
             [self.theBeep2Short stopIt];
@@ -393,7 +397,7 @@ void MyAudioServicesSystemVibrationCompletionProc (
     }
 }
 
-- (void) computeDistanceToMarker {
+- (void) computedistanceToMarker {
     
     // Note: this is only called if a marker is found
     
@@ -401,7 +405,7 @@ void MyAudioServicesSystemVibrationCompletionProc (
     if (theDetector.outValues.borderReached.top || theDetector.outValues.borderReached.bottom ||
         theDetector.outValues.borderReached.left || theDetector.outValues.borderReached.right) {
         // impossible to compute distance - a border has been reached
-        self.distanceToMarker = -1;
+        self.distanceToMarkerInMillimiters = -1;
     }
     else {
         // this is a very simplified distance computation that assumes that the phone is centered in one of the two planes orthogonal to the marker 
@@ -409,7 +413,7 @@ void MyAudioServicesSystemVibrationCompletionProc (
         double markerImageHeightInPixels = sqrt((double) ((theDetector.outValues.right.iX -  theDetector.outValues.left.iX)*(theDetector.outValues.right.iX -  theDetector.outValues.left.iX) + (theDetector.outValues.right.iY -  theDetector.outValues.left.iY)*(theDetector.outValues.right.iY -  theDetector.outValues.left.iY)));
         double markerImageWidthInPixels = sqrt((double) ((theDetector.outValues.top.iX -  theDetector.outValues.bottom.iX)*(theDetector.outValues.top.iX -  theDetector.outValues.bottom.iX) + (theDetector.outValues.top.iY -  theDetector.outValues.bottom.iY)*(theDetector.outValues.top.iY -  theDetector.outValues.bottom.iY)));
         double maxHeightInPixels = MAX(markerImageHeightInPixels,markerImageWidthInPixels);
-        self.distanceToMarker = (double)(focalLengthInPixels[self.whichLensSelected]  * MARKER_HEIGHT) / (double) maxHeightInPixels;
+        self.distanceToMarkerInMillimiters = (double)(1000.*focalLengthInPixels[self.whichLensSelected]  * MARKER_HEIGHT) / (double) maxHeightInPixels;
     }
 }
 
@@ -606,7 +610,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         {
             [self CMWriteTimestampOnOutputFile];
             
-            [self computeDistanceToMarker];
+            [self computedistanceToMarker];
             [self computeAnglesToMarker];
             
             self.countFramesForLock++;
@@ -694,7 +698,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     ////////////
     
     //        NSString* fpsString = [NSString stringWithFormat:@"%i fps", self.framesPerSecond];
-//    NSString* fpsString = [NSString stringWithFormat:@"%i cm %i in", (int)(self.distanceToMarker * 100.), (int)(self.distanceToMarker * 39.37)];
+//    NSString* fpsString = [NSString stringWithFormat:@"%i cm %i in", (int)(self.distanceToMarkerInMillimiters * 100.), (int)(self.distanceToMarkerInMillimiters * 39.37)];
     NSString* fpsString = [NSString stringWithFormat:@"%i deg %i deg", (int)(_anglesToMarkerInDegrees.hor), (int)(_anglesToMarkerInDegrees.ver)];
     
     //
