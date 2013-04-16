@@ -205,10 +205,18 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
     //        BOOL openedFile = [[NSFileManager defaultManager] createFileAtPath:outFilePath contents:nil attributes:nil];
     [[NSFileManager defaultManager] createFileAtPath:outFilePath contents:nil attributes:nil];
     // close the current file. Hopefully this is the right way…
-    [self.outFileHandler closeFile];
+    if (self.outFileHandler){
+        [self.outFileHandler writeData:[[NSString stringWithFormat: @"</root>"] dataUsingEncoding:NSUTF8StringEncoding]];
+        [self.outFileHandler closeFile];
+    }
     // new file handler
     self.outFileHandler  = [NSFileHandle fileHandleForWritingToURL:
                             [NSURL fileURLWithPath:outFilePath] error:nil];
+    if (self.outFileHandler){
+        [self.outFileHandler writeData:[[NSString stringWithFormat: @"<root>"] dataUsingEncoding:NSUTF8StringEncoding]];        
+    }
+
+    
     
 }
 - (void) CMUtterDirections:(BOOL)check1 :(BOOL)check2 :(BOOL)check3 :(BOOL)check4
