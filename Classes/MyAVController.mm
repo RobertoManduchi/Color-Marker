@@ -22,6 +22,7 @@
 #define MAX_DIST_FOR_SUCCESS_IN_MILLIMITERS        300.
 #define MAX_ANGLE_TO_TARGET_IN_DEGREES 10
 #define MIN_FRAME_RATE_WHEN_SET     1
+#define MIN_DISTANCE_TO_EDGE        8
 
 //unfortunately I need this…
 BOOL IS_VIBRATING = NO;
@@ -222,47 +223,55 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
 //        [self.theBeep2 stopIt];
 //        [self.theBeep2Short stopIt];
         if ((!check2 && !check4)
-            ||(theDetector.outValues.borderReached.top && theDetector.outValues.borderReached.left))
+//            ||(theDetector.outValues.borderReached.top && theDetector.outValues.borderReached.left))
+            ||(theDetector.outValues.top.iY <= MIN_DISTANCE_TO_EDGE && theDetector.outValues.left.iX <= MIN_DISTANCE_TO_EDGE))
         {
             // NW
             [self.turnRightAndUp playIt];
         }
         else if ((!check1 && !check4)
-                 ||(theDetector.outValues.borderReached.top && theDetector.outValues.borderReached.right))
+//                 ||(theDetector.outValues.borderReached.top && theDetector.outValues.borderReached.right))
+            ||(theDetector.outValues.top.iY <= MIN_DISTANCE_TO_EDGE && theDetector.outValues.right.iX >= (self.width-MIN_DISTANCE_TO_EDGE+12)))
         {
             // SW
             [self.turnRightAndDown playIt];
         }
         else if ((!check2 && !check3)
-                 ||(theDetector.outValues.borderReached.bottom && theDetector.outValues.borderReached.left))
+//                 ||(theDetector.outValues.borderReached.bottom && theDetector.outValues.borderReached.left))
+            ||(theDetector.outValues.bottom.iY >= (self.height-MIN_DISTANCE_TO_EDGE+1) && theDetector.outValues.left.iX <= MIN_DISTANCE_TO_EDGE))
         {
             // NE
             [self.turnLeftAndUp playIt];
         }
         else if ((!check1 && !check3)
-                 ||(theDetector.outValues.borderReached.bottom && theDetector.outValues.borderReached.right))
+//                 ||(theDetector.outValues.borderReached.bottom && theDetector.outValues.borderReached.right))
+            ||(theDetector.outValues.bottom.iY >= (self.height-MIN_DISTANCE_TO_EDGE+1) && theDetector.outValues.right.iX >= (self.width-MIN_DISTANCE_TO_EDGE+1)))
         {
             // SE
             [self.turnLeftAndDown playIt];
         }
         else if ((check1 && check2 && !check3)
-            || theDetector.outValues.borderReached.bottom)
+//                 || theDetector.outValues.borderReached.bottom)
+            || theDetector.outValues.bottom.iY >= (self.height-MIN_DISTANCE_TO_EDGE+1))
         {
             // W
                 [self.turnLeft playIt];
         }
         else if ((check1 && check2 && !check4)
-                 || theDetector.outValues.borderReached.top) {
+//                 || theDetector.outValues.borderReached.top) {
+            || theDetector.outValues.top.iY <= MIN_DISTANCE_TO_EDGE ) {
             // E
                 [self.turnRight playIt];
         }
         else if ((!check1 && check3 && check4)
-                 || theDetector.outValues.borderReached.right){
+//                 || theDetector.outValues.borderReached.right){
+            || theDetector.outValues.right.iX >= (self.width-MIN_DISTANCE_TO_EDGE+1)){
             // S
                 [self.turnDown playIt];
         }
         else if ((!check2 && check3 && check4)
-                 || theDetector.outValues.borderReached.left){
+ //                || theDetector.outValues.borderReached.left){
+            || theDetector.outValues.left.iX <= MIN_DISTANCE_TO_EDGE){
             // N
                 [self.turnUp playIt];
         }
@@ -275,7 +284,9 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
     BOOL check4 = _anglesToMarkerInDegrees.ver > - MAX_ANGLE_TO_TARGET_IN_DEGREES;
     BOOL check3 = _anglesToMarkerInDegrees.ver < MAX_ANGLE_TO_TARGET_IN_DEGREES;
     
-    if (!check1 || !check2 || !check3 || !check4) {
+    if (!check1 || !check2 || !check3 || !check4
+        || (self.distanceToMarkerInMillimiters == -1)) //this means that we have reached a border
+    {
         [self CMUtterDirections:check1 :check2 :check3 :check4];
     }
     
@@ -319,6 +330,7 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
 //    }
     
     if ((self.distanceToMarkerInMillimiters <= MAX_DIST_FOR_SUCCESS_IN_MILLIMITERS )
+        && (self.distanceToMarkerInMillimiters > 0)
         && check1 && check2 && check3 && check4) {
         // Target reached!
         // Stop everything!
@@ -429,8 +441,10 @@ void MyAudioServicesSystemVibrationCompletionProc (
     // Note: this is only called if a marker is found
     
     // First check if too close
-    if (theDetector.outValues.borderReached.top || theDetector.outValues.borderReached.bottom ||
-        theDetector.outValues.borderReached.left || theDetector.outValues.borderReached.right) {
+//    if (theDetector.outValues.borderReached.top || theDetector.outValues.borderReached.bottom ||
+//        theDetector.outValues.borderReached.left || theDetector.outValues.borderReached.right) {
+        if ((theDetector.outValues.top.iY <= MIN_DISTANCE_TO_EDGE) || (theDetector.outValues.bottom.iY >= (self.height-MIN_DISTANCE_TO_EDGE+1)) ||
+            (theDetector.outValues.left.iX <= MIN_DISTANCE_TO_EDGE) || (theDetector.outValues.right.iX >= (self.width-MIN_DISTANCE_TO_EDGE+1))) {
         // impossible to compute distance - a border has been reached
         self.distanceToMarkerInMillimiters = -1;
     }

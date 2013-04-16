@@ -669,7 +669,7 @@ int CMDetect::FindTarget()
     
     FloodSegment(cx,cy,A_,B_,C_,D_);
 
-    outValues.borderReached = IsBorderReached();
+    // outValues.borderReached = IsBorderReached();
     
     // 4 - Compute keypoints
     
@@ -1349,45 +1349,45 @@ int CMDetect::FloodSegment(int cx, int cy, short *A, short *B,short *C,short *D)
     return 1;
 }
 /////
-CMSides CMDetect::IsBorderReached()
-{
-    // could be made faster
-    // doesn't reall reach the border so I check one pixel away.
-    
-    CMSides out;
-    out.top = out.bottom = out.left = out.right = 0;
-    
-    unsigned char * pix;
-    for (int iy=0; iy<IMAGE_H; iy++) {
-        pix = pixPtr(1, iy, ptr);
-        if (pix[0]==1 && pix[1]==255 && pix[2]==255){
-            out.left = 1;
-            break;
-        }
-    }
-    for (int iy=0; iy<IMAGE_H; iy++) {
-        pix = pixPtr(IMAGE_W-2, iy, ptr);
-        if (pix[0]==1 && pix[1]==255 && pix[2]==255){
-            out.right = 1;
-            break;
-        }
-    }
-    for (int ix=0; ix<IMAGE_W; ix++) {
-        pix = pixPtr(ix, 1, ptr);
-        if (pix[0]==1 && pix[1]==255 && pix[2]==255){
-            out.top = 1;
-            break;
-        }
-    }
-    for (int ix=0; ix<IMAGE_W; ix++) {
-        pix = pixPtr(ix, IMAGE_H-2, ptr);
-        if (pix[0]==1 && pix[1]==255 && pix[2]==255){
-            out.bottom = 1;
-            break;
-        }
-    }
-    return out;
-}
+//CMSides CMDetect::IsBorderReached()
+//{
+//    // could be made faster
+//    // doesn't reall reach the border so I check one pixel away.
+//    
+//    CMSides out;
+//    out.top = out.bottom = out.left = out.right = 0;
+//    
+//    unsigned char * pix;
+//    for (int iy=0; iy<IMAGE_H; iy++) {
+//        pix = pixPtr(1, iy, ptr);
+//        if (pix[0]==1 && pix[1]==255 && pix[2]==255){
+//            out.left = 1;
+//            break;
+//        }
+//    }
+//    for (int iy=0; iy<IMAGE_H; iy++) {
+//        pix = pixPtr(IMAGE_W-2, iy, ptr);
+//        if (pix[0]==1 && pix[1]==255 && pix[2]==255){
+//            out.right = 1;
+//            break;
+//        }
+//    }
+//    for (int ix=0; ix<IMAGE_W; ix++) {
+//        pix = pixPtr(ix, 1, ptr);
+//        if (pix[0]==1 && pix[1]==255 && pix[2]==255){
+//            out.top = 1;
+//            break;
+//        }
+//    }
+//    for (int ix=0; ix<IMAGE_W; ix++) {
+//        pix = pixPtr(ix, IMAGE_H-2, ptr);
+//        if (pix[0]==1 && pix[1]==255 && pix[2]==255){
+//            out.bottom = 1;
+//            break;
+//        }
+//    }
+//    return out;
+//}
 
 /////
 int CMDetect::ComputeKeypoints(int cx, int cy)
