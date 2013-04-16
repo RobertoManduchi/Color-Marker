@@ -126,6 +126,7 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
     if (!self.outFileHandler)
         return;
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<Quintuple id=\"%d\">",++(self.nRecorded)] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self CMWriteTimestampOnOutputFile];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<Center>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<X>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.center.iX] dataUsingEncoding:NSUTF8StringEncoding]];
@@ -166,10 +167,10 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"%d",theDetector.outValues.right.iY] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Y>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Right>"] dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Quintuple>"] dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<Distance>%i</Distance>",(int)self.distanceToMarkerInMillimiters]dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<AngleX>%i</AngleX>",(int)self.anglesToMarkerInDegrees.hor]dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<AngleY>%i</AngleY>",(int)self.anglesToMarkerInDegrees.ver]dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Quintuple>"] dataUsingEncoding:NSUTF8StringEncoding]];
     
 }
 - (void) CMWriteTimestampOnOutputFile{
@@ -655,7 +656,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         theDetector.SetMarkerID(self.markerIDSetter.value);
         if ((theDetector.FindTarget()))
         {
-            [self CMWriteTimestampOnOutputFile];
             
             [self computedistanceToMarker];
             [self computeAnglesToMarker];
