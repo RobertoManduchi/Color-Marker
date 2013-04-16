@@ -18,10 +18,10 @@
 #define MIN_INCLINED_TIME_FOR_VIBRATION 1.
 #define DIST_TO_BEEP_FASTER_IN_MILLIMITERS         500.
 #define MARKER_HEIGHT               0.16
-#define MIN_TIME_BETWEEN_DIRECTIONS 1.5
+#define MIN_TIME_BETWEEN_DIRECTIONS 2.5
 #define MAX_DIST_FOR_SUCCESS_IN_MILLIMITERS        300.
 #define MAX_ANGLE_TO_TARGET_IN_DEGREES 10
-#define MIN_FRAME_RATE_WHEN_SET     1
+#define MIN_FRAME_RATE_WHEN_SET     0.5
 #define MIN_DISTANCE_TO_EDGE        8
 
 //unfortunately I need this…
@@ -54,7 +54,8 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
 
 - (IBAction)CMSetFPS:(id)sender {
     if (self.fpsSetter.selectedSegmentIndex==1) {
-        self.minFramePeriod = (double)CLOCKS_PER_SEC / (double)MIN_FRAME_RATE_WHEN_SET;
+//        self.minFramePeriod = (double)CLOCKS_PER_SEC / (double)MIN_FRAME_RATE_WHEN_SET;
+        self.minFramePeriod = 1. / (double)MIN_FRAME_RATE_WHEN_SET;
         useShortBeepSequence = YES;
     }
     else {
@@ -174,7 +175,8 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
 - (void) CMWriteTimestampOnOutputFile{
     if (!self.outFileHandler)
         return;
-    [self.outFileHandler writeData:[[NSString stringWithFormat: @"<Time>%i</Time>",(int)(1000.*clock()/(double)CLOCKS_PER_SEC)] dataUsingEncoding:NSUTF8StringEncoding]];
+//    [self.outFileHandler writeData:[[NSString stringWithFormat: @"<Time>%i</Time>",(int)(1000.*clock()/(double)CLOCKS_PER_SEC)] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.outFileHandler writeData:[[NSString stringWithFormat: @"<Time>%i</Time>",(int)(1000.*CACurrentMediaTime())] dataUsingEncoding:NSUTF8StringEncoding]];
 }
 
 - (void) CMWriteParametersOnOutputFile{
@@ -214,8 +216,10 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
     if ([self isAnySpeechPlaying])
         return;
     
-    if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
-        self.timeSinceLastDirection = clock();
+//    if ((clock() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS * (double)CLOCKS_PER_SEC){
+    if ((CACurrentMediaTime() - self.timeSinceLastDirection) > MIN_TIME_BETWEEN_DIRECTIONS){
+        //self.timeSinceLastDirection = clock();
+        self.timeSinceLastDirection = CACurrentMediaTime();
         self.theBeep1.theAudio.volume = 0.01;
         self.theBeep2.theAudio.volume = 0.01;
         self.theBeep2Short.theAudio.volume = 0.01;
@@ -354,6 +358,7 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
         return;
     }
 
+ // there seems to be some redundancy here
     
     if (self.distanceToMarkerInMillimiters > DIST_TO_BEEP_FASTER_IN_MILLIMITERS )
     {
@@ -593,10 +598,12 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         fabs(theAcceleration.acceleration.x) / fabs(theAcceleration.acceleration.y) > tan(MAX_INCLINATION_ANGLE *3.14/180.)) {
         if (! self.IS_TOO_INCLINED){
             self.IS_TOO_INCLINED = YES;
-            self.isTooInclinedStartTime = (double)clock();
+//            self.isTooInclinedStartTime = (double)clock();
+            self.isTooInclinedStartTime = CACurrentMediaTime();
         }
         else {
-            if (((double)clock() - self.isTooInclinedStartTime) / (double)CLOCKS_PER_SEC > MIN_INCLINED_TIME_FOR_VIBRATION) {
+//            if (((double)clock() - self.isTooInclinedStartTime) / (double)CLOCKS_PER_SEC > MIN_INCLINED_TIME_FOR_VIBRATION) {
+        if ((CACurrentMediaTime() - self.isTooInclinedStartTime)> MIN_INCLINED_TIME_FOR_VIBRATION) {
                 [self vibratePhone];
             }
             
@@ -629,9 +636,11 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     memcpy(base, baseAddress, bytesPerRow * self.height);
     CVPixelBufferUnlockBaseAddress(imageBuffer,0);
     
-    if (clock() - self.mainStartTime > self.minFramePeriod)
+//    if (clock() - self.mainStartTime > self.minFramePeriod)
+    if (CACurrentMediaTime() - self.mainStartTime > self.minFramePeriod)
     {
-        self.mainStartTime = clock();
+//        self.mainStartTime = clock();
+        self.mainStartTime = CACurrentMediaTime();
         
         theDetector.AccessImage((unsigned char*)base, self.width, self.height ,bytesPerRow);
         
@@ -652,7 +661,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
                 theDevice.whiteBalanceMode  = AVCaptureWhiteBalanceModeLocked;
                 [theDevice unlockForConfiguration];
                 
-                self.startTimeExpLock = clock();
+//                self.startTimeExpLock = clock();
+                self.startTimeExpLock = CACurrentMediaTime();
             }
             
             [self writeDataOut];
@@ -669,7 +679,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
             
             self.countFramesForLock = 0;
             
-            if (((clock() - self.startTimeExpLock) > SECONDS_BEFORE_EXP_UNLOCK * (double)CLOCKS_PER_SEC))
+//            if (((clock() - self.startTimeExpLock) > SECONDS_BEFORE_EXP_UNLOCK * (double)CLOCKS_PER_SEC))
+            if (((CACurrentMediaTime() - self.startTimeExpLock) > SECONDS_BEFORE_EXP_UNLOCK))
                 
             {
                 // unlock exposure
@@ -685,10 +696,13 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         ///// test 11/8/12 - show text
         // compute fps
         //     int  self.framesPerSecond = (int) (1/ ((clock() - self.start_time) / (double)CLOCKS_PER_SEC));
-        if ((clock() - self.start_time) > (double)CLOCKS_PER_SEC) {
-            self.framesPerSecond = self.frameCount;
+
+//        if ((clock() - self.start_time) > (double)CLOCKS_PER_SEC) {
+        if ((CACurrentMediaTime() - self.start_time) > 1.) {
+           self.framesPerSecond = self.frameCount;
             self.frameCount = 0;
-            self.start_time = clock();
+//            self.start_time = clock();
+            self.start_time = CACurrentMediaTime();
             [self.actualFramesPerSecond performSelectorOnMainThread : @ selector(setText : )
                                                           withObject:[NSString stringWithFormat:@"%d", (int)self.framesPerSecond]
                                                        waitUntilDone:NO];
@@ -756,7 +770,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     // UIImage *image = [UIImage imageWithCGImage:quartzImage];
     UIImage *image = [UIImage imageWithCGImage:quartzImage scale:(CGFloat)1 orientation:UIImageOrientationRight];
     
-    if ((self.shouldTakeSnapshot) && ((clock() - time1) / (double)CLOCKS_PER_SEC) > 1.) {
+//    if ((self.shouldTakeSnapshot) && ((clock() - time1) / (double)CLOCKS_PER_SEC) > 1.) {
+    if ((self.shouldTakeSnapshot) && (CACurrentMediaTime() - time1)  > 1.) {
         NSMutableString *imageName = [NSMutableString string];
         
         
@@ -909,6 +924,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 - (IBAction)takeSnapshot:(id)sender {
     
     self.shouldTakeSnapshot = YES;
-    time1 = clock();
+//    time1 = clock();
+    time1 = CACurrentMediaTime();
 }
 @end

@@ -16,7 +16,7 @@
     //    BOOL    _shouldTakeSnapshot;
     //
     //    int     _indPicture;
-    float   time1,time2;
+    double   time1,time2;
     
     double focalLengthInPixels[3];
     
