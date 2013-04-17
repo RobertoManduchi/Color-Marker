@@ -48,8 +48,8 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
     else {
         self.whichLensSelected = 0;
      }
-    unsigned int theSeed = 1 + self.lensSetter.selectedSegmentIndex + 2*self.fpsSetter.selectedSegmentIndex;
-    srand(theSeed);
+//    unsigned int theSeed = 1 + self.lensSetter.selectedSegmentIndex + 2*self.fpsSetter.selectedSegmentIndex;
+//    srand(theSeed);
 }
 
 - (IBAction)CMSetFPS:(id)sender {
@@ -62,8 +62,8 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
         self.minFramePeriod = 0.;
         useShortBeepSequence = NO;
     }
-    unsigned int theSeed = 1 + self.lensSetter.selectedSegmentIndex + 2*self.fpsSetter.selectedSegmentIndex;
-    srand(theSeed);
+//    unsigned int theSeed = 1 + self.lensSetter.selectedSegmentIndex + 2*self.fpsSetter.selectedSegmentIndex;
+//    srand(theSeed);
 }
 
 - (IBAction)CMForward:(id)sender {
@@ -71,7 +71,8 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
     // select new marker
     int newID;
     
-    newID = availableMarkerIDs[rand() % 8];
+//    newID = availableMarkerIDs[rand() % 8];
+    newID = availableMarkerIDs[arc4random() % 8];
     self.markerIDSetter.value = (double) newID;
     NSString *theText = [NSString stringWithFormat:@"%d", (int)self.markerIDSetter.value];
     [self.markerID performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
