@@ -77,6 +77,7 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
     NSString *theText = [NSString stringWithFormat:@"%d", (int)self.markerIDSetter.value];
     [self.markerID performSelectorOnMainThread : @ selector(setText : ) withObject:theText waitUntilDone:YES];
     self.detectorIsRunning = TRUE;
+    self.nRecorded = 0;
     [self CMLockScreen];
     
     [self CMStartNewFile];
@@ -171,6 +172,9 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<Distance>%i</Distance>",(int)self.distanceToMarkerInMillimiters]dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<AngleX>%i</AngleX>",(int)self.anglesToMarkerInDegrees.hor]dataUsingEncoding:NSUTF8StringEncoding]];
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"<AngleY>%i</AngleY>",(int)self.anglesToMarkerInDegrees.ver]dataUsingEncoding:NSUTF8StringEncoding]];
+    if (self.targetWasReached){
+        [self.outFileHandler writeData:[[NSString stringWithFormat: @"<SpokenOutput>%@</SpokenOutput>",@"TargetReached"]dataUsingEncoding:NSUTF8StringEncoding]];
+    }
     [self.outFileHandler writeData:[[NSString stringWithFormat: @"</Quintuple>"] dataUsingEncoding:NSUTF8StringEncoding]];
     
 }
@@ -343,10 +347,13 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
 //        return;
 //    }
     
+    self.targetWasReached = NO;
+    
     if ((self.distanceToMarkerInMillimiters <= MAX_DIST_FOR_SUCCESS_IN_MILLIMITERS )
         && (self.distanceToMarkerInMillimiters > 0)
         && check1 && check2 && check3 && check4) {
         // Target reached!
+        self.targetWasReached = YES;
         // Stop everything!
         // This should be structured differently
         [self.theBeep1 stopIt];
@@ -362,9 +369,9 @@ int availableMarkerIDs[8] = {2,3,7,10,11,13,14,18};
         [self.turnLeft stopIt];
         [self.targetReached playIt];
         
-        if (self.outFileHandler){
-            [self.outFileHandler writeData:[[NSString stringWithFormat: @"<SpokenOutput>%@</SpokenOutput>",@"TargetReached"]dataUsingEncoding:NSUTF8StringEncoding]];
-        }
+//        if (self.outFileHandler){
+//            [self.outFileHandler writeData:[[NSString stringWithFormat: @"<SpokenOutput>%@</SpokenOutput>",@"TargetReached"]dataUsingEncoding:NSUTF8StringEncoding]];
+//        }
         return;
     }
 
@@ -673,10 +680,9 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 //                self.startTimeExpLock = clock();
                 self.startTimeExpLock = CACurrentMediaTime();
             }
-            
-            [self writeDataOut];
-            
+                        
             [self CMSoundOnDetection];
+            [self writeDataOut];
             
          }
         else   // not found

@@ -141,6 +141,8 @@ struct Angles {
 
 @property struct Angles anglesToMarkerInDegrees;
 
+@property   BOOL targetWasReached;
+
 //@property (retain, nonatomic) IBOutlet UIStepper *maxFramesPerSecond;
 
 /*!
